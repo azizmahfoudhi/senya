@@ -45,7 +45,36 @@ export type Expense = {
   lotId?: UUID;
   note?: string;
 };
+export type Harvest = {
+  id: UUID;
+  lotId?: UUID; // Si null, c'est une récolte globale
+  dateISO: string;
+  quantiteKg: number;
+  rendementHuilePct?: number; // ex: 18.5
+  revenuGenere?: number;
+};
 
+export type TaskStatus = "a_faire" | "en_cours" | "termine";
+export type TaskType = "taille" | "labour" | "traitement" | "irrigation" | "recolte" | "autre";
+
+export type FarmTask = {
+  id: UUID;
+  titre: string;
+  datePrevueISO: string;
+  dateRealiseeISO?: string;
+  statut: TaskStatus;
+  typeTache: TaskType;
+  lotId?: UUID;
+};
+
+export type Treatment = {
+  id: UUID;
+  lotId: UUID;
+  dateISO: string;
+  maladie: string;
+  produit: string;
+  notes?: string;
+};
 
 
 export type FarmSettings = {
@@ -68,6 +97,9 @@ export type FarmState = {
   types: TreeType[];
   lots: Batch[];
   depenses: Expense[];
+  harvests: Harvest[];
+  tasks: FarmTask[];
+  treatments: Treatment[];
 
   scenarios: Scenario[];
 };

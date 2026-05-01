@@ -2,9 +2,12 @@ import type {
   Batch,
   Expense,
   FarmSettings,
+  FarmTask,
+  Harvest,
   IrrigationStatus,
   Scenario,
   TreeType,
+  Treatment,
   UUID,
 } from "@/lib/domain";
 import { supabaseBrowser } from "@/lib/supabaseClient";
@@ -42,6 +45,34 @@ type DbExpenseRow = {
 
 
 
+type DbHarvestRow = {
+  id: UUID;
+  lot_id: UUID | null;
+  date: string;
+  quantite_kg: number;
+  rendement_huile_pct: number | null;
+  revenu_genere: number | null;
+};
+
+type DbTaskRow = {
+  id: UUID;
+  titre: string;
+  date_prevue: string;
+  date_realisee: string | null;
+  statut: string;
+  type_tache: string;
+  lot_id: UUID | null;
+};
+
+type DbTreatmentRow = {
+  id: UUID;
+  lot_id: UUID;
+  date: string;
+  maladie: string;
+  produit: string;
+  notes: string | null;
+};
+
 type DbScenarioRow = {
   id: UUID;
   nom: string;
@@ -78,6 +109,41 @@ function mapExpense(r: DbExpenseRow): Expense {
 
 function mapScenario(r: DbScenarioRow): Scenario {
   return { id: r.id, nom: r.nom, ...(r.payload as any) };
+}
+
+
+function mapHarvest(r: any): Harvest {
+  return {
+    id: r.id,
+    lotId: r.lot_id ?? undefined,
+    dateISO: r.date,
+    quantiteKg: Number(r.quantite_kg),
+    rendementHuilePct: r.rendement_huile_pct != null ? Number(r.rendement_huile_pct) : undefined,
+    revenuGenere: r.revenu_genere != null ? Number(r.revenu_genere) : undefined,
+  };
+}
+
+function mapTask(r: any): FarmTask {
+  return {
+    id: r.id,
+    titre: r.titre,
+    datePrevueISO: r.date_prevue,
+    dateRealiseeISO: r.date_realisee ?? undefined,
+    statut: r.statut as any,
+    typeTache: r.type_tache as any,
+    lotId: r.lot_id ?? undefined,
+  };
+}
+
+function mapTreatment(r: any): Treatment {
+  return {
+    id: r.id,
+    lotId: r.lot_id,
+    dateISO: r.date,
+    maladie: r.maladie,
+    produit: r.produit,
+    notes: r.notes ?? undefined,
+  };
 }
 
 export async function getOrCreateSettings(): Promise<{ rowId: UUID; settings: FarmSettings }> {
@@ -232,6 +298,125 @@ export async function updateExpense(id: UUID, input: Partial<Omit<Expense, "id">
   if (input.lotId !== undefined) payload.lot_id = input.lotId;
   if (input.note !== undefined) payload.note = input.note;
   const { error } = await sb.from("expenses").update(payload).eq("id", id);
+  if (error) throw error;
+}
+
+// HARVESTS
+export async function listHarvests(): Promise<Harvest[]> {
+  const sb = supabaseBrowser();
+  const { data, error } = await sb.from("harvests").select("*").order("date", { ascending: false });
+  if (error) throw error;
+  return (data as any[]).map(mapHarvest);
+}
+
+export async function createHarvest(input: Omit<Harvest, "id">) {
+  const sb = supabaseBrowser();
+  const { data, error } = await sb.from("harvests").insert({
+    lot_id: input.lotId ?? null,
+    date: input.dateISO,
+    quantite_kg: input.quantiteKg,
+    rendement_huile_pct: input.rendementHuilePct ?? null,
+    revenu_genere: input.revenuGenere ?? null,
+  }).select("*").single();
+  if (error) throw error;
+  return mapHarvest(data as any);
+}
+
+export async function updateHarvest(id: UUID, input: Partial<Omit<Harvest, "id">>) {
+  const sb = supabaseBrowser();
+  const payload: any = {};
+  if (input.lotId !== undefined) payload.lot_id = input.lotId;
+  if (input.dateISO !== undefined) payload.date = input.dateISO;
+  if (input.quantiteKg !== undefined) payload.quantite_kg = input.quantiteKg;
+  if (input.rendementHuilePct !== undefined) payload.rendement_huile_pct = input.rendementHuilePct;
+  if (input.revenuGenere !== undefined) payload.revenu_genere = input.revenuGenere;
+  const { error } = await sb.from("harvests").update(payload).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteHarvest(id: UUID) {
+  const sb = supabaseBrowser();
+  const { error } = await sb.from("harvests").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// TASKS
+export async function listTasks(): Promise<FarmTask[]> {
+  const sb = supabaseBrowser();
+  const { data, error } = await sb.from("tasks").select("*").order("date_prevue", { ascending: true });
+  if (error) throw error;
+  return (data as any[]).map(mapTask);
+}
+
+export async function createTask(input: Omit<FarmTask, "id">) {
+  const sb = supabaseBrowser();
+  const { data, error } = await sb.from("tasks").insert({
+    titre: input.titre,
+    date_prevue: input.datePrevueISO,
+    date_realisee: input.dateRealiseeISO ?? null,
+    statut: input.statut,
+    type_tache: input.typeTache,
+    lot_id: input.lotId ?? null,
+  }).select("*").single();
+  if (error) throw error;
+  return mapTask(data as any);
+}
+
+export async function updateTask(id: UUID, input: Partial<Omit<FarmTask, "id">>) {
+  const sb = supabaseBrowser();
+  const payload: any = {};
+  if (input.titre !== undefined) payload.titre = input.titre;
+  if (input.datePrevueISO !== undefined) payload.date_prevue = input.datePrevueISO;
+  if (input.dateRealiseeISO !== undefined) payload.date_realisee = input.dateRealiseeISO;
+  if (input.statut !== undefined) payload.statut = input.statut;
+  if (input.typeTache !== undefined) payload.type_tache = input.typeTache;
+  if (input.lotId !== undefined) payload.lot_id = input.lotId;
+  const { error } = await sb.from("tasks").update(payload).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteTask(id: UUID) {
+  const sb = supabaseBrowser();
+  const { error } = await sb.from("tasks").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// TREATMENTS
+export async function listTreatments(): Promise<Treatment[]> {
+  const sb = supabaseBrowser();
+  const { data, error } = await sb.from("treatments").select("*").order("date", { ascending: false });
+  if (error) throw error;
+  return (data as any[]).map(mapTreatment);
+}
+
+export async function createTreatment(input: Omit<Treatment, "id">) {
+  const sb = supabaseBrowser();
+  const { data, error } = await sb.from("treatments").insert({
+    lot_id: input.lotId,
+    date: input.dateISO,
+    maladie: input.maladie,
+    produit: input.produit,
+    notes: input.notes ?? null,
+  }).select("*").single();
+  if (error) throw error;
+  return mapTreatment(data as any);
+}
+
+export async function updateTreatment(id: UUID, input: Partial<Omit<Treatment, "id">>) {
+  const sb = supabaseBrowser();
+  const payload: any = {};
+  if (input.lotId !== undefined) payload.lot_id = input.lotId;
+  if (input.dateISO !== undefined) payload.date = input.dateISO;
+  if (input.maladie !== undefined) payload.maladie = input.maladie;
+  if (input.produit !== undefined) payload.produit = input.produit;
+  if (input.notes !== undefined) payload.notes = input.notes;
+  const { error } = await sb.from("treatments").update(payload).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteTreatment(id: UUID) {
+  const sb = supabaseBrowser();
+  const { error } = await sb.from("treatments").delete().eq("id", id);
   if (error) throw error;
 }
 

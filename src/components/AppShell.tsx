@@ -11,6 +11,8 @@ import {
   Wallet,
   Layers,
   LineChart,
+  Calendar,
+  Wheat,
 } from "lucide-react";
 
 const nav = [
@@ -18,7 +20,8 @@ const nav = [
   { href: "/structure", label: "Structure", icon: Sprout },
   { href: "/lots", label: "Lots", icon: Layers },
   { href: "/depenses", label: "Dépenses", icon: Wallet },
-  { href: "/projections", label: "Projections", icon: LineChart },
+  { href: "/recoltes", label: "Récoltes", icon: Wheat },
+  { href: "/calendrier", label: "Calendrier", icon: Calendar },
 ];
 
 import Image from "next/image";
@@ -67,7 +70,7 @@ export function AppShell({
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 border-t border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 pb-safe">
-        <div className="mx-auto w-full max-w-4xl px-2 py-2 grid grid-cols-5 gap-1">
+        <div className="mx-auto w-full max-w-4xl px-2 py-2 flex items-center justify-between overflow-x-auto no-scrollbar gap-1">
           {nav.map((i) => (
             <NavItem key={i.href} {...i} />
           ))}
@@ -92,14 +95,14 @@ function NavItem({
     <Link
       href={href}
       className={cn(
-        "group flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-all duration-300",
+        "group flex min-w-[64px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-all duration-300",
         active
           ? "bg-primary/10 text-primary shadow-sm"
           : "text-muted hover:bg-muted/10 hover:text-foreground",
       )}
     >
-      <Icon className={cn("h-5 w-5 transition-transform duration-300", active ? "scale-110" : "group-hover:scale-110")} />
-      <span className="leading-none">{label}</span>
+      <Icon className={cn("h-5 w-5 shrink-0 transition-transform duration-300", active ? "scale-110" : "group-hover:scale-110")} />
+      <span className="leading-none whitespace-nowrap">{label}</span>
     </Link>
   );
 }

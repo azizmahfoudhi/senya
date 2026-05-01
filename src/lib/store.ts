@@ -43,6 +43,9 @@ const initial: FarmState = {
   types: [],
   lots: [],
   depenses: [],
+  harvests: [],
+  tasks: [],
+  treatments: [],
   scenarios: [],
 };
 
