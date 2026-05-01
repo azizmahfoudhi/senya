@@ -23,8 +23,8 @@ export default function HomePage() {
   const [weather, setWeather] = React.useState<WeatherData | null>(null);
 
   React.useEffect(() => {
-    // Fetch real-time weather for Tunisia (approx. Tunis coordinates)
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=36.8065&longitude=10.1815&current=temperature_2m,precipitation&timezone=Africa%2FTunis")
+    // Fetch real-time weather for Nasrallah, Tunisia (Approx 35.35 N, 9.81 E)
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.35&longitude=9.81&current=temperature_2m,precipitation&timezone=Africa%2FTunis")
       .then(res => res.json())
       .then(data => {
         if (data && data.current) {
