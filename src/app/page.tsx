@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { buildInsights, farmTotals, recurringSeriesLast12Months, WeatherData } from "@/lib/derive";
+import { buildInsights, farmTotals, expensesSeriesLast12Months, WeatherData } from "@/lib/derive";
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useFarmData } from "@/lib/useFarmData";
@@ -43,13 +43,12 @@ export default function HomePage() {
     types: farm.types,
     lots: farm.lots,
     depenses: farm.depenses,
-    recurrents: farm.recurrents,
     scenarios: farm.scenarios,
   };
 
   const totals = farmTotals(state);
   const insights = buildInsights(state, weather);
-  const recurringSeries = recurringSeriesLast12Months(state).map((p) => ({
+  const expensesSeries = expensesSeriesLast12Months(state).map((p) => ({
     ...p,
     month: p.monthISO.slice(5, 7),
   }));
@@ -159,9 +158,9 @@ export default function HomePage() {
               delay="delay-[200ms]"
             />
             <MetricCard
-              title="Coûts fixes / mois"
-              value={formatMoneyDT(totals.monthlyRecurring)}
-              sub="Charges récurrentes"
+              title="Dépenses / 12 mois"
+              value={formatMoneyDT(totals.estimatedYearlyCosts)}
+              sub="Dépenses totales"
               delay="delay-[300ms]"
             />
             <MetricCard
@@ -180,7 +179,7 @@ export default function HomePage() {
                     Rentabilité (estimation)
                   </CardTitle>
                   <CardDescription>
-                    Recettes − (récurrents × 12 + dépenses 12 derniers mois)
+                    Recettes − dépenses 12 derniers mois
                   </CardDescription>
                 </div>
               </CardHeader>
@@ -218,14 +217,14 @@ export default function HomePage() {
             <Card className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-[600ms] fill-mode-both border-border/50 bg-card/50 backdrop-blur-xl shadow-sm hover:shadow-md transition-shadow">
               <CardHeader>
                 <div>
-                  <CardTitle>Charges récurrentes</CardTitle>
-                  <CardDescription>Projection simple sur 12 mois</CardDescription>
+                  <CardTitle>Dépenses</CardTitle>
+                  <CardDescription>Dépenses des 12 derniers mois</CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="h-44 -ml-4">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={recurringSeries} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <AreaChart data={expensesSeries} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id="colorMontant" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />

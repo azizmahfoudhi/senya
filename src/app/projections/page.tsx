@@ -18,7 +18,6 @@ export default function ProjectionsPage() {
     types: farm.types,
     lots: farm.lots,
     depenses: farm.depenses,
-    recurrents: farm.recurrents,
     scenarios: farm.scenarios,
   };
 
@@ -26,13 +25,12 @@ export default function ProjectionsPage() {
   const tISO = todayISO();
   const typeById = new Map(farm.types.map((t) => [t.id, t]));
 
-  // Projection simple: production croît via âge (lots existants), coûts = récurrents * 12 + moyenne dépenses 12m
+  // Projection simple: production croît via âge (lots existants), coûts = moyenne dépenses 12m
   const last12Total = farm.depenses
     .filter((e) => e.dateISO >= new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().slice(0, 10))
     .reduce((acc, e) => acc + e.montant, 0);
 
-  const annualFixed = totalsNow.monthlyRecurring * 12;
-  const annualVariable = last12Total; // approx
+  const annualCosts = last12Total; // approx
 
   const series = Array.from({ length: years + 1 }).map((_, i) => {
     const year = new Date().getFullYear() + i;
@@ -43,7 +41,7 @@ export default function ProjectionsPage() {
       return acc + batchEstimatedProductionKg({ batch: lot, type, atISO });
     }, 0);
     const revenue = prodKg * (farm.settings.prixKgOlives || 0);
-    const costs = annualFixed + annualVariable;
+    const costs = annualCosts;
     const profit = revenue - costs;
     return { year: String(year), prodKg, revenue, costs, profit };
   });
@@ -57,7 +55,7 @@ export default function ProjectionsPage() {
           <CardHeader>
             <div>
               <CardTitle>Vue 5–10 ans</CardTitle>
-              <CardDescription>Projection simple basée sur âge des lots + coûts récurrents</CardDescription>
+              <CardDescription>Projection simple basée sur âge des lots + dépenses moyennes</CardDescription>
             </div>
           </CardHeader>
           <CardContent className="grid gap-3">
@@ -118,7 +116,7 @@ export default function ProjectionsPage() {
           </CardHeader>
           <CardContent className="text-sm text-muted grid gap-2">
             <div>- La production augmente avec l’âge (courbe), ajustée par type et irrigation.</div>
-            <div>- Les coûts annuels = récurrents × 12 + approximation des dépenses des 12 derniers mois.</div>
+            <div>- Les coûts annuels = approximation des dépenses des 12 derniers mois.</div>
             <div>- Pour simuler des décisions (nouveaux arbres / irrigation), on ajoute ensuite l’écran Scénarios.</div>
           </CardContent>
         </Card>

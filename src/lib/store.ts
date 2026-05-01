@@ -11,7 +11,6 @@ import type {
   FarmSettings,
   FarmState,
   IrrigationStatus,
-  RecurringExpense,
   Scenario,
   TreeType,
   UUID,
@@ -33,9 +32,6 @@ export type FarmActions = {
   addExpense(input: Omit<Expense, "id">): void;
   removeExpense(id: UUID): void;
 
-  addRecurring(input: Omit<RecurringExpense, "id">): void;
-  removeRecurring(id: UUID): void;
-
   addScenario(input: Omit<Scenario, "id">): void;
   removeScenario(id: UUID): void;
 };
@@ -47,7 +43,6 @@ const initial: FarmState = {
   types: [],
   lots: [],
   depenses: [],
-  recurrents: [],
   scenarios: [],
 };
 
@@ -94,9 +89,6 @@ export const useFarmStore = create<Store>()(
           depenses: s.depenses.map((e) =>
             e.lotId === id ? { ...e, lotId: undefined } : e,
           ),
-          recurrents: s.recurrents.map((r) =>
-            r.lotId === id ? { ...r, lotId: undefined } : r,
-          ),
         }));
       },
 
@@ -106,14 +98,6 @@ export const useFarmStore = create<Store>()(
       },
       removeExpense(id) {
         set((s) => ({ depenses: s.depenses.filter((e) => e.id !== id) }));
-      },
-
-      addRecurring(input) {
-        const r: RecurringExpense = { id: uuid(), ...input };
-        set((s) => ({ recurrents: [r, ...s.recurrents] }));
-      },
-      removeRecurring(id) {
-        set((s) => ({ recurrents: s.recurrents.filter((r) => r.id !== id) }));
       },
 
       addScenario(input) {
@@ -132,7 +116,6 @@ export const useFarmStore = create<Store>()(
         types: s.types,
         lots: s.lots,
         depenses: s.depenses,
-        recurrents: s.recurrents,
         scenarios: s.scenarios,
       }),
       migrate: (persistedState: any) => persistedState as any,

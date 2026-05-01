@@ -1,27 +1,23 @@
 "use client";
 
 import * as React from "react";
-import type { Batch, Expense, FarmSettings, RecurringExpense, Scenario, TreeType, UUID } from "@/lib/domain";
+import type { Batch, Expense, FarmSettings, Scenario, TreeType, UUID } from "@/lib/domain";
 import {
   createBatch,
   createExpense,
-  createRecurring,
   createTreeType,
   deleteBatch,
   deleteExpense,
-  deleteRecurring,
   deleteTreeType,
   getOrCreateSettings,
   listBatches,
   listExpenses,
-  listRecurring,
   listScenarios,
   listTreeTypes,
   updateSettings,
   updateTreeType as dbUpdateTreeType,
   updateBatch as dbUpdateBatch,
   updateExpense as dbUpdateExpense,
-  updateRecurring as dbUpdateRecurring,
 } from "@/lib/db";
 
 export function useFarmData() {
@@ -33,7 +29,6 @@ export function useFarmData() {
   const [types, setTypes] = React.useState<TreeType[]>([]);
   const [lots, setLots] = React.useState<Batch[]>([]);
   const [depenses, setDepenses] = React.useState<Expense[]>([]);
-  const [recurrents, setRecurrents] = React.useState<RecurringExpense[]>([]);
   const [scenarios, setScenarios] = React.useState<Scenario[]>([]);
 
   const refresh = React.useCallback(async () => {
@@ -44,17 +39,15 @@ export function useFarmData() {
       setSettingsRowId(s.rowId);
       setSettings(s.settings);
 
-      const [t, l, d, r, sc] = await Promise.all([
+      const [t, l, d, sc] = await Promise.all([
         listTreeTypes(),
         listBatches(),
         listExpenses(),
-        listRecurring(),
         listScenarios(),
       ]);
       setTypes(t);
       setLots(l);
       setDepenses(d);
-      setRecurrents(r);
       setScenarios(sc);
     } catch (e: any) {
       setError(e?.message ?? "Erreur Supabase");
@@ -114,18 +107,7 @@ export function useFarmData() {
         setDepenses((d) => d.filter((x) => x.id !== id));
       },
 
-      async addRecurring(input: Omit<RecurringExpense, "id">) {
-        const created = await createRecurring(input);
-        setRecurrents((r) => [created, ...r]);
-      },
-      async updateRecurring(id: UUID, input: Partial<Omit<RecurringExpense, "id">>) {
-        await dbUpdateRecurring(id, input);
-        setRecurrents((r) => r.map((x) => (x.id === id ? { ...x, ...input } : x)));
-      },
-      async removeRecurring(id: UUID) {
-        await deleteRecurring(id);
-        setRecurrents((r) => r.filter((x) => x.id !== id));
-      },
+
     }),
     [settingsRowId],
   );
@@ -138,7 +120,6 @@ export function useFarmData() {
     types,
     lots,
     depenses,
-    recurrents,
     scenarios,
     actions,
   };

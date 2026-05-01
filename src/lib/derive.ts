@@ -4,8 +4,6 @@ import {
   ageYearsFromISO,
   batchEstimatedProductionKg,
   buildScenarioState,
-  expandRecurringToMonthlyCosts,
-  recurringMonthlyTotal,
   sumExpensesTotal,
 } from "@/lib/engine";
 
@@ -19,7 +17,6 @@ export function farmTotals(state: FarmState, scenarioId?: UUID) {
 
   const totalTrees = s.lots.reduce((acc, l) => acc + l.nbArbres, 0);
   const totalInvestment = sumExpensesTotal(s);
-  const monthlyRecurring = recurringMonthlyTotal(s);
 
   const typeById = new Map(s.types.map((t) => [t.id, t]));
   const estimatedYearlyProductionKg = s.lots.reduce((acc, lot) => {
@@ -30,12 +27,12 @@ export function farmTotals(state: FarmState, scenarioId?: UUID) {
 
   const estimatedRevenue = estimatedYearlyProductionKg * (s.settings.prixKgOlives || 0);
 
-  // Coût annuel approx: récurrent * 12 + dépenses “derniers 12 mois”
+  // Coût annuel approx: dépenses “derniers 12 mois”
   const from12 = formatISO(subMonths(new Date(), 12), { representation: "date" });
   const last12 = s.depenses
     .filter((e) => e.dateISO >= from12 && e.dateISO <= tISO)
     .reduce((acc, e) => acc + e.montant, 0);
-  const estimatedYearlyCosts = monthlyRecurring * 12 + last12;
+  const estimatedYearlyCosts = last12;
 
   const profit = estimatedRevenue - estimatedYearlyCosts;
   const costPerKg =
@@ -48,7 +45,6 @@ export function farmTotals(state: FarmState, scenarioId?: UUID) {
   return {
     totalTrees,
     totalInvestment,
-    monthlyRecurring,
     estimatedYearlyProductionKg,
     estimatedRevenue,
     estimatedYearlyCosts,
@@ -59,15 +55,23 @@ export function farmTotals(state: FarmState, scenarioId?: UUID) {
   };
 }
 
-export function recurringSeriesLast12Months(state: FarmState) {
-  const start = startOfMonth(subMonths(new Date(), 11));
-  const fromISO = formatISO(start, { representation: "date" });
-  const toISO = formatISO(startOfMonth(new Date()), { representation: "date" });
-  return expandRecurringToMonthlyCosts({
-    recurrents: state.recurrents,
-    fromISO,
-    toISO,
-  });
+export function expensesSeriesLast12Months(state: FarmState) {
+  const series = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = subMonths(now, i);
+    const monthPrefix = formatISO(d, { representation: "date" }).slice(0, 7); // yyyy-MM
+    
+    const montant = state.depenses
+      .filter((e) => e.dateISO.startsWith(monthPrefix))
+      .reduce((acc, e) => acc + e.montant, 0);
+
+    series.push({
+      monthISO: `${monthPrefix}-01`,
+      montant,
+    });
+  }
+  return series;
 }
 
 export type WeatherData = {
@@ -127,21 +131,7 @@ export function buildInsights(state: FarmState, weather: WeatherData | null = nu
     }
   }
 
-  // 3. Expense Optimization
-  if (t.estimatedYearlyCosts > 0) {
-    const irrigationRecurring = state.recurrents
-      .filter((r) => r.categorie === "irrigation")
-      .reduce((acc, r) => acc + r.montantMensuel * 12, 0);
-      
-    if (irrigationRecurring / t.estimatedYearlyCosts > 0.4) {
-      insights.push({
-        level: "warning",
-        titre: "Optimisation des coûts d'eau",
-        detail: "L'irrigation représente plus de 40% de vos charges annuelles estimées. Avez-vous vérifié l'état de votre système goutte-à-goutte pour éviter les fuites ?",
-        icon: "💧"
-      });
-    }
-  }
+
 
   // 4. Age-Based Yield Milestones
   if (state.lots.length > 0) {

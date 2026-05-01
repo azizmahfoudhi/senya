@@ -51,22 +51,6 @@ export function demoSeed(): FarmState {
         note: "Taille + traitement",
       },
     ],
-    recurrents: [
-      {
-        id: uuid(),
-        nom: "Eau + énergie (irrigation)",
-        montantMensuel: 950,
-        categorie: "irrigation",
-        debutISO: "2024-01-01",
-      },
-      {
-        id: uuid(),
-        nom: "Main d’œuvre (mensuel)",
-        montantMensuel: 1800,
-        categorie: "main_oeuvre",
-        debutISO: "2024-01-01",
-      },
-    ],
     scenarios: [
       {
         id: uuid(),

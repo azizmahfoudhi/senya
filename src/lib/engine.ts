@@ -3,7 +3,6 @@ import type {
   Batch,
   FarmState,
   IrrigationStatus,
-  RecurringExpense,
   TreeType,
   UUID,
 } from "@/lib/domain";
@@ -87,43 +86,7 @@ export function sumExpensesForBatch(state: FarmState, lotId: UUID) {
     .reduce((acc, e) => acc + e.montant, 0);
 }
 
-export function recurringMonthlyTotal(state: FarmState) {
-  return state.recurrents.reduce((acc, r) => acc + r.montantMensuel, 0);
-}
 
-export function recurringMonthlyForBatch(state: FarmState, lotId: UUID) {
-  return state.recurrents
-    .filter((r) => r.lotId === lotId)
-    .reduce((acc, r) => acc + r.montantMensuel, 0);
-}
-
-export function expandRecurringToMonthlyCosts(args: {
-  recurrents: RecurringExpense[];
-  fromISO: string;
-  toISO: string;
-}) {
-  // Retourne des points mensuels (ISO du 1er jour) -> montant
-  const from = parseISO(args.fromISO);
-  const to = parseISO(args.toISO);
-  const months = Math.max(0, differenceInMonths(to, from));
-  const points: Array<{ monthISO: string; montant: number }> = [];
-
-  for (let i = 0; i <= months; i++) {
-    const d = addMonths(from, i);
-    const monthISO = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-      2,
-      "0",
-    )}-01`;
-    let montant = 0;
-    for (const r of args.recurrents) {
-      const startOk = parseISO(r.debutISO) <= d;
-      const endOk = !r.finISO || parseISO(r.finISO) >= d;
-      if (startOk && endOk) montant += r.montantMensuel;
-    }
-    points.push({ monthISO, montant });
-  }
-  return points;
-}
 
 export function buildScenarioState(base: FarmState, scenarioId?: UUID) {
   const scenario = base.scenarios.find((s) => s.id === scenarioId);
@@ -139,19 +102,6 @@ export function buildScenarioState(base: FarmState, scenarioId?: UUID) {
     return l;
   });
 
-  const recurrents = scenario.coutMensuelIrrigationAdditionnel
-    ? [
-        ...base.recurrents,
-        {
-          id: `scenario-irrig-${scenario.id}`,
-          nom: `Irrigation (scénario)`,
-          montantMensuel: scenario.coutMensuelIrrigationAdditionnel,
-          categorie: "irrigation" as const,
-          debutISO: new Date().toISOString().slice(0, 10),
-        },
-      ]
-    : base.recurrents;
-
-  return { ...base, lots, recurrents };
+  return { ...base, lots };
 }
 

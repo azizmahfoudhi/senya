@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useParams } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { ageYearsFromISO, batchEstimatedProductionKg, recurringMonthlyForBatch, sumExpensesForBatch } from "@/lib/engine";
+import { ageYearsFromISO, batchEstimatedProductionKg, sumExpensesForBatch } from "@/lib/engine";
 import { todayISO } from "@/lib/derive";
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { useFarmData } from "@/lib/useFarmData";
@@ -40,11 +40,9 @@ export default function LotDetailPage() {
     types: farm.types,
     lots: farm.lots,
     depenses: farm.depenses,
-    recurrents: farm.recurrents,
     scenarios: farm.scenarios,
   };
   const cost = sumExpensesForBatch(farmState, lot.id);
-  const monthly = recurringMonthlyForBatch(farmState, lot.id);
   const prod = type ? batchEstimatedProductionKg({ batch: lot, type, atISO: tISO }) : 0;
   const perTreeCost = lot.nbArbres > 0 ? cost / lot.nbArbres : 0;
   const yieldPerTree = lot.nbArbres > 0 ? prod / lot.nbArbres : 0;
@@ -67,19 +65,6 @@ export default function LotDetailPage() {
             <Kpi label="Coût / arbre" value={formatMoneyDT(perTreeCost)} />
             <Kpi label="Rendement estimé / arbre" value={`${formatNumber(yieldPerTree, 1)} kg`} />
             <Kpi label="Production estimée" value={formatKg(prod)} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div>
-              <CardTitle>Charges récurrentes affectées</CardTitle>
-              <CardDescription>Récurrents liés à ce lot</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-base font-semibold">{formatMoneyDT(monthly)} / mois</div>
-            <div className="text-xs text-muted">Astuce: utilisez les récurrents pour l’irrigation ou la main d’œuvre.</div>
           </CardContent>
         </Card>
       </div>

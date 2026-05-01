@@ -45,15 +45,7 @@ export type Expense = {
   note?: string;
 };
 
-export type RecurringExpense = {
-  id: UUID;
-  nom: string;
-  montantMensuel: number;
-  categorie: ExpenseCategory;
-  debutISO: string; // yyyy-MM-dd
-  finISO?: string; // yyyy-MM-dd
-  lotId?: UUID;
-};
+
 
 export type FarmSettings = {
   surfaceHa: number;
@@ -75,7 +67,7 @@ export type FarmState = {
   types: TreeType[];
   lots: Batch[];
   depenses: Expense[];
-  recurrents: RecurringExpense[];
+
   scenarios: Scenario[];
 };
 

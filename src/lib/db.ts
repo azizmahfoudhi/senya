@@ -3,7 +3,6 @@ import type {
   Expense,
   FarmSettings,
   IrrigationStatus,
-  RecurringExpense,
   Scenario,
   TreeType,
   UUID,
@@ -40,15 +39,7 @@ type DbExpenseRow = {
   note: string | null;
 };
 
-type DbRecurringRow = {
-  id: UUID;
-  nom: string;
-  montant_mensuel: number;
-  categorie: string;
-  debut: string;
-  fin: string | null;
-  lot_id: UUID | null;
-};
+
 
 type DbScenarioRow = {
   id: UUID;
@@ -82,17 +73,7 @@ function mapExpense(r: DbExpenseRow): Expense {
     note: r.note ?? undefined,
   };
 }
-function mapRecurring(r: DbRecurringRow): RecurringExpense {
-  return {
-    id: r.id,
-    nom: r.nom,
-    montantMensuel: Number(r.montant_mensuel),
-    categorie: r.categorie as any,
-    debutISO: r.debut,
-    finISO: r.fin ?? undefined,
-    lotId: r.lot_id ?? undefined,
-  };
-}
+
 function mapScenario(r: DbScenarioRow): Scenario {
   return { id: r.id, nom: r.nom, ...(r.payload as any) };
 }
@@ -208,39 +189,7 @@ export async function deleteExpense(id: UUID) {
   if (error) throw error;
 }
 
-export async function listRecurring(): Promise<RecurringExpense[]> {
-  const sb = supabaseBrowser();
-  const { data, error } = await sb
-    .from("recurring_expenses")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data as any[]).map(mapRecurring);
-}
 
-export async function createRecurring(input: Omit<RecurringExpense, "id">) {
-  const sb = supabaseBrowser();
-  const { data, error } = await sb
-    .from("recurring_expenses")
-    .insert({
-      nom: input.nom,
-      montant_mensuel: input.montantMensuel,
-      categorie: input.categorie,
-      debut: input.debutISO,
-      fin: input.finISO ?? null,
-      lot_id: input.lotId ?? null,
-    })
-    .select("*")
-    .single();
-  if (error) throw error;
-  return mapRecurring(data as any);
-}
-
-export async function deleteRecurring(id: UUID) {
-  const sb = supabaseBrowser();
-  const { error } = await sb.from("recurring_expenses").delete().eq("id", id);
-  if (error) throw error;
-}
 
 export async function listScenarios(): Promise<Scenario[]> {
   const sb = supabaseBrowser();
@@ -282,16 +231,5 @@ export async function updateExpense(id: UUID, input: Partial<Omit<Expense, "id">
   if (error) throw error;
 }
 
-export async function updateRecurring(id: UUID, input: Partial<Omit<RecurringExpense, "id">>) {
-  const sb = supabaseBrowser();
-  const payload: any = {};
-  if (input.nom !== undefined) payload.nom = input.nom;
-  if (input.montantMensuel !== undefined) payload.montant_mensuel = input.montantMensuel;
-  if (input.categorie !== undefined) payload.categorie = input.categorie;
-  if (input.debutISO !== undefined) payload.debut = input.debutISO;
-  if (input.finISO !== undefined) payload.fin = input.finISO;
-  if (input.lotId !== undefined) payload.lot_id = input.lotId;
-  const { error } = await sb.from("recurring_expenses").update(payload).eq("id", id);
-  if (error) throw error;
-}
+
 

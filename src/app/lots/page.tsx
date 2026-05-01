@@ -104,7 +104,6 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
       types: farm.types,
       lots: farm.lots,
       depenses: farm.depenses,
-      recurrents: farm.recurrents,
       scenarios: farm.scenarios,
     },
     lot.id,
