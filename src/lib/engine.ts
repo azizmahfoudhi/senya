@@ -13,20 +13,26 @@ export function ageYearsFromISO(datePlantationISO: string, atISO: string) {
   return Math.max(0, months / 12);
 }
 
-// Courbe simple “croissance -> plateau” (mobile, explicable, modifiable)
-// 0-2 ans: 0
-// 3: 2kg, 4: 5kg, 5: 10kg, 6: 15kg, 7: 18kg, 8+: max
-function baseYieldByAgeKg(ageYears: number) {
+// Courbe de rendement en cloche (Gompertz simplifiée ou interpolation douce)
+// 0-2 ans: 0%
+// 3 ans: 5% (premiers fruits)
+// 4 ans: 20%
+// 5 ans: 45%
+// 6 ans: 70%
+// 7 ans: 90%
+// 8+ ans: 100% du max
+function yieldPercentageByAge(ageYears: number) {
   const pts: Array<[number, number]> = [
     [0, 0],
     [2, 0],
-    [3, 2],
-    [4, 5],
-    [5, 10],
-    [6, 15],
-    [7, 18],
-    [8, 20],
-    [12, 20],
+    [3, 0.05],
+    [4, 0.20],
+    [5, 0.45],
+    [6, 0.70],
+    [7, 0.90],
+    [8, 1.00],
+    [25, 1.00],
+    [30, 0.90], // Déclin très lent pour les vieux arbres
   ];
   const a = Math.max(0, ageYears);
   for (let i = 0; i < pts.length - 1; i++) {
@@ -34,7 +40,9 @@ function baseYieldByAgeKg(ageYears: number) {
     const [x2, y2] = pts[i + 1]!;
     if (a >= x1 && a <= x2) {
       const t = x2 === x1 ? 0 : (a - x1) / (x2 - x1);
-      return y1 + t * (y2 - y1);
+      // Lissage cubique simple pour des transitions douces : 3t^2 - 2t^3
+      const smoothT = t * t * (3 - 2 * t);
+      return y1 + smoothT * (y2 - y1);
     }
   }
   return pts[pts.length - 1]![1];
@@ -45,9 +53,13 @@ export function estimatedYieldKgPerTree(args: {
   ageYears: number;
   irrigation: IrrigationStatus;
 }) {
-  const base = baseYieldByAgeKg(args.ageYears);
-  const scaled = (base / 20) * args.type.rendementMaxKgParArbre;
-  const irrigationMultiplier = args.irrigation === "irrigue" ? 1.18 : 1;
+  const yieldPct = yieldPercentageByAge(args.ageYears);
+  const scaled = yieldPct * args.type.rendementMaxKgParArbre;
+  
+  // L'irrigation a un impact énorme en année sèche, ou un impact standard de +30/40%
+  // On considère que le rendement max est atteint SOUS irrigation idéale.
+  // Donc si non irrigué, le rendement est diminué drastiquement (ex: -40%).
+  const irrigationMultiplier = args.irrigation === "irrigue" ? 1.0 : 0.6;
   return Math.max(0, scaled * irrigationMultiplier);
 }
 

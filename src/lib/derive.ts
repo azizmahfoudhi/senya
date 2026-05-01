@@ -40,6 +40,10 @@ export function farmTotals(state: FarmState, scenarioId?: UUID) {
   const costPerKg =
     estimatedYearlyProductionKg > 0 ? estimatedYearlyCosts / estimatedYearlyProductionKg : 0;
 
+  // ROI and Break-Even calculations
+  const breakEvenYears = profit > 0 ? totalInvestment / profit : null;
+  const roiPercentage = totalInvestment > 0 ? (profit / totalInvestment) * 100 : 0;
+
   return {
     totalTrees,
     totalInvestment,
@@ -49,6 +53,8 @@ export function farmTotals(state: FarmState, scenarioId?: UUID) {
     estimatedYearlyCosts,
     profit,
     costPerKg,
+    breakEvenYears,
+    roiPercentage,
   };
 }
 
@@ -63,41 +69,11 @@ export function recurringSeriesLast12Months(state: FarmState) {
   });
 }
 
-export type Insight = { level: "info" | "warning" | "danger"; titre: string; detail: string };
+export type Insight = { level: "info" | "warning" | "danger" | "success"; titre: string; detail: string };
 
 export function buildInsights(state: FarmState): Insight[] {
   const t = farmTotals(state);
   const insights: Insight[] = [];
-
-  if (t.totalTrees > 0 && t.totalInvestment / t.totalTrees > 140) {
-    insights.push({
-      level: "warning",
-      titre: "Coût par arbre élevé",
-      detail:
-        "Votre investissement total par arbre est élevé. Vérifiez la catégorie “Plantation” et les achats d’équipement.",
-    });
-  }
-
-  if (t.estimatedYearlyProductionKg > 0 && t.costPerKg > (state.settings.prixKgOlives || 0)) {
-    insights.push({
-      level: "danger",
-      titre: "Coût par kg supérieur au prix de vente",
-      detail:
-        "À ce rythme, chaque kg vous coûte plus cher que ce que vous vendez. Essayez un scénario (irrigation/ajout de lots) ou réduisez les coûts récurrents.",
-    });
-  }
-
-  const irrigationRecurring = state.recurrents
-    .filter((r) => r.categorie === "irrigation")
-    .reduce((acc, r) => acc + r.montantMensuel, 0);
-  if (irrigationRecurring > 0 && t.estimatedYearlyProductionKg < 1000) {
-    insights.push({
-      level: "info",
-      titre: "Irrigation à surveiller",
-      detail:
-        "Vous payez une irrigation récurrente, mais la production estimée reste faible. Vérifiez l’âge des arbres ou l’allocation des coûts par lot.",
-    });
-  }
 
   if (state.lots.length === 0) {
     insights.push({
@@ -106,6 +82,62 @@ export function buildInsights(state: FarmState): Insight[] {
       detail:
         "Un lot = arbres plantés au même moment. Ajoutez votre premier lot pour obtenir des estimations de production et de rentabilité.",
     });
+    return insights;
+  }
+
+  if (t.totalTrees > 0 && t.totalInvestment / t.totalTrees > 200) {
+    insights.push({
+      level: "warning",
+      titre: "Coût par arbre critique",
+      detail:
+        "Votre investissement dépasse 200 MAD par arbre. Surveillez vos dépenses d'infrastructure et d'équipement pour ne pas dégrader le ROI.",
+    });
+  }
+
+  if (t.estimatedYearlyProductionKg > 0 && t.costPerKg > (state.settings.prixKgOlives || 0)) {
+    insights.push({
+      level: "danger",
+      titre: "Production à perte estimée",
+      detail:
+        `À ce stade, 1 kg vous coûte ${t.costPerKg.toFixed(2)} MAD (Prix de vente: ${state.settings.prixKgOlives} MAD). La ferme n'est pas encore rentable, ce qui est normal pour de jeunes plantations.`,
+    });
+  }
+
+  const irrigationRecurring = state.recurrents
+    .filter((r) => r.categorie === "irrigation")
+    .reduce((acc, r) => acc + r.montantMensuel, 0);
+    
+  if (irrigationRecurring > 0 && t.estimatedYearlyProductionKg < 500) {
+    insights.push({
+      level: "info",
+      titre: "Coûts d'irrigation disproportionnés",
+      detail:
+        "Les coûts d'irrigation pèsent lourd sur une production encore faible. Pensez à ajuster le cycle selon l'âge réel des arbres.",
+    });
+  }
+
+  if (t.profit > 0 && t.breakEvenYears !== null) {
+    if (t.breakEvenYears < 5) {
+      insights.push({
+        level: "success",
+        titre: "Excellente Rentabilité",
+        detail: `Si ce rythme se maintient, vous amortirez votre investissement total de ${t.totalInvestment.toLocaleString()} MAD en seulement ${t.breakEvenYears.toFixed(1)} ans.`,
+      });
+    } else {
+      insights.push({
+        level: "info",
+        titre: "Amortissement à long terme",
+        detail: `Le retour sur investissement est estimé à ${t.breakEvenYears.toFixed(1)} ans. Augmenter le rendement ou le prix de vente accélérera ce retour.`,
+      });
+    }
+  }
+
+  if (insights.length === 0 && t.profit <= 0) {
+    insights.push({
+      level: "info",
+      titre: "Phase de Croissance",
+      detail: "Vos arbres grandissent. Le vrai potentiel économique sera visible lorsque la majorité des lots dépassera 4 à 5 ans d'âge."
+    })
   }
 
   return insights.slice(0, 4);
