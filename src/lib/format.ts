@@ -1,16 +1,10 @@
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 
-export function formatMoneyMAD(value: number) {
-  try {
-    return new Intl.NumberFormat("fr-FR", {
-      style: "currency",
-      currency: "MAD",
-      maximumFractionDigits: 0,
-    }).format(value);
-  } catch {
-    return `${Math.round(value)} MAD`;
-  }
+export function formatMoneyDT(value: number) {
+  return `${new Intl.NumberFormat("fr-FR", {
+    maximumFractionDigits: 0,
+  }).format(value)} DT`;
 }
 
 export function formatNumber(value: number, digits = 0) {

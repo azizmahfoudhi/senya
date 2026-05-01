@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { farmTotals, todayISO } from "@/lib/derive";
 import { batchEstimatedProductionKg } from "@/lib/engine";
-import { formatKg, formatMoneyMAD, formatNumber } from "@/lib/format";
+import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { useFarmData } from "@/lib/useFarmData";
 
 export default function ProjectionsPage() {
@@ -78,7 +78,7 @@ export default function ProjectionsPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <Kpi label="Production (année 0)" value={formatKg(series[0]?.prodKg ?? 0)} />
-              <Kpi label="Résultat (année 0)" value={formatMoneyMAD(series[0]?.profit ?? 0)} />
+              <Kpi label="Résultat (année 0)" value={formatMoneyDT(series[0]?.profit ?? 0)} />
               <Kpi label="Point mort" value={breakEven ? `${breakEven}` : "Non atteint"} />
               <Kpi label="Prix/kg" value={formatNumber(farm.settings.prixKgOlives || 0, 2)} />
             </div>
@@ -97,7 +97,7 @@ export default function ProjectionsPage() {
                     formatter={(v: unknown, k: unknown) => {
                       const key = String(k);
                       if (key === "prodKg") return formatKg(Number(v));
-                      return formatMoneyMAD(Number(v));
+                      return formatMoneyDT(Number(v));
                     }}
                   />
                   <Line type="monotone" dataKey="revenue" stroke="var(--primary)" strokeWidth={2} dot={false} />

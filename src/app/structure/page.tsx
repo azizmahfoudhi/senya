@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { useFarmData } from "@/lib/useFarmData";
-import { formatMoneyMAD } from "@/lib/format";
+import { formatMoneyDT } from "@/lib/format";
 
 export default function StructurePage() {
   const farm = useFarmData();
@@ -41,7 +41,7 @@ export default function StructurePage() {
                 }
               />
               <div className="text-xs text-muted">
-                Exemple: 6.5 → {formatMoneyMAD(6.5)} / kg
+                Exemple: 6.5 → {formatMoneyDT(6.5)} / kg
               </div>
             </label>
           </CardContent>

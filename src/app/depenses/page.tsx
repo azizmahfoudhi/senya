@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import type { ExpenseCategory } from "@/lib/domain";
 import { EXPENSE_CATEGORY_LABEL } from "@/lib/domain";
-import { formatDateLong, formatMoneyMAD } from "@/lib/format";
+import { formatDateLong, formatMoneyDT } from "@/lib/format";
 import { useFarmData } from "@/lib/useFarmData";
 
 const categories: ExpenseCategory[] = [
@@ -111,7 +111,7 @@ function OneOffExpenses() {
           {farm.depenses.map((d) => (
             <div key={d.id} className="flex items-start justify-between gap-3 rounded-xl border border-border p-3">
               <div className="min-w-0">
-                <div className="text-sm font-semibold">{formatMoneyMAD(d.montant)}</div>
+                <div className="text-sm font-semibold">{formatMoneyDT(d.montant)}</div>
                 <div className="text-xs text-muted">
                   {formatDateLong(d.dateISO)} · {EXPENSE_CATEGORY_LABEL[d.categorie as ExpenseCategory]}
                   {d.lotId ? ` · Lot` : ""}
@@ -200,7 +200,7 @@ function RecurringExpenses() {
               <div className="min-w-0">
                 <div className="text-sm font-semibold">{r.nom}</div>
                 <div className="text-xs text-muted">
-                  {formatMoneyMAD(r.montantMensuel)} / mois · {EXPENSE_CATEGORY_LABEL[r.categorie as ExpenseCategory]} · début {r.debutISO}
+                  {formatMoneyDT(r.montantMensuel)} / mois · {EXPENSE_CATEGORY_LABEL[r.categorie as ExpenseCategory]} · début {r.debutISO}
                 </div>
               </div>
               <Button variant="ghost" onClick={() => farm.actions.removeRecurring(r.id)}>

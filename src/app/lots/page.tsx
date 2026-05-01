@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ageYearsFromISO, batchEstimatedProductionKg, sumExpensesForBatch } from "@/lib/engine";
-import { formatKg, formatMoneyMAD, formatNumber } from "@/lib/format";
+import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { todayISO } from "@/lib/derive";
 import { useFarmData } from "@/lib/useFarmData";
 
@@ -51,7 +51,7 @@ export default function LotsPage() {
                   </div>
                   <div className="rounded-xl border border-border p-3">
                     <div className="text-xs text-muted">Coûts (ponctuels)</div>
-                    <div className="mt-1 text-base font-semibold">{formatMoneyMAD(cost)}</div>
+                    <div className="mt-1 text-base font-semibold">{formatMoneyDT(cost)}</div>
                   </div>
                 </div>
 

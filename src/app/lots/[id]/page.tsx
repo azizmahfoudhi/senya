@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ageYearsFromISO, batchEstimatedProductionKg, recurringMonthlyForBatch, sumExpensesForBatch } from "@/lib/engine";
 import { todayISO } from "@/lib/derive";
-import { formatKg, formatMoneyMAD, formatNumber } from "@/lib/format";
+import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { useFarmData } from "@/lib/useFarmData";
 
 export default function LotDetailPage() {
@@ -63,8 +63,8 @@ export default function LotDetailPage() {
             </div>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-2">
-            <Kpi label="Coûts (ponctuels)" value={formatMoneyMAD(cost)} />
-            <Kpi label="Coût / arbre" value={formatMoneyMAD(perTreeCost)} />
+            <Kpi label="Coûts (ponctuels)" value={formatMoneyDT(cost)} />
+            <Kpi label="Coût / arbre" value={formatMoneyDT(perTreeCost)} />
             <Kpi label="Rendement estimé / arbre" value={`${formatNumber(yieldPerTree, 1)} kg`} />
             <Kpi label="Production estimée" value={formatKg(prod)} />
           </CardContent>
@@ -78,7 +78,7 @@ export default function LotDetailPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-base font-semibold">{formatMoneyMAD(monthly)} / mois</div>
+            <div className="text-base font-semibold">{formatMoneyDT(monthly)} / mois</div>
             <div className="text-xs text-muted">Astuce: utilisez les récurrents pour l’irrigation ou la main d’œuvre.</div>
           </CardContent>
         </Card>

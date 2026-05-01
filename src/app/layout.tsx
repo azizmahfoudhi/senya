@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OlivierPilot",
+  title: "Senya",
   description:
     "Gestion et optimisation d’une oliveraie: coûts, production, rentabilité et projections.",
 };

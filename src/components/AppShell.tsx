@@ -33,7 +33,7 @@ export function AppShell({
       <header className="sticky top-0 z-10 border-b border-border/40 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto w-full max-w-4xl px-4 py-3 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-widest text-muted font-semibold">OlivierPilot</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted font-semibold">Senya</div>
             <div className="truncate text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               {title ?? "Tableau de bord"}
             </div>

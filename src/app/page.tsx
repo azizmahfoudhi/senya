@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { buildInsights, farmTotals, recurringSeriesLast12Months } from "@/lib/derive";
-import { formatKg, formatMoneyMAD, formatNumber } from "@/lib/format";
+import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useFarmData } from "@/lib/useFarmData";
 
@@ -86,13 +86,13 @@ export default function HomePage() {
         />
         <MetricCard
           title="Investissement"
-          value={formatMoneyMAD(totals.totalInvestment)}
+          value={formatMoneyDT(totals.totalInvestment)}
           sub="Dépenses totales"
           delay="delay-[200ms]"
         />
         <MetricCard
           title="Coûts fixes / mois"
-          value={formatMoneyMAD(totals.monthlyRecurring)}
+          value={formatMoneyDT(totals.monthlyRecurring)}
           sub="Charges récurrentes"
           delay="delay-[300ms]"
         />
@@ -121,7 +121,7 @@ export default function HomePage() {
               <div className="rounded-2xl border border-border/40 bg-background/40 p-4 transition-all hover:bg-background/60">
                 <div className="text-xs text-muted font-medium uppercase tracking-wider">Recettes</div>
                 <div className="mt-2 text-2xl font-bold tracking-tight">
-                  {formatMoneyMAD(totals.estimatedRevenue)}
+                  {formatMoneyDT(totals.estimatedRevenue)}
                 </div>
                 <div className="mt-1 text-xs text-muted flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-primary/40 inline-block"></span>
@@ -136,7 +136,7 @@ export default function HomePage() {
                     totals.profit >= 0 ? "text-primary" : "text-danger drop-shadow-sm",
                   )}
                 >
-                  {formatMoneyMAD(totals.profit)}
+                  {formatMoneyDT(totals.profit)}
                 </div>
                 <div className="mt-1 text-xs text-muted flex items-center gap-1">
                   <span className={cn("w-2 h-2 rounded-full inline-block", totals.profit >= 0 ? "bg-primary/40" : "bg-danger/40")}></span>
@@ -184,7 +184,7 @@ export default function HomePage() {
                       padding: '8px 12px'
                     }}
                     itemStyle={{ color: 'var(--foreground)', fontWeight: 600 }}
-                    formatter={(v: unknown) => [formatMoneyMAD(Number(v)), "Montant"]}
+                    formatter={(v: unknown) => [formatMoneyDT(Number(v)), "Montant"]}
                     labelStyle={{ color: 'var(--muted)', marginBottom: '4px' }}
                   />
                   <Area

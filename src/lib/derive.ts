@@ -90,7 +90,7 @@ export function buildInsights(state: FarmState): Insight[] {
       level: "warning",
       titre: "Coût par arbre critique",
       detail:
-        "Votre investissement dépasse 200 MAD par arbre. Surveillez vos dépenses d'infrastructure et d'équipement pour ne pas dégrader le ROI.",
+        "Votre investissement dépasse 200 DT par arbre. Surveillez vos dépenses d'infrastructure et d'équipement pour ne pas dégrader le ROI.",
     });
   }
 
@@ -99,7 +99,7 @@ export function buildInsights(state: FarmState): Insight[] {
       level: "danger",
       titre: "Production à perte estimée",
       detail:
-        `À ce stade, 1 kg vous coûte ${t.costPerKg.toFixed(2)} MAD (Prix de vente: ${state.settings.prixKgOlives} MAD). La ferme n'est pas encore rentable, ce qui est normal pour de jeunes plantations.`,
+        `À ce stade, 1 kg vous coûte ${t.costPerKg.toFixed(2)} DT (Prix de vente: ${state.settings.prixKgOlives} DT). La ferme n'est pas encore rentable, ce qui est normal pour de jeunes plantations.`,
     });
   }
 
@@ -121,7 +121,7 @@ export function buildInsights(state: FarmState): Insight[] {
       insights.push({
         level: "success",
         titre: "Excellente Rentabilité",
-        detail: `Si ce rythme se maintient, vous amortirez votre investissement total de ${t.totalInvestment.toLocaleString()} MAD en seulement ${t.breakEvenYears.toFixed(1)} ans.`,
+        detail: `Si ce rythme se maintient, vous amortirez votre investissement total de ${t.totalInvestment.toLocaleString()} DT en seulement ${t.breakEvenYears.toFixed(1)} ans.`,
       });
     } else {
       insights.push({
