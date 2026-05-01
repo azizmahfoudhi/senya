@@ -278,7 +278,7 @@ export default function HomePage() {
                   <div>
                     <CardTitle className="text-lg">Assistant Senya</CardTitle>
                     <CardDescription>
-                      {weather ? `Météo locale: ${weather.temp}°C, ${weather.precipitation}mm` : "Analyse en temps réel de votre ferme..."}
+                      {weather ? `Météo à Nasrallah: ${weather.temp}°C, ${weather.precipitation}mm` : "Analyse en temps réel de votre ferme..."}
                     </CardDescription>
                   </div>
                 </div>
