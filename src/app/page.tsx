@@ -283,32 +283,48 @@ export default function HomePage() {
                     <div className="text-sm font-medium">L'assistant collecte des données...</div>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-3">
-                    {insights.map((i, idx) => (
+                  <div className="flex flex-col gap-4">
+                    {insights.map((i) => (
                       <div
-                        key={idx}
+                        key={i.id}
                         className={cn(
-                          "rounded-2xl border p-4 transition-all flex gap-3 items-start",
+                          "rounded-2xl border p-4 transition-all flex flex-col sm:flex-row gap-4 items-start",
                           i.level === "danger" 
-                            ? "border-danger/20 bg-danger/5" 
+                            ? "border-danger/30 bg-danger/5 shadow-[0_0_15px_rgba(239,68,68,0.1)]" 
                             : i.level === "warning" 
-                              ? "border-warning/30 bg-warning/5"
+                              ? "border-warning/40 bg-warning/5"
                               : i.level === "success"
-                                ? "border-primary/30 bg-primary/10"
+                                ? "border-primary/40 bg-primary/10"
                                 : "border-primary/20 bg-primary/5"
                         )}
                       >
-                        <div className="text-2xl mt-0.5 shrink-0">
-                          {i.icon || "💡"}
+                        <div className="text-3xl mt-1 shrink-0 p-2 bg-background/50 rounded-xl border border-border/40">
+                          {i.icon}
                         </div>
-                        <div>
+                        <div className="flex-1 w-full space-y-3">
                           <div className={cn(
-                            "text-sm font-semibold tracking-tight mb-1",
+                            "text-lg font-bold tracking-tight border-b border-border/40 pb-2",
                             i.level === "danger" ? "text-danger" : i.level === "warning" ? "text-warning-foreground" : "text-primary"
                           )}>
                             {i.titre}
                           </div>
-                          <div className="text-sm text-foreground/80 leading-relaxed">{i.detail}</div>
+                          
+                          <div className="space-y-2 text-sm">
+                            <div>
+                              <span className="font-semibold text-foreground/90 uppercase text-xs tracking-wider opacity-80">Le Constat</span>
+                              <div className="text-foreground/80 mt-0.5">{i.whatIsHappening}</div>
+                            </div>
+                            <div className="bg-background/40 p-2 rounded-lg border border-border/30">
+                              <span className="font-semibold text-foreground/90 uppercase text-xs tracking-wider opacity-80 flex items-center gap-1">
+                                🎯 Action Recommandée
+                              </span>
+                              <div className="text-foreground font-medium mt-0.5">{i.whatToDo}</div>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-foreground/90 uppercase text-xs tracking-wider opacity-80">L'Impact</span>
+                              <div className="text-muted-foreground mt-0.5 italic">{i.whyItMatters}</div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}

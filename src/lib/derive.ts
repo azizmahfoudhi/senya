@@ -78,197 +78,189 @@ export function expensesSeriesLast12Months(state: FarmState) {
 
 
 export type Insight = {
-  level: "info" | "warning" | "danger" | "success";
+  id: string;
+  level: "danger" | "warning" | "info" | "success";
   titre: string;
-  detail: string;
-  icon?: string;
+  whatIsHappening: string;
+  whatToDo: string;
+  whyItMatters: string;
+  icon: string;
+  priorityScore: number;
 };
 
 export function buildInsights(state: FarmState, weather: WeatherData | null = null): Insight[] {
   const t = farmTotals(state);
   const insights: Insight[] = [];
-
-  // 1. Data Freshness
+  const tISO = todayISO();
   const today = new Date();
+
+  function addInsight(insight: Omit<Insight, "id">) {
+    insights.push({ ...insight, id: Math.random().toString(36).slice(2, 9) });
+  }
+
+  // 1. RISK ALERTS (Weather)
+  if (weather) {
+    const isRaining = weather.current.precipitation > 0;
+    if (weather.current.temp > 35) {
+      addInsight({
+        level: "danger",
+        titre: "Alerte Canicule",
+        icon: "🌡️",
+        priorityScore: 100,
+        whatIsHappening: `Température extrême détectée (${weather.current.temp}°C). Le stress hydrique peut bloquer la croissance des olives.`,
+        whatToDo: "Déclenchez une irrigation de nuit ou très tôt le matin pour les lots irrigués.",
+        whyItMatters: "L'évaporation est minimale la nuit. Sauver l'humidité garantit la survie des jeunes plants et la taille des fruits."
+      });
+    } else if (weather.current.temp < 5) {
+      addInsight({
+        level: "danger",
+        titre: "Alerte Gel",
+        icon: "❄️",
+        priorityScore: 100,
+        whatIsHappening: `Risque de gel imminent (${weather.current.temp}°C). Le gel détruit les jeunes pousses végétatives.`,
+        whatToDo: "Évitez toute taille immédiate. Allumez des feux de fumée contrôlés si les jeunes plants sont exposés.",
+        whyItMatters: "Le tissu végétatif gelé ne produit pas de fleurs, ce qui ampute directement la prochaine récolte."
+      });
+    } else if (weather.current.windSpeed > 30) {
+      addInsight({
+        level: "warning",
+        titre: "Alerte Vent Fort",
+        icon: "🌬️",
+        priorityScore: 80,
+        whatIsHappening: `Des vents violents sont mesurés à ${weather.current.windSpeed} km/h.`,
+        whatToDo: "Repoussez toute application de traitements foliaires ou de pesticides.",
+        whyItMatters: "Le vent disperse les produits, annulant leur efficacité et polluant les zones adjacentes (perte d'argent)."
+      });
+    }
+
+    // Irrigation Guidance
+    if (isRaining || weather.current.precipitation > 2) {
+      addInsight({
+        level: "success",
+        titre: "Suspension d'Irrigation",
+        icon: "🌧️",
+        priorityScore: 90,
+        whatIsHappening: `Il pleut actuellement (${weather.current.precipitation}mm). La terre accumule une réserve d'eau naturelle.`,
+        whatToDo: "Coupez les pompes et suspendez les cycles d'irrigation pour les 3 prochains jours.",
+        whyItMatters: "L'excès d'eau favorise l'asphyxie racinaire (pourridié) et vous fait gaspiller de l'énergie (électricité/carburant)."
+      });
+    }
+  }
+
+  // 2. TASK REMINDERS
+  const overdueTasks = state.tasks.filter(tk => tk.statut !== "termine" && tk.datePrevueISO < tISO);
+  if (overdueTasks.length > 0) {
+    addInsight({
+      level: "danger",
+      titre: "Interventions en retard",
+      icon: "⏰",
+      priorityScore: 95,
+      whatIsHappening: `Vous avez ${overdueTasks.length} tâche(s) planifiée(s) dont la date est dépassée (ex: ${overdueTasks[0].titre}).`,
+      whatToDo: "Consultez l'onglet Calendrier et réaffectez ou exécutez ces tâches en priorité.",
+      whyItMatters: "Le retard dans les traitements phytosanitaires ou la taille entraîne une perte de rendement irrattrapable."
+    });
+  }
+
+  // 3. FINANCIAL WARNINGS
   const thirtyDaysAgo = formatISO(subMonths(today, 1), { representation: "date" });
   const recentExpenses = state.depenses.filter(d => d.dateISO >= thirtyDaysAgo);
   
   if (state.lots.length > 0 && recentExpenses.length === 0) {
-    insights.push({
-      level: "info",
-      titre: "Comptabilité à jour ?",
-      detail: "Je remarque que vous n'avez enregistré aucune dépense ce mois-ci. N'oubliez pas de saisir vos factures pour que mes projections restent précises.",
-      icon: "📅"
+    addInsight({
+      level: "warning",
+      titre: "Trou de données comptables",
+      icon: "🕳️",
+      priorityScore: 70,
+      whatIsHappening: "Aucune dépense n'a été saisie dans les 30 derniers jours.",
+      whatToDo: "Mettez à jour vos frais (carburant, électricité, ouvriers) dans l'onglet Dépenses.",
+      whyItMatters: "Sans données exactes, les calculs de rentabilité et le ROI sont faussés. Vous naviguez à l'aveugle."
     });
   }
 
-  // 2. Weather & Irrigation Advice
-  if (weather) {
-    const isRaining = weather.current.precipitation > 0;
-    if (isRaining || weather.current.precipitation > 2) {
-      insights.push({
-        level: "success",
-        titre: "Pluie en cours",
-        detail: `La météo annonce de la pluie (${weather.current.precipitation}mm). Inutile d'irriguer aujourd'hui, économisez l'eau et l'énergie.`,
-        icon: "🌧️"
-      });
-    } else if (weather.current.temp > 35) {
-      insights.push({
-        level: "danger",
-        titre: "Alerte Canicule",
-        detail: `Il fait très chaud actuellement (${weather.current.temp}°C). Augmentez la fréquence d'irrigation, de préférence tard le soir ou tôt le matin pour limiter l'évaporation.`,
-        icon: "🌡️"
-      });
-    } else if (weather.current.temp < 5) {
-      insights.push({
-        level: "danger",
-        titre: "Alerte Gel",
-        detail: `Risque de gel (${weather.current.temp}°C). Surveillez vos jeunes plants, ils sont les plus vulnérables.`,
-        icon: "❄️"
-      });
-    } else if (weather.current.windSpeed > 30) {
-      insights.push({
-        level: "warning",
-        titre: "Vent fort",
-        detail: `Des vents de ${weather.current.windSpeed} km/h sont signalés. Si vous avez prévu un traitement foliaire, il vaut mieux le reporter.`,
-        icon: "🌬️"
-      });
-    } else if (weather.current.temp > 25 && !isRaining) {
-      insights.push({
-        level: "warning",
-        titre: "Temps sec et chaud",
-        detail: `Il fait ${weather.current.temp}°C sans précipitation prévue. Fenêtre idéale pour un cycle d'irrigation standard.`,
-        icon: "☀️"
-      });
-    }
-  }
-
-
-
-  // 4. Age-Based Yield Milestones
-  if (state.lots.length > 0) {
-    const tISO = todayISO();
-    const lotsApproachingMaturity = state.lots.filter(l => {
-      const age = ageYearsFromISO(l.datePlantationISO, tISO);
-      return age >= 3.5 && age <= 4.5;
-    });
-
-    if (lotsApproachingMaturity.length > 0) {
-      const names = lotsApproachingMaturity.map(l => l.nom).join(", ");
-      insights.push({
-        level: "success",
-        titre: "Pic de production en vue !",
-        detail: `Excellente nouvelle ! Vos lots (${names}) approchent de leur pleine maturité. Vous devriez voir un saut significatif dans la récolte la saison prochaine. Préparez la main d'œuvre !`,
-        icon: "📈"
-      });
-    }
-  }
-
-  // 5. Profitability & General Business
-  if (t.profit > 0 && t.breakEvenYears !== null) {
-    if (t.breakEvenYears < 5) {
-      insights.push({
-        level: "success",
-        titre: "Félicitations, ferme très saine",
-        detail: `Votre gestion est excellente. Au rythme actuel, vous amortirez la totalité de votre investissement initial dans ${t.breakEvenYears.toFixed(1)} ans. Continuez ainsi !`,
-        icon: "💰"
-      });
-    }
-  } else if (t.profit <= 0 && state.lots.length > 0) {
-    insights.push({
-      level: "info",
-      titre: "Phase de Croissance",
-      detail: "Vos projections affichent un déficit, mais c'est normal pour une jeune ferme. Vos rendements augmenteront naturellement avec l'âge de vos oliviers.",
-      icon: "🌱"
+  if (t.costPerKg && state.settings.prixKgOlives && t.costPerKg > (state.settings.prixKgOlives * 0.8)) {
+    addInsight({
+      level: "danger",
+      titre: "Marge critique détectée",
+      icon: "💸",
+      priorityScore: 85,
+      whatIsHappening: `Votre coût de production (${t.costPerKg.toFixed(2)} DT/kg) se rapproche dangereusement de votre prix de vente (${state.settings.prixKgOlives} DT/kg).`,
+      whatToDo: "Analysez le graphique des dépenses. Réduisez les coûts de main d'œuvre ou cherchez à vendre vos olives plus cher (circuit direct).",
+      whyItMatters: "Une marge nette inférieure à 20% met votre exploitation en risque financier au moindre aléa climatique."
     });
   }
 
-  if (state.lots.length === 0) {
-    insights.push({
-      level: "info",
-      titre: "Je suis là pour vous aider",
-      detail: "Bonjour ! Je suis votre assistant agricole. Commencez par créer un lot dans la section 'Paramétrer la ferme' pour que je puisse commencer à analyser vos données.",
-      icon: "👋"
+  // 4. PERFORMANCE INSIGHTS (Lots underperforming)
+  const underperformingLots = state.lots.filter(l => (l.etatCroissance ?? 3) <= 2);
+  if (underperformingLots.length > 0) {
+    addInsight({
+      level: "warning",
+      titre: "Parcelles sous-performantes",
+      icon: "📉",
+      priorityScore: 75,
+      whatIsHappening: `${underperformingLots.length} lot(s) (ex: ${underperformingLots[0].nom}) signalent une croissance ralentie (1 ou 2 étoiles).`,
+      whatToDo: "Inspectez le système d'irrigation de ces lots et prévoyez un apport en azote/potasse ciblé.",
+      whyItMatters: "Ces lots font chuter la production globale. Un traitement correctif rapide peut réactiver la pousse avant le printemps."
     });
   }
 
-  // 6. Seasonal Calendar (Tunisia/Kairouan)
+  // 5. SEASONAL GUIDANCE
   const currentMonth = today.getMonth() + 1; // 1-12
   if (currentMonth === 1 || currentMonth === 2) {
-    insights.push({
+    addInsight({
       level: "info",
-      titre: "Calendrier: Taille & Engrais",
-      detail: "C'est la période idéale pour la taille de fructification et l'apport d'engrais organique avant le réveil végétatif du printemps.",
-      icon: "✂️"
+      titre: "Saison de la Taille",
+      icon: "✂️",
+      priorityScore: 50,
+      whatIsHappening: "L'arbre est en repos végétatif hivernal.",
+      whatToDo: "Procédez à la taille de fructification et aérez le centre de l'arbre. Appliquez un fongicide au cuivre après la coupe.",
+      whyItMatters: "Une bonne pénétration de la lumière garantit une floraison homogène et prévient l'humidité (œil de paon)."
     });
   } else if (currentMonth === 4 || currentMonth === 5) {
-    insights.push({
-      level: "warning",
-      titre: "Calendrier: Floraison critique",
-      detail: "Période de floraison. Assurez-vous d'éviter tout stress hydrique pour maximiser la formation des fruits.",
-      icon: "🌸"
+    addInsight({
+      level: "info",
+      titre: "Période de Floraison",
+      icon: "🌸",
+      priorityScore: 60,
+      whatIsHappening: "Les inflorescences se développent. L'arbre consomme énormément d'énergie.",
+      whatToDo: "Maintenez une humidité du sol constante. Apportez du bore (traitement foliaire) pour favoriser la nouaison.",
+      whyItMatters: "Tout stress hydrique ou carence durant cette phase fait chuter les fleurs, détruisant la récolte avant même qu'elle ne commence."
     });
-  } else if (currentMonth >= 10 && currentMonth <= 12) {
-    insights.push({
+  } else if (currentMonth === 9 || currentMonth === 10) {
+    addInsight({
+      level: "info",
+      titre: "Préparation Récolte",
+      icon: "🧺",
+      priorityScore: 50,
+      whatIsHappening: "La lipogenèse (création de l'huile) est en phase finale.",
+      whatToDo: "Stoppez l'irrigation 2 à 3 semaines avant la récolte. Nettoyez le sol sous les arbres et réservez vos ouvriers.",
+      whyItMatters: "Couper l'eau augmente le pourcentage d'huile (moins d'eau dans le fruit) et facilite mécaniquement la récolte."
+    });
+  }
+
+  // 6. GENERAL (Empty state / Positive)
+  if (state.lots.length === 0) {
+    addInsight({
+      level: "info",
+      titre: "Initialisation requise",
+      icon: "👋",
+      priorityScore: 10,
+      whatIsHappening: "Votre compte ne contient aucune donnée sur vos parcelles.",
+      whatToDo: "Allez dans l'onglet 'Lots' et ajoutez vos plantations (âge, nombre d'arbres, type).",
+      whyItMatters: "Sans la structure de votre ferme, le moteur d'Intelligence Artificielle ne peut pas générer de recommandations sur-mesure."
+    });
+  } else if (t.profit > 0 && t.breakEvenYears && t.breakEvenYears < 5 && insights.length < 2) {
+    addInsight({
       level: "success",
-      titre: "Calendrier: Préparation Récolte",
-      detail: "La saison de récolte approche ! Pensez à vérifier votre matériel et à budgétiser la main-d'œuvre.",
-      icon: "🧺"
+      titre: "Performance Exceptionnelle",
+      icon: "🏆",
+      priorityScore: 5,
+      whatIsHappening: `Votre ferme est hautement rentable avec un amortissement estimé à ${t.breakEvenYears.toFixed(1)} ans.`,
+      whatToDo: "Envisagez de réinvestir le surplus dans la modernisation (irrigation intelligente) ou dans de nouveaux plants.",
+      whyItMatters: "Optimiser le capital dégagé permet de sécuriser l'exploitation face à une éventuelle mauvaise année (alternance)."
     });
   }
 
-  // 7. Preventative Action (Pest Control)
-  if (currentMonth >= 4 && currentMonth <= 6) {
-    const hasPestControl = state.depenses.some(d => d.categorie === "entretien" && d.dateISO >= thirtyDaysAgo);
-    if (!hasPestControl && state.lots.length > 0) {
-      insights.push({
-        level: "warning",
-        titre: "Traitements Préventifs",
-        detail: "Pensez aux traitements contre la teigne ou la mouche de l'olivier. Aucune dépense de traitement n'a été notée récemment.",
-        icon: "🐛"
-      });
-    }
-  }
-
-  // 8. Nasrallah Context (Bour vs Irrigué)
-  const hasBour = state.lots.some(l => l.irrigation === "non_irrigue");
-  if (hasBour && currentMonth >= 6 && currentMonth <= 8) {
-    insights.push({
-      level: "warning",
-      titre: "Terres en Bour (Nasrallah)",
-      detail: "Pour vos lots non irrigués, pensez au travail du sol superficiel pour casser la croûte et conserver l'humidité résiduelle face aux chaleurs de Kairouan.",
-      icon: "🏜️"
-    });
-  }
-
-  // 9. Variety Intelligence
-  const typeById = new Map(state.types.map(t => [t.id, t]));
-  const hasChemlali = state.lots.some(l => {
-    const type = typeById.get(l.typeId);
-    return type && type.nom.toLowerCase().includes("chemlali");
-  });
-  if (hasChemlali) {
-    insights.push({
-      level: "info",
-      titre: "Spécificité Chemlali",
-      detail: "Vos lots de Chemlali sont sujets à l'alternance. Une taille douce et régulière aidera à stabiliser la production d'une année sur l'autre.",
-      icon: "🌳"
-    });
-  }
-
-  const hasKoroneiki = state.lots.some(l => {
-    const type = typeById.get(l.typeId);
-    return type && type.nom.toLowerCase().includes("koroneiki");
-  });
-  if (hasKoroneiki) {
-    insights.push({
-      level: "info",
-      titre: "Conduite Intensive",
-      detail: "Le Koroneiki nécessite des apports d'eau et de nutriments très réguliers pour maintenir son rendement élevé.",
-      icon: "💧"
-    });
-  }
-
-  return insights.slice(0, 5);
+  // Sort by Priority Score descending, then take top 5
+  return insights.sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 5);
 }
 
