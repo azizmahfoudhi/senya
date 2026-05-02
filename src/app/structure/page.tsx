@@ -7,14 +7,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/Input";
 import { useFarmData } from "@/lib/useFarmData";
 import { formatMoneyDT } from "@/lib/format";
-import { CheckCircle2, Trees, Trash2, Sprout, Edit2, X, Check, Star } from "lucide-react";
+import { CheckCircle2, Trees, Trash2, Sprout, Edit2, X, Check, Star, Settings, DollarSign, Map } from "lucide-react";
 
 export default function StructurePage() {
   const farm = useFarmData();
 
   return (
-    <AppShell title="Structure">
-      <div className="grid gap-4 md:grid-cols-2">
+    <AppShell title="Structure & Paramètres">
+      <div className="mb-6 animate-in fade-in slide-in-from-top-4">
+        <h1 className="text-2xl font-black flex items-center gap-2">
+          <Settings className="w-6 h-6 text-primary" />
+          Structure de la Ferme
+        </h1>
+        <p className="text-sm text-muted mt-1">Gérez la surface globale, le marché et ajoutez vos parcelles d'arbres.</p>
+      </div>
+      <div className="grid gap-6 md:grid-cols-[1fr_400px]">
         <div className="flex flex-col gap-4">
           <SettingsCard farm={farm} />
           <CreateBatchCard farm={farm} />
@@ -41,9 +48,14 @@ function SettingsCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
     <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Paramètres généraux</CardTitle>
-            <CardDescription>Surface et prix de vente estimés</CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <Settings className="w-5 h-5" />
+            </div>
+            <div>
+              <CardTitle>Paramètres généraux</CardTitle>
+              <CardDescription>Surface et prix de vente estimés</CardDescription>
+            </div>
           </div>
           {saving === "saved" && (
             <div className="flex items-center gap-1 text-xs text-primary animate-in fade-in slide-in-from-right-2">
@@ -104,9 +116,14 @@ function TreeTypesCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   return (
     <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm h-full">
       <CardHeader>
-        <div>
-          <CardTitle>Variétés d’oliviers</CardTitle>
-          <CardDescription>Définissez les types d'arbres et leurs rendements</CardDescription>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center text-warning-foreground">
+            <Trees className="w-5 h-5" />
+          </div>
+          <div>
+            <CardTitle>Variétés d’oliviers</CardTitle>
+            <CardDescription>Définissez les types d'arbres et leurs rendements max</CardDescription>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="grid gap-5">
@@ -179,9 +196,14 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   return (
     <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm">
       <CardHeader>
-        <div>
-          <CardTitle>Création rapide de Lot</CardTitle>
-          <CardDescription>Ajoutez un ensemble d'arbres plantés au même moment</CardDescription>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center text-success">
+            <Sprout className="w-5 h-5" />
+          </div>
+          <div>
+            <CardTitle>Création d'un Lot</CardTitle>
+            <CardDescription>Ajoutez un groupe d'arbres (même variété, même âge)</CardDescription>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="grid gap-4">

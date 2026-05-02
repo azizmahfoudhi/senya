@@ -141,7 +141,7 @@ export default function HomePage() {
                 Bonjour.
               </h2>
               <p className="text-muted-foreground font-medium text-lg pt-1">
-                Ferme de {formatNumber(farm.settings.surfaceHa)} ha.
+                Ferme de {farm.settings.surfaceHa} ha.
               </p>
               <div className="mt-4 inline-flex items-center gap-2 bg-background/50 px-4 py-2 rounded-2xl border border-border/50">
                 <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Santé Globale</span>
