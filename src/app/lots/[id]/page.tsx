@@ -6,11 +6,12 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { ageYearsFromISO, batchEstimatedProductionKg, sumExpensesForBatch } from "@/lib/engine";
+import { ageYearsFromISO, batchEstimatedProductionKg, sumExpensesForBatch, estimatedYieldKgPerTree } from "@/lib/engine";
+import { computeLotHealth, computeLotForecast } from "@/lib/intelligence";
 import { todayISO } from "@/lib/derive";
 import { formatDateLong, formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { useFarmData } from "@/lib/useFarmData";
-import { Star, ShieldAlert, Bug, Plus, Trash2, Edit2, Check, X } from "lucide-react";
+import { Star, ShieldAlert, Bug, Plus, Trash2, Edit2, Check, X, Sprout } from "lucide-react";
 
 export default function LotDetailPage() {
   const farm = useFarmData();
@@ -37,7 +38,7 @@ export default function LotDetailPage() {
   }
 
   const type = typeById.get(lot.typeId);
-  const age = ageYearsFromISO(lot.datePlantationISO, tISO);
+  const lotAge = ageYearsFromISO(lot.datePlantationISO, tISO);
   const farmState = {
     settings: farm.settings,
     types: farm.types,
@@ -49,8 +50,10 @@ export default function LotDetailPage() {
     scenarios: farm.scenarios,
   };
   const cost = sumExpensesForBatch(farmState, lot.id);
-
   const prod = type ? batchEstimatedProductionKg({ batch: lot, type, atISO: tISO }) : 0;
+  const health = computeLotHealth(farmState, lot.id);
+  const forecast = computeLotForecast(farmState, lot.id);
+
   const perTreeCost = lot.nbArbres > 0 ? cost / lot.nbArbres : 0;
   const yieldPerTree = lot.nbArbres > 0 ? prod / lot.nbArbres : 0;
 
@@ -68,7 +71,7 @@ export default function LotDetailPage() {
                 <CardTitle className="text-xl">Résumé</CardTitle>
                 <CardDescription>
                   {type?.nom ?? "Type inconnu"} · {formatNumber(lot.nbArbres)} arbres ·{" "}
-                  {formatNumber(age, 1)} ans · {lot.irrigation === "irrigue" ? "Irrigué" : "Non irrigué"}
+                  {formatNumber(lotAge, 1)} ans · {lot.irrigation === "irrigue" ? "Irrigué" : "Non irrigué"}
                   {lot.etatCroissance !== 3 && (
                     <>
                       {" "}·{" "}
@@ -101,22 +104,121 @@ export default function LotDetailPage() {
           <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-warning">
             <ShieldAlert className="w-5 h-5" /> Carnet de Santé
           </h2>
-          <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm mb-4">
-            <CardContent className="p-2">
-              <AddTreatment lotId={lot.id} />
-            </CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="border-border/50 bg-card/40 backdrop-blur-sm p-4 text-center">
+              <div className="text-sm font-medium text-muted">Statut</div>
+              <div className="font-bold text-lg">{(lot.etatCroissance ?? 0) >= 3 ? "Normal" : "Critique"}</div>
+            </Card>
+            <Card className="border-border/50 bg-card/40 backdrop-blur-sm p-4 text-center">
+              <div className="text-sm font-medium text-muted">Âge</div>
+              <div className="font-bold text-lg">{lotAge.toFixed(1)} ans</div>
+            </Card>
+          </div>
+
+          <Card className="border-border/50 bg-card/40 backdrop-blur-sm mt-6 overflow-hidden relative">
+            <div className={`absolute top-0 left-0 w-1 h-full bg-current ${health.colorClass}`} />
+            <div className="p-4 pl-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-bold text-lg">Score de Santé</h3>
+                  <p className="text-sm text-muted">Basé sur 5 piliers analytiques</p>
+                </div>
+                <div className={`text-3xl font-black ${health.colorClass}`}>
+                  {health.total}<span className="text-lg opacity-50">/100</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-5 gap-1 mb-2">
+                {[
+                  { label: "Rendement", val: health.breakdown.yield },
+                  { label: "Eau", val: health.breakdown.water },
+                  { label: "Finances", val: health.breakdown.financial },
+                  { label: "Opérations", val: health.breakdown.operations },
+                  { label: "Stress", val: health.breakdown.stress },
+                ].map((p, idx) => (
+                  <div key={idx} className="flex flex-col items-center gap-1">
+                    <div className="h-16 w-full bg-background rounded-full overflow-hidden flex flex-col justify-end border border-border/40">
+                      <div className={`w-full transition-all duration-1000 ${p.val < 50 ? 'bg-danger' : p.val < 80 ? 'bg-warning' : 'bg-success'}`} style={{ height: `${p.val}%` }} />
+                    </div>
+                    <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium truncate w-full text-center">{p.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 text-xs p-2 bg-background/50 rounded-lg border border-border/40 flex items-start gap-2">
+                <span className="shrink-0">⚠️</span>
+                <span className="text-muted-foreground">Le point faible actuel est <strong>{health.weakestPillar}</strong>. La résolution de ce point augmentera rapidement le score.</span>
+              </div>
+            </div>
           </Card>
-          <div className="grid gap-2">
-            {lotTreatments.length > 0 ? (
-              lotTreatments.map(t => <TreatmentRow key={t.id} t={t} farm={farm} />)
-            ) : (
-              <div className="flex flex-col items-center justify-center p-6 text-center border border-dashed border-border rounded-xl bg-muted/5">
-                <Bug className="w-8 h-8 text-muted mb-2 opacity-50" />
-                <div className="text-sm font-medium">Aucun traitement</div>
-                <div className="text-xs text-muted">Ce lot n'a reçu aucun traitement phytosanitaire.</div>
+        </div>
+
+        {/* Prediction Engine Forecast */}
+        <div className="flex flex-col gap-4">
+          <Card className="border-primary/20 bg-primary/5 p-5 relative overflow-hidden shadow-sm">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <Sprout className="w-24 h-24" />
+            </div>
+            <h3 className="font-bold text-lg text-primary flex items-center gap-2 mb-4">
+              🔮 Prévisions Saison Prochaine
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4 relative z-10">
+              <div>
+                <div className="text-sm font-medium text-foreground/70 mb-1">Rendement Prévu</div>
+                <div className="text-2xl font-black text-foreground">
+                  {formatKg(forecast.yieldKg)}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-foreground/70 mb-1">Bénéfice Net Prévu</div>
+                <div className={`text-2xl font-black ${forecast.profitDt >= 0 ? "text-success" : "text-danger"}`}>
+                  {formatMoneyDT(forecast.profitDt)}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 relative z-10">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Coût estimé</span>
+                <span className="font-medium text-danger">{formatMoneyDT(forecast.costDt)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Confiance IA</span>
+                <span className="font-medium bg-background px-2 py-0.5 rounded-full border border-border/50 text-xs uppercase tracking-wider">{forecast.confidence}</span>
+              </div>
+            </div>
+
+            {forecast.risks.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-primary/10 relative z-10">
+                <div className="text-sm font-semibold mb-2 flex items-center gap-1 text-danger">
+                  <ShieldAlert className="w-4 h-4" /> Risques Détectés
+                </div>
+                <ul className="space-y-1">
+                  {forecast.risks.map((r, idx) => (
+                    <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
+                      <span className="text-danger mt-0.5">•</span> {r}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
-          </div>
+          </Card>
+        </div>
+
+        <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm mb-4">
+          <CardContent className="p-2">
+            <AddTreatment lotId={lot.id} />
+          </CardContent>
+        </Card>
+        <div className="grid gap-2">
+          {lotTreatments.length > 0 ? (
+            lotTreatments.map(t => <TreatmentRow key={t.id} t={t} farm={farm} />)
+          ) : (
+            <div className="flex flex-col items-center justify-center p-6 text-center border border-dashed border-border rounded-xl bg-muted/5">
+              <Bug className="w-8 h-8 text-muted mb-2 opacity-50" />
+              <div className="text-sm font-medium">Aucun traitement</div>
+              <div className="text-xs text-muted">Ce lot n'a reçu aucun traitement phytosanitaire.</div>
+            </div>
+          )}
         </div>
 
       </div>
