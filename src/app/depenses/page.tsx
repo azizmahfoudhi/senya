@@ -32,7 +32,7 @@ export default function DepensesPage() {
     <AppShell 
       title="Dépenses"
       actions={
-        <Button size="sm" variant="outline" className="gap-2 print:hidden" onClick={() => window.print()}>
+        <Button size="sm" variant="secondary" className="gap-2 print:hidden" onClick={() => window.print()}>
           <Printer className="w-4 h-4" />
           <span className="hidden sm:inline">Exporter PDF</span>
         </Button>
