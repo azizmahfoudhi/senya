@@ -11,6 +11,7 @@ import {
   Wallet,
   Layers,
   BrainCircuit,
+  TrendingUp,
 } from "lucide-react";
 
 const nav = [
@@ -19,6 +20,7 @@ const nav = [
   { href: "/lots", label: "Lots", icon: Layers },
   { href: "/depenses", label: "Dépenses", icon: Wallet },
   { href: "/memory", label: "Mémoire", icon: BrainCircuit },
+  { href: "/projections", label: "Prévisions", icon: TrendingUp },
 ];
 
 import Image from "next/image";

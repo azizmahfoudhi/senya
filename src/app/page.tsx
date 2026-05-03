@@ -18,7 +18,7 @@ import { computeGlobalHealth } from "@/lib/intelligence";
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useFarmData } from "@/lib/useFarmData";
-import { Sprout, Layers, Wallet, ArrowRight } from "lucide-react";
+import { Sprout, Layers, Wallet, ArrowRight, TrendingUp } from "lucide-react";
 
 export default function HomePage() {
   const farm = useFarmData();
@@ -218,6 +218,15 @@ export default function HomePage() {
                       Coût/kg: {formatNumber(totals.costPerKg || 0, 2)}
                     </div>
                   </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-border/50 relative z-10">
+                  <Link href="/projections" className="flex items-center justify-between group/link hover:bg-background/40 p-2 -mx-2 rounded-xl transition-all">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-semibold">Voir les projections à long terme</span>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted group-hover/link:text-primary transition-colors transform group-hover/link:translate-x-1" />
+                  </Link>
                 </div>
               </CardContent>
             </Card>
