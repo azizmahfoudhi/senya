@@ -31,25 +31,25 @@ export function useWeather() {
   useEffect(() => {
     async function fetchWeather() {
       try {
-        // Ajout explicite du modèle ECMWF (Modèle européen très haute précision)
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max&timezone=auto&models=ecmwf_ifs04`);
+        const apiKey = "a2b47a2988da4ab3956222827260305";
+        const res = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${lat},${lon}&days=5&aqi=no&alerts=no`);
         if (!res.ok) throw new Error("Failed to fetch weather data");
         const json = await res.json();
         
         setData({
           current: {
-            temp: json.current.temperature_2m,
-            humidity: json.current.relative_humidity_2m,
-            windSpeed: json.current.wind_speed_10m,
-            precipitation: json.current.precipitation,
+            temp: json.current.temp_c,
+            humidity: json.current.humidity,
+            windSpeed: json.current.wind_kph,
+            precipitation: json.current.precip_mm,
             isDay: json.current.is_day === 1,
-            weatherCode: json.current.weather_code,
+            weatherCode: json.current.condition.code,
           },
           daily: {
-            dates: json.daily.time,
-            maxTemps: json.daily.temperature_2m_max,
-            minTemps: json.daily.temperature_2m_min,
-            uvIndex: json.daily.uv_index_max,
+            dates: json.forecast.forecastday.map((d: any) => d.date),
+            maxTemps: json.forecast.forecastday.map((d: any) => d.day.maxtemp_c),
+            minTemps: json.forecast.forecastday.map((d: any) => d.day.mintemp_c),
+            uvIndex: json.forecast.forecastday.map((d: any) => d.day.uv),
           }
         });
       } catch (err: any) {
