@@ -80,16 +80,47 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
   const lotTasks = state.tasks.filter(t => t.lotId === lotId);
   let opScore = 100;
   if (lotTasks.length > 0) {
-    const overdue = lotTasks.filter(t => t.statut !== "termine" && new Date(t.datePrevueISO) < new Date()).length;
-    opScore = clamp(100 - (overdue / lotTasks.length) * 100);
+    const nowTime = Date.now();
+    let penalty = 0;
+    
+    lotTasks.forEach(t => {
+      if (t.statut !== "termine") {
+        const dueTime = new Date(t.datePrevueISO).getTime();
+        const daysLate = (nowTime - dueTime) / (1000 * 60 * 60 * 24);
+        if (daysLate > 0) {
+          // Pénalité proportionnelle à la gravité du retard
+          if (daysLate > 30) penalty += 30;      // Retard critique (> 1 mois)
+          else if (daysLate > 7) penalty += 15;  // Retard moyen (> 1 semaine)
+          else penalty += 5;                     // Léger retard
+        }
+      }
+    });
+    
+    opScore = clamp(100 - penalty);
   }
 
   // --- 5. Environmental Stress (15%) ---
-  // Based on treatments and lot health
   const lotTreatments = state.treatments.filter(t => t.lotId === lotId);
-  // More treatments = more stress history
-  let stressScore = 100 - (lotTreatments.length * 10);
-  if (growth < 3) stressScore -= 20;
+  let stressScore = 100;
+  
+  const nowTime = Date.now();
+  lotTreatments.forEach(t => {
+    const treatTime = new Date(t.dateISO).getTime();
+    const daysAgo = (nowTime - treatTime) / (1000 * 60 * 60 * 24);
+    
+    // On ne pénalise que les traitements récents (maladies actives ou récentes)
+    if (daysAgo <= 365) {
+      stressScore -= 15; // Grosse pénalité pour maladie dans l'année
+    } else if (daysAgo <= 730) {
+      stressScore -= 5;  // Légère pénalité résiduelle (1 à 2 ans)
+    }
+  });
+
+  // L'état de croissance est un signe vital de stress
+  if (growth < 3) {
+    stressScore -= (3 - growth) * 20; // 1 étoile = -40, 2 étoiles = -20
+  }
+
   stressScore = clamp(stressScore);
 
   // --- Total Calculation ---
