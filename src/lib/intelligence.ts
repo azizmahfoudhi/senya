@@ -178,14 +178,27 @@ export function computeLotForecast(state: FarmState, lotId: UUID): LotForecast {
   }
 
   // 2. Base Expected Cost
-  const lotExpenses = state.depenses.filter(e => e.lotId === lotId);
+  // Récupérer les dépenses de la dernière année
+  const oneYearAgoISO = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
+  
+  // Dépenses spécifiques au lot
+  const recentLotExpenses = state.depenses.filter(e => e.lotId === lotId && e.dateISO >= oneYearAgoISO);
+  const lotSpecificCost = recentLotExpenses.reduce((sum, e) => sum + e.montant, 0);
+
+  // Dépenses globales (sans lotId) réparties proportionnellement au nombre d'arbres
+  const recentGlobalExpenses = state.depenses.filter(e => !e.lotId && e.dateISO >= oneYearAgoISO);
+  const totalGlobalCost = recentGlobalExpenses.reduce((sum, e) => sum + e.montant, 0);
+  const totalTreesInFarm = state.lots.reduce((acc, l) => acc + l.nbArbres, 0);
+  const lotShare = totalTreesInFarm > 0 ? lot.nbArbres / totalTreesInFarm : 0;
+  const allocatedGlobalCost = totalGlobalCost * lotShare;
+
+  const baseCostLastYear = lotSpecificCost + allocatedGlobalCost;
+
   let predictedCost = 0;
-  if (lotExpenses.length > 0) {
-    const totalExp = lotExpenses.reduce((sum, e) => sum + e.montant, 0);
-    const yearsOfData = 1; // Simplified, in reality would calculate date range
-    predictedCost = (totalExp / yearsOfData) * 1.1; // Add 10% inflation/buffer
+  if (baseCostLastYear > 0) {
+    predictedCost = baseCostLastYear * 1.05; // Ajout d'un buffer/inflation de 5%
   } else {
-    // Fallback: estimate 5 DT per tree
+    // Fallback: estimate 5 DT per tree if no data
     predictedCost = lot.nbArbres * 5;
   }
 
@@ -240,33 +253,30 @@ export type MultiYearForecast = {
 export function computeMultiYearForecast(state: FarmState, yearsToProject: number = 10): MultiYearForecast[] {
   const forecasts: MultiYearForecast[] = [];
   const currentYear = new Date().getFullYear();
+  const oneYearAgoISO = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Coût de base total de la ferme sur les 12 derniers mois
+  const recentTotalExpenses = state.depenses.filter(e => e.dateISO >= oneYearAgoISO);
+  let totalBaseCost = recentTotalExpenses.reduce((sum, e) => sum + e.montant, 0);
+  if (totalBaseCost === 0 && state.lots.length > 0) {
+    totalBaseCost = state.lots.reduce((acc, l) => acc + (l.nbArbres * 5), 0);
+  }
 
   for (let i = 0; i < yearsToProject; i++) {
     const targetYear = currentYear + i;
     const harvestISO = `${targetYear}-11-01T00:00:00.000Z`; // Période de récolte (Novembre)
 
     let totalYield = 0;
-    let totalCost = 0;
 
     for (const lot of state.lots) {
       const type = state.types.find(t => t.id === lot.typeId);
       if (!type) continue;
-
-      // 1. Yield for this future year
-      const predictedYield = batchEstimatedProductionKg({ batch: lot, type, atISO: harvestISO });
-      totalYield += predictedYield;
-
-      // 2. Cost (simplified: historical cost per lot or fallback, +2% inflation per year)
-      const lotExpenses = state.depenses.filter(e => e.lotId === lot.id);
-      let baseCost = lot.nbArbres * 5; // fallback
-      if (lotExpenses.length > 0) {
-        const totalExp = lotExpenses.reduce((sum, e) => sum + e.montant, 0);
-        baseCost = totalExp / 1; // Assuming 1 year of data for now
-      }
-      // Add inflation: 2% per year
-      const inflationFactor = Math.pow(1.02, i);
-      totalCost += baseCost * inflationFactor;
+      totalYield += batchEstimatedProductionKg({ batch: lot, type, atISO: harvestISO });
     }
+
+    // Coût total pour cette année (base + 2% inflation cumulative)
+    const inflationFactor = Math.pow(1.02, i);
+    const totalCost = totalBaseCost * inflationFactor;
 
     const revenue = totalYield * (state.settings.prixKgOlives || 1);
     
