@@ -12,6 +12,8 @@ import { CheckCircle2, Trees, Trash2, Sprout, Edit2, X, Check, Star, Settings, D
 export default function StructurePage() {
   const farm = useFarmData();
 
+  const [activeTab, setActiveTab] = React.useState<"params" | "varietes" | "lots">("params");
+
   return (
     <AppShell title="Structure & Paramètres">
       <div className="mb-6 animate-in fade-in slide-in-from-top-4">
@@ -21,13 +23,36 @@ export default function StructurePage() {
         </h1>
         <p className="text-sm text-muted mt-1">Gérez la surface globale, le marché et ajoutez vos parcelles d'arbres.</p>
       </div>
-      <div className="grid gap-6 md:grid-cols-[1fr_400px]">
-        <div className="flex flex-col gap-4">
-          <SettingsCard farm={farm} />
-          <CreateBatchCard farm={farm} />
-        </div>
-        <div className="flex flex-col gap-4">
-          <TreeTypesCard farm={farm} />
+
+      <div className="flex flex-wrap gap-2 pb-2 mb-6 animate-in fade-in slide-in-from-bottom-2">
+        <Button 
+          variant={activeTab === "params" ? "primary" : "secondary"} 
+          onClick={() => setActiveTab("params")}
+          className="rounded-full"
+        >
+          <Settings className="w-4 h-4 mr-2" /> Paramètres Généraux
+        </Button>
+        <Button 
+          variant={activeTab === "varietes" ? "primary" : "secondary"} 
+          onClick={() => setActiveTab("varietes")}
+          className="rounded-full"
+        >
+          <Trees className="w-4 h-4 mr-2" /> Variétés d'olives
+        </Button>
+        <Button 
+          variant={activeTab === "lots" ? "primary" : "secondary"} 
+          onClick={() => setActiveTab("lots")}
+          className="rounded-full"
+        >
+          <Sprout className="w-4 h-4 mr-2" /> Création de lot
+        </Button>
+      </div>
+
+      <div className="grid gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex flex-col gap-4 max-w-2xl">
+          {activeTab === "params" && <SettingsCard farm={farm} />}
+          {activeTab === "lots" && <CreateBatchCard farm={farm} />}
+          {activeTab === "varietes" && <TreeTypesCard farm={farm} />}
         </div>
       </div>
     </AppShell>
