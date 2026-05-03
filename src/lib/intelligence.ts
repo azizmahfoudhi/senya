@@ -10,7 +10,6 @@ export type HealthScore = {
     yield: number; // /100
     water: number; // /100
     financial: number; // /100
-    operations: number; // /100
     stress: number; // /100
   };
 };
@@ -76,28 +75,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
   }
   finScore = clamp(finScore);
 
-  // --- 4. Operational Health (15%) ---
-  const lotTasks = state.tasks.filter(t => t.lotId === lotId);
-  let opScore = 100;
-  if (lotTasks.length > 0) {
-    const nowTime = Date.now();
-    let penalty = 0;
-    
-    lotTasks.forEach(t => {
-      if (t.statut !== "termine") {
-        const dueTime = new Date(t.datePrevueISO).getTime();
-        const daysLate = (nowTime - dueTime) / (1000 * 60 * 60 * 24);
-        if (daysLate > 0) {
-          // Pénalité proportionnelle à la gravité du retard
-          if (daysLate > 30) penalty += 30;      // Retard critique (> 1 mois)
-          else if (daysLate > 7) penalty += 15;  // Retard moyen (> 1 semaine)
-          else penalty += 5;                     // Léger retard
-        }
-      }
-    });
-    
-    opScore = clamp(100 - penalty);
-  }
+
 
   // --- 5. Environmental Stress (15%) ---
   const lotTreatments = state.treatments.filter(t => t.lotId === lotId);
@@ -125,10 +103,9 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
 
   // --- Total Calculation ---
   const total = clamp(
-    (yieldScore * 0.30) +
-    (waterScore * 0.20) +
-    (finScore * 0.20) +
-    (opScore * 0.15) +
+    (yieldScore * 0.35) +
+    (waterScore * 0.25) +
+    (finScore * 0.25) +
     (stressScore * 0.15)
   );
 
@@ -137,7 +114,6 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
     Yield: yieldScore,
     Water: waterScore,
     Financial: finScore,
-    Operations: opScore,
     Stress: stressScore
   };
   const weakestPillar = Object.entries(pillars).sort((a, b) => a[1] - b[1])[0]![0];
@@ -157,7 +133,6 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
       yield: yieldScore,
       water: waterScore,
       financial: finScore,
-      operations: opScore,
       stress: stressScore,
     }
   };
@@ -166,7 +141,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
 function fallbackHealth(): HealthScore {
   return {
     total: 0, label: "Inconnu", colorClass: "text-muted", weakestPillar: "N/A",
-    breakdown: { yield: 0, water: 0, financial: 0, operations: 0, stress: 0 }
+    breakdown: { yield: 0, water: 0, financial: 0, stress: 0 }
   };
 }
 
@@ -241,10 +216,7 @@ export function computeLotForecast(state: FarmState, lotId: UUID): LotForecast {
   if (growthStatus < 3) {
     risks.push("Croissance sous-optimale limitant le potentiel");
   }
-  const overdueTasks = state.tasks.filter(t => t.lotId === lotId && t.statut !== "termine" && new Date(t.datePrevueISO) < new Date());
-  if (overdueTasks.length > 0) {
-    risks.push(`Opérations critiques en retard (${overdueTasks.length})`);
-  }
+
 
   // 4. Profit
   const predictedRevenue = predictedYield * (state.settings.prixKgOlives || 1);

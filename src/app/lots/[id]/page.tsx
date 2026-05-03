@@ -127,12 +127,11 @@ export default function LotDetailPage() {
                   {health.total}<span className="text-lg opacity-50">/100</span>
                 </div>
               </div>
-              <div className="grid grid-cols-5 gap-1 mb-2">
+              <div className="grid grid-cols-4 gap-1 mb-2">
                 {[
                   { label: "Rendement", val: health.breakdown.yield },
                   { label: "Eau", val: health.breakdown.water },
                   { label: "Finances", val: health.breakdown.financial },
-                  { label: "Opérations", val: health.breakdown.operations },
                   { label: "Stress", val: health.breakdown.stress },
                 ].map((p, idx) => (
                   <div key={idx} className="flex flex-col items-center gap-1">
