@@ -30,7 +30,7 @@ const clamp = (val: number) => Math.max(0, Math.min(100, Math.round(val)));
 /**
  * 1. Farm Health Score (Unified Intelligence Index)
  */
-export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
+export function computeLotHealth(state: FarmState, lotId: UUID, rainMm?: number): HealthScore {
   const lot = state.lots.find((l) => l.id === lotId);
   const type = state.types.find((t) => t.id === lot?.typeId) || state.types[0];
   if (!lot || !type) return fallbackHealth();
@@ -39,7 +39,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
 
   // --- 1. Yield Performance (35%) ---
   // Compares estimated yield vs theoretical maximum based on age
-  const estimatedYield = batchEstimatedProductionKg({ batch: lot, type, atISO: nowISO, rainMm: state.settings.pluviometrieAnnuelleMm });
+  const estimatedYield = batchEstimatedProductionKg({ batch: lot, type, atISO: nowISO, rainMm: rainMm ?? state.settings.pluviometrieAnnuelleMm });
   const theoreticalMax = lot.nbArbres * type.rendementMaxKgParArbre;
   let yieldScore = theoreticalMax > 0 ? (estimatedYield / theoreticalMax) * 100 : 0;
   // If lot is very young (age < 3), score shouldn't be 0, it should just be neutral 100 because it's growing perfectly if stars are 3+
@@ -51,7 +51,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
 
   // --- 2. Water Efficiency (25%) ---
   let waterScore = 50;
-  const rain = state.settings.pluviometrieAnnuelleMm ?? 300;
+  const rain = rainMm ?? state.settings.pluviometrieAnnuelleMm ?? 300;
 
   if (lot.irrigation === "optimal") {
     waterScore = 100;
@@ -157,7 +157,7 @@ function fallbackHealth(): HealthScore {
 /**
  * 2. Prediction Engine (Senya Forecasting Module)
  */
-export function computeLotForecast(state: FarmState, lotId: UUID): LotForecast {
+export function computeLotForecast(state: FarmState, lotId: UUID, rainMm?: number): LotForecast {
   const lot = state.lots.find((l) => l.id === lotId);
   const type = state.types.find((t) => t.id === lot?.typeId) || state.types[0];
   if (!lot || !type) return { yieldKg: 0, costDt: 0, profitDt: 0, confidence: "Faible", risks: [] };
@@ -171,7 +171,7 @@ export function computeLotForecast(state: FarmState, lotId: UUID): LotForecast {
   const harvestISO = `${targetYear}-11-01T00:00:00.000Z`;
   
   // 1. Base Expected Yield (from Gompertz engine) evaluated at harvest time!
-  let predictedYield = batchEstimatedProductionKg({ batch: lot, type, atISO: harvestISO, rainMm: state.settings.pluviometrieAnnuelleMm });
+  let predictedYield = batchEstimatedProductionKg({ batch: lot, type, atISO: harvestISO, rainMm: rainMm ?? state.settings.pluviometrieAnnuelleMm });
   
   // Adjust based on historical Farm Memory Yields
   const lotYields = state.yields.filter(y => y.lotId === lotId);

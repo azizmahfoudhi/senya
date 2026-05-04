@@ -11,10 +11,12 @@ import { computeLotHealth, computeLotForecast } from "@/lib/intelligence";
 import { todayISO } from "@/lib/derive";
 import { formatDateLong, formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { useFarmData } from "@/lib/useFarmData";
+import { useHistoricalRain } from "@/lib/useHistoricalRain";
 import { Star, ShieldAlert, Bug, Plus, Trash2, Edit2, Check, X, Sprout } from "lucide-react";
 
 export default function LotDetailPage() {
   const farm = useFarmData();
+  const { projectedRainMm } = useHistoricalRain();
   const params = useParams<{ id: string }>();
   const id = params?.id;
 
@@ -58,9 +60,9 @@ export default function LotDetailPage() {
     scenarios: farm.scenarios,
   };
   const cost = sumExpensesForBatch(farmState, lot.id);
-  const prod = type ? batchEstimatedProductionKg({ batch: lot, type, atISO: tISO, rainMm: farm.settings.pluviometrieAnnuelleMm }) : 0;
-  const health = computeLotHealth(farmState, lot.id);
-  const forecast = computeLotForecast(farmState, lot.id);
+  const prod = type ? batchEstimatedProductionKg({ batch: lot, type, atISO: tISO, rainMm: projectedRainMm }) : 0;
+  const health = computeLotHealth(farmState, lot.id, projectedRainMm);
+  const forecast = computeLotForecast(farmState, lot.id, projectedRainMm);
 
   const perTreeCost = lot.nbArbres > 0 ? cost / lot.nbArbres : 0;
   const yieldPerTree = lot.nbArbres > 0 ? prod / lot.nbArbres : 0;

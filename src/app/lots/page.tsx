@@ -10,11 +10,13 @@ import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { todayISO } from "@/lib/derive";
 import { useFarmData } from "@/lib/useFarmData";
 import { computeLotHealth } from "@/lib/intelligence";
+import { useHistoricalRain } from "@/lib/useHistoricalRain";
 import { Trees, Plus, Map as MapIcon, Droplets, DropletOff, Edit2, X, Check, Trash2, Star, ShieldAlert } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 
 export default function LotsPage() {
   const farm = useFarmData();
+  const { projectedRainMm } = useHistoricalRain();
   const typeById = new Map(farm.types.map((t) => [t.id, t]));
   const tISO = todayISO();
 
@@ -79,7 +81,7 @@ export default function LotsPage() {
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
             {farm.lots.map((lot) => (
-              <LotCard key={lot.id} lot={lot} farm={farm} typeById={typeById} tISO={tISO} />
+              <LotCard key={lot.id} lot={lot} farm={farm} typeById={typeById} tISO={tISO} rainMm={projectedRainMm} />
             ))}
           </div>
         )}
@@ -88,7 +90,7 @@ export default function LotsPage() {
   );
 }
 
-function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typeof useFarmData>; typeById: Map<string, any>; tISO: string }) {
+function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: ReturnType<typeof useFarmData>; typeById: Map<string, any>; tISO: string; rainMm: number }) {
   const [isEditing, setIsEditing] = React.useState(false);
   const [nom, setNom] = React.useState(lot.nom);
   const [typeId, setTypeId] = React.useState(lot.typeId);
@@ -99,7 +101,7 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
 
   const type = typeById.get(lot.typeId);
   const age = ageYearsFromISO(lot.datePlantationISO, tISO);
-  const prod = type ? batchEstimatedProductionKg({ batch: lot, type, atISO: tISO, rainMm: farm.settings.pluviometrieAnnuelleMm }) : 0;
+  const prod = type ? batchEstimatedProductionKg({ batch: lot, type, atISO: tISO, rainMm: rainMm }) : 0;
   const cost = sumExpensesForBatch(
     {
       settings: farm.settings,
@@ -124,7 +126,7 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
     treatments: farm.treatments,
     scenarios: farm.scenarios,
   };
-  const health = computeLotHealth(farmState, lot.id);
+  const health = computeLotHealth(farmState, lot.id, rainMm);
 
   async function handleSave() {
     if (!nom.trim() || !typeId) return;
