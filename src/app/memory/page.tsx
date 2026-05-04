@@ -196,40 +196,39 @@ export default function MemoryPage() {
     <AppShell 
       title="Mémoire Agricole"
       actions={
-        <Button size="sm" variant="secondary" className="gap-2 print:hidden" onClick={() => window.print()}>
+        <Button size="sm" variant="secondary" className="gap-2 print:hidden rounded-xl shadow-lg font-bold uppercase tracking-widest text-[10px]" onClick={() => window.print()}>
           <Printer className="w-4 h-4" />
-          <span className="hidden sm:inline">Exporter PDF</span>
+          Exporter
         </Button>
       }
     >
-      <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
         
-        {/* HEADER & SEARCH */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-black flex items-center gap-2">
-                <BrainCircuit className="w-6 h-6 text-primary" />
-                Mémoire de la Ferme
-              </h1>
-              <p className="text-sm text-muted">Historique complet des événements, actions et rendements.</p>
-            </div>
-            
-            <Button size="sm" className="gap-2 bg-success hover:bg-success/90 text-success-foreground print:hidden" onClick={() => setIsAddYieldOpen(true)}>
-              <Plus className="w-4 h-4" />
-              Saisir Récolte
-            </Button>
-            
-            {/* Native Modal for Add Yield */}
-            {isAddYieldOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-                <div className="bg-card w-full max-w-md p-6 rounded-2xl shadow-xl border border-border/50 relative animate-in zoom-in-95 duration-200">
-                  <h2 className="text-xl font-bold mb-4">{editingEvent ? "Modifier la récolte" : "Enregistrer une récolte"}</h2>
-                  <form onSubmit={handleAddYield} className="space-y-4">
-                    {!editingEvent && (
-                      <div className="space-y-1.5">
-                      <label className="text-sm font-medium">Lier à un/des lot(s) (Répartition proportionnelle)</label>
-                      <div className="flex flex-wrap gap-2">
+        {/* HEADER */}
+        <div className="px-2 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+              Mémoire de la Ferme
+            </h1>
+            <p className="text-muted-foreground font-medium pt-1 max-w-md text-lg">Le grand livre d'histoire de votre exploitation. Archivez chaque action pour nourrir l'intelligence de demain.</p>
+          </div>
+          
+          <Button size="lg" className="gap-2 bg-primary shadow-xl shadow-primary/20 rounded-2xl font-black uppercase tracking-widest text-[10px] h-14 px-8 print:hidden" onClick={() => setIsAddYieldOpen(true)}>
+            <Plus className="w-5 h-5" />
+            Saisir Récolte
+          </Button>
+
+          {/* Native Modal for Add Yield */}
+          {isAddYieldOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xl animate-in fade-in duration-300">
+              <div className="bg-card w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl border border-border/40 relative animate-in zoom-in-95 duration-500 overflow-hidden">
+                <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary via-emerald-400 to-primary" />
+                <h2 className="text-2xl font-black tracking-tighter mb-6">{editingEvent ? "Modifier la récolte" : "Enregistrer une récolte"}</h2>
+                <form onSubmit={handleAddYield} className="space-y-6">
+                  {!editingEvent && (
+                    <div className="space-y-3">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Affectation (Répartition auto)</div>
+                      <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1">
                         {farm.lots.map(l => {
                           const isSelected = selectedLotIds.has(l.id);
                           return (
@@ -242,107 +241,116 @@ export default function MemoryPage() {
                                 else next.add(l.id);
                                 setSelectedLotIds(next);
                               }}
-                              className={`px-3 py-1 text-xs rounded-full border transition-colors ${isSelected ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted border-border/60 text-muted-foreground'}`}
+                              className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl border transition-all ${isSelected ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20' : 'bg-background hover:bg-muted border-border/40 text-muted-foreground'}`}
                             >
                               {l.nom}
                             </button>
                           );
                         })}
                       </div>
-                      {selectedLotIds.size === 0 && <div className="text-xs text-danger mt-1">Veuillez sélectionner au moins un lot</div>}
-                      {selectedLotIds.size > 1 && <div className="text-xs text-primary font-medium mt-1">Répartition automatique entre {selectedLotIds.size} lots</div>}
+                      {selectedLotIds.size === 0 && <div className="text-[10px] font-bold text-danger animate-pulse">SÉLECTIONNEZ UN LOT</div>}
                     </div>
-                    )}
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium">Date / Année</label>
-                      <Input type="date" value={yDate} onChange={e => setYDate(e.target.value)} required />
+                  )}
+                  <div className="space-y-2">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Date de récolte</div>
+                    <Input type="date" value={yDate} onChange={e => setYDate(e.target.value)} required className="h-12 rounded-xl bg-muted/5 font-bold" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Quantité Totale (kg)</div>
+                    <Input type="number" min="0" value={yQuantite} onChange={e => setYQuantite(e.target.value)} required placeholder="Ex: 1200" className="h-12 rounded-xl bg-muted/5 font-bold" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Qté Vendue (kg)</div>
+                      <Input type="number" min="0" value={yQuantiteVendue} onChange={e => setYQuantiteVendue(e.target.value)} placeholder="Optionnel" className="h-12 rounded-xl bg-muted/5 font-bold" />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium">Quantité totale récoltée (kg)</label>
-                      <Input type="number" min="0" value={yQuantite} onChange={e => setYQuantite(e.target.value)} required placeholder="Ex: 1200" />
+                    <div className="space-y-2">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Prix (DT/kg)</div>
+                      <Input type="number" step="0.001" min="0" value={yPrixVente} onChange={e => setYPrixVente(e.target.value)} placeholder="Optionnel" className="h-12 rounded-xl bg-muted/5 font-bold" />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Qté vendue (kg)</label>
-                        <Input type="number" min="0" value={yQuantiteVendue} onChange={e => setYQuantiteVendue(e.target.value)} placeholder="Ex: 1000" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Prix vente (DT/kg)</label>
-                        <Input type="number" step="0.001" min="0" value={yPrixVente} onChange={e => setYPrixVente(e.target.value)} placeholder="Ex: 6.5" />
-                      </div>
-                    </div>
-                      <div className="flex gap-2 pt-2">
-                        <Button type="button" variant="secondary" className="flex-1" onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }} disabled={isSubmitting}>Annuler</Button>
-                        <Button type="submit" className="flex-1" disabled={isSubmitting || (!editingEvent && selectedLotIds.size === 0)}>
-                          {isSubmitting ? "Envoi..." : editingEvent ? "Mettre à jour" : "Enregistrer"}
-                        </Button>
-                      </div>
-                  </form>
-                </div>
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <Button type="button" variant="ghost" className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px]" onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }} disabled={isSubmitting}>Annuler</Button>
+                    <Button type="submit" className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20" disabled={isSubmitting || (!editingEvent && selectedLotIds.size === 0)}>
+                      {isSubmitting ? "Enregistrement..." : "Enregistrer"}
+                    </Button>
+                  </div>
+                </form>
               </div>
-            )}
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 print:hidden">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
-              <Input 
-                placeholder="Rechercher (ex: 'Taille 2024', 'Lot A', 'Canicule'...)" 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 bg-card/50 backdrop-blur-sm border-border/50"
-              />
             </div>
-            <Select value={filterType} onChange={e => setFilterType(e.target.value)} className="w-full sm:w-[180px] bg-card/50">
-              <option value="all">Tous les événements</option>
-              <option value="yield">🌾 Récoltes & Rendements</option>
-              <option value="expense">💸 Dépenses</option>
-              <option value="treatment">🐛 Traitements</option>
-            </Select>
+          )}
+        </div>
+
+        {/* SEARCH & FILTERS */}
+        <div className="flex flex-col sm:flex-row gap-4 px-2 print:hidden">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted group-focus-within:text-primary transition-colors" />
+            <Input 
+              placeholder="Rechercher par lot, année, ou type d'événement..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-12 h-14 rounded-2xl bg-muted/5 border-border/40 focus:bg-background transition-all font-medium text-lg"
+            />
           </div>
+          <select 
+            value={filterType} 
+            onChange={e => setFilterType(e.target.value)} 
+            className="h-14 w-full sm:w-[220px] rounded-2xl border border-border/40 bg-muted/5 px-4 py-2 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
+          >
+            <option value="all">Tout l'Historique</option>
+            <option value="yield">Récoltes</option>
+            <option value="expense">Dépenses</option>
+            <option value="treatment">Traitements</option>
+          </select>
         </div>
 
         {/* TIMELINE */}
-        <div className="relative border-l-2 border-border/40 ml-4 pl-6 space-y-6 pb-12">
+        <div className="relative ml-8 border-l-2 border-dashed border-border/60 space-y-10 pb-20">
           {filteredEvents.length === 0 ? (
-            <div className="text-center py-12 text-muted">
-              Aucun événement ne correspond à votre recherche.
+            <div className="text-center py-20 bg-muted/5 rounded-[3rem] border-2 border-dashed border-border/40">
+              <div className="text-4xl mb-4 opacity-20">📂</div>
+              <div className="text-sm font-black uppercase tracking-widest text-muted">Aucune archive trouvée</div>
             </div>
           ) : (
             filteredEvents.map((event, index) => (
-              <div key={event.id} className="relative group animate-in fade-in slide-in-from-left-4 fill-mode-both" style={{ animationDelay: `${index * 50}ms` }}>
+              <div key={event.id} className="relative pl-10 animate-in fade-in slide-in-from-left-6 fill-mode-both group" style={{ animationDelay: `${index * 50}ms` }}>
                 {/* Timeline Dot */}
-                <div className={`absolute -left-[35px] w-8 h-8 rounded-full border-4 border-background flex items-center justify-center ${event.colorClass} shadow-sm transition-transform group-hover:scale-110`}>
+                <div className={cn(
+                  "absolute -left-[17px] top-4 w-8 h-8 rounded-full border-4 border-background flex items-center justify-center shadow-xl transition-all duration-500 group-hover:scale-125 z-10",
+                  event.colorClass
+                )}>
                   {event.icon}
                 </div>
                 
-                <Card className="border-border/50 bg-card/40 backdrop-blur-md shadow-sm group-hover:shadow-md transition-all group-hover:border-primary/20 overflow-hidden">
-                  <div className="p-4 flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{formatDateLong(event.dateISO)}</span>
+                <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-xl shadow-black/5 group-hover:shadow-primary/5 group-hover:border-primary/20 transition-all duration-500 overflow-hidden group-hover:-translate-y-1">
+                  <div className="p-8 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/10 px-3 py-1 rounded-full border border-border/20">
+                          {formatDateLong(event.dateISO)}
+                        </span>
                         {event.lotName && (
-                          <span className="text-[10px] bg-background/80 px-2 py-0.5 rounded-full border border-border/40 text-foreground/80 font-medium">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                             {event.lotName}
                           </span>
                         )}
                       </div>
-                      <h3 className="font-semibold text-base">{event.title}</h3>
-                      {event.subtitle && <p className="text-sm text-muted mt-0.5">{event.subtitle}</p>}
+                      <h3 className="text-2xl font-black tracking-tighter leading-tight">{event.title}</h3>
+                      {event.subtitle && <p className="text-sm font-medium text-muted-foreground italic">{event.subtitle}</p>}
                     </div>
                     
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex items-center gap-6 shrink-0 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
                       {event.amount !== undefined && (
-                        <div className={`text-lg font-black ${event.type === 'expense' ? 'text-danger' : 'text-success'}`}>
+                        <div className={`text-3xl font-black tracking-tighter tabular-nums ${event.type === 'expense' ? 'text-danger' : 'text-success'}`}>
                           {event.type === 'expense' ? `-${formatMoneyDT(event.amount)}` : `+${formatKg(event.amount)}`}
                         </div>
                       )}
                       
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
                         {event.type === "yield" && (
                           <button 
                             onClick={() => openEditModal(event)}
-                            className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                            className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/10"
                             title="Modifier"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -350,7 +358,7 @@ export default function MemoryPage() {
                         )}
                         <button 
                           onClick={() => handleDeleteEvent(event)}
-                          className="p-2 rounded-xl hover:bg-danger/10 text-muted-foreground hover:text-danger transition-colors"
+                          className="w-10 h-10 rounded-xl bg-danger/10 text-danger flex items-center justify-center hover:bg-danger hover:text-white transition-all shadow-lg shadow-danger/10"
                           title="Supprimer"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -363,6 +371,12 @@ export default function MemoryPage() {
             ))
           )}
         </div>
+
+      </div>
+    </AppShell>
+  );
+}
+>
 
       </div>
     </AppShell>
