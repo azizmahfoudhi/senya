@@ -98,6 +98,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
   const [nb, setNb] = React.useState(String(lot.nbArbres));
   const [irrig, setIrrig] = React.useState(lot.irrigation);
   const [croissance, setCroissance] = React.useState<number>(lot.etatCroissance ?? 3);
+  const [stress, setStress] = React.useState<import("@/lib/domain").StressLevel>(lot.stressLevel ?? "bas");
 
   const type = typeById.get(lot.typeId);
   const age = ageYearsFromISO(lot.datePlantationISO, tISO);
@@ -137,6 +138,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
       nbArbres: Math.max(1, Number(nb || 0)),
       irrigation: irrig,
       etatCroissance: croissance,
+      stressLevel: stress,
     });
     setIsEditing(false);
   }
@@ -213,6 +215,30 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
               ))}
             </div>
           </label>
+          <div className="grid gap-1.5">
+            <div className="text-[11px] font-bold text-foreground/70 uppercase tracking-wider px-0.5">Niveau de Stress Environnemental (Sécheresse, etc.)</div>
+            <div className="flex gap-1.5">
+              {[
+                { id: "bas", label: "Bas", desc: "Sain" },
+                { id: "moyen", label: "Moyen", desc: "Stressé" },
+                { id: "eleve", label: "Élevé", desc: "Critique" },
+              ].map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setStress(s.id as any)}
+                  className={cn(
+                    "flex-1 flex flex-col items-center py-2 px-1 rounded-xl border transition-all",
+                    stress === s.id 
+                      ? "bg-primary border-primary text-primary-foreground shadow-sm" 
+                      : "bg-background border-border hover:border-primary/50 text-muted-foreground"
+                  )}
+                >
+                  <span className="text-xs font-bold">{s.label}</span>
+                  <span className="text-[9px] opacity-80 uppercase font-medium">{s.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
     );

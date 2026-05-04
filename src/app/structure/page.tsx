@@ -111,6 +111,7 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   const [nb, setNb] = React.useState<string>("100");
   const [irrig, setIrrig] = React.useState<import("@/lib/domain").IrrigationStatus>("non_irrigue");
   const [croissance, setCroissance] = React.useState<number>(3);
+  const [stress, setStress] = React.useState<import("@/lib/domain").StressLevel>("bas");
 
   async function submit() {
     const chosen = typeId || farm.types[0]?.id;
@@ -122,6 +123,7 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
       nbArbres: Math.max(1, Number(nb || 0)), // Prevent negative or zero
       irrigation: irrig,
       etatCroissance: croissance,
+      stressLevel: stress,
     });
     setNom("Nouveau lot");
     setNb("100");
@@ -219,6 +221,34 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
             ))}
           </div>
         </label>
+        
+        <div className="grid gap-1.5">
+          <div className="text-sm font-medium text-foreground/80 px-0.5">Niveau de Stress Environnemental (Sécheresse, etc.)</div>
+          <div className="flex gap-2">
+            {[
+              { id: "bas", label: "Bas", desc: "Sain" },
+              { id: "moyen", label: "Moyen", desc: "Stressé" },
+              { id: "eleve", label: "Élevé", desc: "Critique" },
+            ].map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setStress(s.id as any)}
+                className={cn(
+                  "flex-1 flex flex-col items-center py-2.5 px-2 rounded-2xl border-2 transition-all",
+                  stress === s.id 
+                    ? "bg-primary border-primary text-primary-foreground shadow-md" 
+                    : "bg-background/50 border-border/40 hover:border-primary/30 text-muted-foreground"
+                )}
+              >
+                <span className="text-xs font-black uppercase tracking-tight">{s.label}</span>
+                <span className="text-[10px] opacity-70 font-bold">{s.desc}</span>
+              </button>
+            ))}
+          </div>
+          <div className="text-[10px] text-muted italic px-1">
+            Réduit directement le rendement (Sécheresse prolongée, maladie chronique).
+          </div>
+        </div>
         
         <Button onClick={submit} disabled={farm.types.length === 0} className="w-full mt-2 gap-2">
           <Sprout className="w-4 h-4" />

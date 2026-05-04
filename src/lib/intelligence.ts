@@ -95,6 +95,8 @@ export function computeLotHealth(state: FarmState, lotId: UUID, rainMm?: number)
   // --- 4. Environmental Stress (15%) ---
   const lotTreatments = state.treatments.filter(t => t.lotId === lotId);
   let stressScore = 100;
+  if (lot.stressLevel === "moyen") stressScore = 60;
+  else if (lot.stressLevel === "eleve") stressScore = 30;
   
   const nowTime = Date.now();
   lotTreatments.forEach(t => {

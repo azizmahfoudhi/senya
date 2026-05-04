@@ -1,6 +1,7 @@
 export type UUID = string;
 
 export type IrrigationStatus = "non_irrigue" | "faible" | "normal" | "optimal";
+export type StressLevel = "bas" | "moyen" | "eleve";
 
 export type ExpenseCategory =
   | "plantation"
@@ -36,6 +37,7 @@ export type Batch = {
   nbArbres: number;
   irrigation: IrrigationStatus;
   etatCroissance?: number; // 1 to 5 stars
+  stressLevel?: StressLevel;
 };
 
 export type Expense = {

@@ -63,6 +63,7 @@ export function estimatedYieldKgPerTree(args: {
   irrigation: IrrigationStatus;
   growthStatus?: number;
   rainMm?: number;
+  stressLevel?: import("./domain").StressLevel;
 }) {
   const yieldPct = yieldPercentageByAge(args.ageYears, args.type);
   const scaled = yieldPct * args.type.rendementMaxKgParArbre;
@@ -93,8 +94,13 @@ export function estimatedYieldKgPerTree(args: {
   if (args.growthStatus === 2) growthMultiplier = 0.7;
   if (args.growthStatus === 4) growthMultiplier = 1.2;
   if (args.growthStatus === 5) growthMultiplier = 1.5;
+  
+  // Multiplicateur Stress (Impact direct sur la santé de l'arbre)
+  let stressMultiplier = 1.0;
+  if (args.stressLevel === "moyen") stressMultiplier = 0.7;
+  else if (args.stressLevel === "eleve") stressMultiplier = 0.4;
 
-  return Math.max(0, scaled * irrigationMultiplier * growthMultiplier);
+  return Math.max(0, scaled * irrigationMultiplier * growthMultiplier * stressMultiplier);
 }
 
 export function batchEstimatedProductionKg(args: {
@@ -110,6 +116,7 @@ export function batchEstimatedProductionKg(args: {
     irrigation: args.batch.irrigation,
     growthStatus: args.batch.etatCroissance,
     rainMm: args.rainMm,
+    stressLevel: args.batch.stressLevel,
   });
   return perTree * args.batch.nbArbres;
 }

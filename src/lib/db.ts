@@ -34,6 +34,7 @@ type DbBatchRow = {
   nb_arbres: number;
   irrigation: IrrigationStatus;
   etat_croissance: string | null;
+  stress_level: string | null;
 };
 
 type DbExpenseRow = {
@@ -96,6 +97,7 @@ function mapBatch(r: DbBatchRow): Batch {
     nbArbres: Number(r.nb_arbres),
     irrigation: r.irrigation,
     etatCroissance: isNaN(Number(r.etat_croissance)) ? 3 : Number(r.etat_croissance) || 3,
+    stressLevel: (r.stress_level as any) || "bas",
   };
 }
 function mapExpense(r: DbExpenseRow): Expense {
@@ -219,6 +221,7 @@ export async function createBatch(input: Omit<Batch, "id">) {
       nb_arbres: input.nbArbres,
       irrigation: input.irrigation,
       etat_croissance: input.etatCroissance ?? 3,
+      stress_level: input.stressLevel ?? "bas",
     })
     .select("*")
     .single();
@@ -318,6 +321,7 @@ export async function updateBatch(id: UUID, input: Partial<Omit<Batch, "id">>) {
   if (input.nbArbres !== undefined) payload.nb_arbres = input.nbArbres;
   if (input.irrigation !== undefined) payload.irrigation = input.irrigation;
   if (input.etatCroissance !== undefined) payload.etat_croissance = input.etatCroissance;
+  if (input.stressLevel !== undefined) payload.stress_level = input.stressLevel;
   const { error } = await sb.from("batches").update(payload).eq("id", id);
   if (error) throw error;
 }
