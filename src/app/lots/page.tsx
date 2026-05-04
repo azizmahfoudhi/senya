@@ -244,11 +244,14 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
   }
 
   return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm hover:shadow-md transition-shadow group flex flex-col">
-      <CardHeader className="pb-3">
+    <Card className="glass-card rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 group flex flex-col relative overflow-hidden border-border/40">
+      <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-500 pointer-events-none">
+        <Trees className="w-24 h-24" />
+      </div>
+      <CardHeader className="pb-3 relative z-10">
         <div className="flex items-start justify-between min-w-0 gap-4">
           <div>
-            <CardTitle className="truncate text-lg mb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">{lot.nom}</CardTitle>
+            <CardTitle className="truncate text-xl mb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent font-black">{lot.nom}</CardTitle>
             <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1">
               {lot.typeId && type ? (
                 <span className="font-medium text-foreground/80">{type.nom}</span>

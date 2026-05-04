@@ -17,6 +17,8 @@ import {
   Sun,
 } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
+import { CommandPalette } from "./CommandPalette";
+import { Search, Command as CommandIcon } from "lucide-react";
 
 const nav = [
   { href: "/", label: "Résumé", icon: BarChart3 },
@@ -66,6 +68,17 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: true }))}
+              className="hidden sm:flex items-center gap-2 h-10 px-3 rounded-xl bg-muted/5 text-muted hover:bg-muted/10 transition-all border border-border/20 group"
+              title="Rechercher (Ctrl+K)"
+            >
+              <Search className="w-4 h-4 group-hover:text-primary transition-colors" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Rechercher</span>
+              <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-background border border-border/40 text-[9px]">
+                <CommandIcon className="w-2.5 h-2.5" /> K
+              </div>
+            </button>
+            <button
               onClick={toggle}
               className="w-10 h-10 rounded-xl flex items-center justify-center bg-muted/10 text-muted hover:bg-muted/20 hover:text-foreground transition-all duration-300 border border-border/20"
               aria-label="Changer de thème"
@@ -76,6 +89,8 @@ export function AppShell({
           </div>
         </div>
       </header>
+
+      <CommandPalette />
 
       <main className="flex-1 mx-auto w-full max-w-4xl px-4 py-6 pb-28 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both delay-100 print:pb-0 print:py-0">
         {children}

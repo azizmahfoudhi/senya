@@ -142,21 +142,60 @@ export default function HomePage() {
       ) : (
         <>
           {/* HERO SECTION */}
-          <div className="flex flex-col sm:flex-row gap-4 items-stretch mb-4 mt-2 px-6">
-            <div className="flex-1 space-y-1 bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-3xl border border-primary/20">
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight flex items-center gap-2">
-                <span className="text-xl sm:text-2xl animate-wave inline-block origin-bottom-right">👋</span> 
+          <div className="flex flex-col sm:flex-row gap-6 items-stretch mb-8 mt-2 px-2">
+            <div className="flex-1 space-y-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-8 rounded-[2.5rem] border border-primary/20 shadow-inner relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
+              
+              <h2 className="text-4xl sm:text-5xl font-black tracking-tight flex items-center gap-3">
+                <span className="animate-float inline-block">👋</span> 
                 Bonjour.
               </h2>
-              <p className="text-muted-foreground font-medium text-lg pt-1">
-                Oliveraie de {farm.settings.surfaceHa} ha.
+              <p className="text-muted-foreground font-medium text-xl pt-1">
+                Oliveraie de {farm.settings.surfaceHa} ha <span className="text-sm opacity-50 font-normal">({farm.lots.length} parcelles)</span>
               </p>
-              <div className="mt-4 inline-flex items-center gap-2 bg-background/50 px-4 py-2 rounded-2xl border border-border/50">
-                <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Évaluation Globale</span>
-                <div className="flex items-center gap-1.5">
-                  <div className={`h-2.5 w-2.5 rounded-full ${globalHealth >= 80 ? 'bg-success' : globalHealth >= 50 ? 'bg-warning' : 'bg-danger'}`} />
-                  <span className="font-bold text-lg">{historyLoading ? "..." : globalHealth}<span className="text-sm opacity-60">/100</span></span>
+              
+              <div className="mt-8 flex flex-wrap gap-3">
+                <div className="inline-flex items-center gap-3 bg-background/60 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-border/50 shadow-sm animate-pulse-glow">
+                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Santé Moyenne</span>
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      "h-3 w-3 rounded-full animate-pulse",
+                      globalHealth >= 80 ? 'bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]' : globalHealth >= 50 ? 'bg-warning shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 'bg-danger shadow-[0_0_8px_rgba(239,68,68,0.5)]'
+                    )} />
+                    <span className="font-black text-2xl tracking-tighter">{historyLoading ? "..." : globalHealth}<span className="text-sm opacity-40 font-bold">/100</span></span>
+                  </div>
                 </div>
+                
+                <Link href="/lots" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-2xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20">
+                  Gérer les lots <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* QUICK HEALTH GRID (Visual Map) */}
+            <div className="sm:w-64 glass-card rounded-[2.5rem] p-6 flex flex-col">
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 px-1">État des Parcelles</div>
+              <div className="grid grid-cols-4 gap-2 flex-1">
+                {farm.lots.slice(0, 16).map((lot) => {
+                  const h = computeLotHealth(state, lot.id, projectedRainMm);
+                  return (
+                    <Link 
+                      key={lot.id} 
+                      href={`/lots/${lot.id}`}
+                      title={`${lot.nom}: ${h.total}/100`}
+                      className={cn(
+                        "aspect-square rounded-lg transition-all hover:scale-110 hover:z-10 shadow-sm",
+                        h.total >= 80 ? 'bg-success/40 border border-success/30' : h.total >= 50 ? 'bg-warning/40 border border-warning/30' : 'bg-danger/40 border border-danger/30'
+                      )}
+                    />
+                  );
+                })}
+                {Array.from({ length: Math.max(0, 8 - farm.lots.length) }).map((_, i) => (
+                  <div key={i} className="aspect-square rounded-lg bg-muted/5 border border-dashed border-border/20" />
+                ))}
+              </div>
+              <div className="mt-4 text-[10px] text-muted-foreground font-medium text-center italic">
+                Vue schématique
               </div>
             </div>
           </div>
@@ -293,34 +332,30 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="md:col-span-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-[700ms] fill-mode-both border-border/50 bg-card/50 backdrop-blur-xl shadow-sm hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all">
-              <CardHeader className="pb-3 border-b border-border/50">
+            <Card className="md:col-span-2 glass-card rounded-[2.5rem] shadow-xl hover:shadow-primary/5 transition-all relative overflow-hidden group">
+              <div className="absolute inset-x-0 top-0 h-1 bg-primary/20 animate-scanning z-20 pointer-events-none" />
+              
+              <CardHeader className="pb-3 border-b border-border/40 relative z-10">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
-                      <span className="text-2xl">🤖</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                      <span className="text-3xl animate-float">🤖</span>
                     </div>
                     <div>
-                        <CardTitle className="text-lg bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">Assistant Senya</CardTitle>
-                        <CardDescription>
-                          {weather ? `Météo : ${weather.current.temp}°C · ` : "Analyse..."}
-                          {lastFetched && <span className="text-[10px] opacity-70">Màj: {lastFetched}</span>}
-                        </CardDescription>
+                      <CardTitle className="text-xl bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent font-black tracking-tight">Intelligence Artificielle</CardTitle>
+                      <CardDescription className="font-medium">
+                        {weather ? `${weather.current.temp}°C · ${weather.current.isDay ? 'Ensoleillé' : 'Nuit'}` : "Calcul des variables..."}
+                        {lastFetched && <span className="ml-2 text-[10px] opacity-70">Màj: {lastFetched}</span>}
+                      </CardDescription>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <Link href="/memory">
-                      <Button variant="ghost" size="sm" className="h-8 gap-2 text-muted-foreground hover:text-primary">
+                      <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl border-border/50 bg-background/40 hover:bg-primary/5 hover:text-primary transition-all">
                         <BrainCircuit className="w-4 h-4" />
-                        <span className="hidden sm:inline">Mémoire</span>
+                        <span className="hidden sm:inline font-bold">Mémoire</span>
                       </Button>
                     </Link>
-                    {weather && (
-                      <div className="text-right hidden sm:block border-l border-border/50 pl-4">
-                        <div className="text-2xl font-black">{weather.current.temp}°C</div>
-                        <div className="text-xs text-muted">{weather.current.isDay ? "Ensoleillé" : "Nuit Claire"}</div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </CardHeader>
