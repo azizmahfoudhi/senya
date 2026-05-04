@@ -1,4 +1,4 @@
-import { FarmState, UUID } from "@/lib/domain";
+import { FarmState, UUID, Batch, ExpenseCategory } from "@/lib/domain";
 import { batchEstimatedProductionKg, sumExpensesForBatch } from "@/lib/engine";
 
 export type HealthScore = {
@@ -29,6 +29,26 @@ const clamp = (val: number) => {
   if (isNaN(val)) return 0;
   return Math.max(0, Math.min(100, Math.round(val)));
 };
+
+/**
+ * Calculates a weight for a lot based on tree count and age-based consumption factors.
+ * Especially useful for Irrigation where young trees consume less.
+ */
+function getLotResourceWeight(lot: Batch, category?: ExpenseCategory): number {
+  const currentYear = new Date().getFullYear();
+  const plantYear = new Date(lot.datePlantationISO).getFullYear();
+  const age = Math.max(0, currentYear - plantYear);
+
+  let factor = 1.0;
+  // Irrigation smart weighting: small trees drink much less
+  if (category === "irrigation") {
+    if (age < 4) factor = 0.3;      // Jeunes (1-3 ans)
+    else if (age < 8) factor = 0.6;  // Moyens (4-7 ans)
+    else factor = 1.0;              // Adultes (8+)
+  }
+  
+  return lot.nbArbres * factor;
+}
 
 /**
  * 1. Farm Health Score (Unified Intelligence Index)
@@ -211,12 +231,16 @@ export function computeLotForecast(state: FarmState, lotId: UUID, rainMm?: numbe
   const recentLotExpenses = state.depenses.filter(e => e.lotId === lotId && e.dateISO >= oneYearAgoISO);
   const lotSpecificCost = recentLotExpenses.reduce((sum, e) => sum + e.montant, 0);
 
-  // Dépenses globales (sans lotId) réparties proportionnellement au nombre d'arbres
+  // Dépenses globales (sans lotId) réparties proportionnellement (avec poids intelligent pour l'irrigation)
   const recentGlobalExpenses = state.depenses.filter(e => !e.lotId && e.dateISO >= oneYearAgoISO);
-  const totalGlobalCost = recentGlobalExpenses.reduce((sum, e) => sum + e.montant, 0);
-  const totalTreesInFarm = state.lots.reduce((acc, l) => acc + l.nbArbres, 0);
-  const lotShare = totalTreesInFarm > 0 ? lot.nbArbres / totalTreesInFarm : 0;
-  const allocatedGlobalCost = totalGlobalCost * lotShare;
+  let allocatedGlobalCost = 0;
+
+  recentGlobalExpenses.forEach(exp => {
+    const totalWeight = state.lots.reduce((acc, l) => acc + getLotResourceWeight(l, exp.categorie as ExpenseCategory), 0);
+    const myWeight = getLotResourceWeight(lot, exp.categorie as ExpenseCategory);
+    const share = totalWeight > 0 ? (myWeight / totalWeight) : 0;
+    allocatedGlobalCost += (exp.montant * share);
+  });
 
   const baseCostLastYear = lotSpecificCost + allocatedGlobalCost;
 

@@ -134,19 +134,36 @@ function OneOffExpenses() {
         note: note.trim() || undefined,
       });
     } else {
-      // Répartition proportionnelle selon le nombre d'arbres
+      // Répartition proportionnelle intelligente (prend en compte l'âge pour l'irrigation)
       const selectedLots = farm.lots.filter(l => selectedLotIds.has(l.id));
-      const totalTrees = selectedLots.reduce((sum, l) => sum + l.nbArbres, 0);
       
-      for (const lot of selectedLots) {
-        const proportion = totalTrees > 0 ? (lot.nbArbres / totalTrees) : (1 / selectedLots.length);
+      let totalWeight = 0;
+      const lotsWithWeights = selectedLots.map(l => {
+        const currentYear = new Date().getFullYear();
+        const plantYear = new Date(l.datePlantationISO).getFullYear();
+        const age = Math.max(0, currentYear - plantYear);
+        
+        let weightFactor = 1.0;
+        if (categorie === "irrigation") {
+          if (age < 4) weightFactor = 0.3;      // Jeunes arbres consomment moins
+          else if (age < 8) weightFactor = 0.6;  // Arbres en croissance
+          else weightFactor = 1.0;              // Adultes
+        }
+        
+        const weight = l.nbArbres * weightFactor;
+        totalWeight += weight;
+        return { lot: l, weight };
+      });
+      
+      for (const item of lotsWithWeights) {
+        const proportion = totalWeight > 0 ? (item.weight / totalWeight) : (1 / selectedLots.length);
         const lotMontant = Number((totalMontant * proportion).toFixed(3));
         
         await farm.actions.addExpense({
           dateISO,
           montant: lotMontant,
           categorie,
-          lotId: lot.id,
+          lotId: item.lot.id,
           note: note.trim() || undefined,
         });
       }
