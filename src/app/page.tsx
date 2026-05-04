@@ -12,13 +12,14 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Button } from "@/components/ui/Button";
 import { buildInsights, farmTotals, expensesSeriesLast12Months } from "@/lib/derive";
 import { useWeather } from "@/lib/useWeather";
 import { computeGlobalHealth } from "@/lib/intelligence";
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useFarmData } from "@/lib/useFarmData";
-import { Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings } from "lucide-react";
+import { Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit } from "lucide-react";
 
 export default function HomePage() {
   const farm = useFarmData();
