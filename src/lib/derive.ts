@@ -136,12 +136,12 @@ export function buildInsights(state: FarmState, weather: WeatherData | null = nu
     if (isRaining || weather.current.precipitation > 2) {
       addInsight({
         level: "success",
-        titre: "Suspension d'Irrigation",
+        titre: "Économie d'eau possible",
         icon: "🌧️",
         priorityScore: 90,
-        whatIsHappening: `Il pleut actuellement (${weather.current.precipitation}mm). La terre accumule une réserve d'eau naturelle.`,
-        whatToDo: "Coupez les pompes et suspendez les cycles d'irrigation pour les 3 prochains jours.",
-        whyItMatters: "L'excès d'eau favorise l'asphyxie racinaire (pourridié) et vous fait gaspiller de l'énergie (électricité/carburant)."
+        whatIsHappening: `Les précipitations actuelles (${weather.current.precipitation}mm) assurent une humidité naturelle suffisante.`,
+        whatToDo: "Mettez vos systèmes d'irrigation en pause pour les 48 à 72 prochaines heures.",
+        whyItMatters: "L'excès d'eau fatigue les racines et représente un coût inutile en énergie et en ressources."
       });
     }
   }
@@ -155,12 +155,12 @@ export function buildInsights(state: FarmState, weather: WeatherData | null = nu
   if (state.lots.length > 0 && recentExpenses.length === 0) {
     addInsight({
       level: "warning",
-      titre: "Trou de données comptables",
+      titre: "Mise à jour comptable",
       icon: "🕳️",
       priorityScore: 70,
-      whatIsHappening: "Aucune dépense n'a été saisie dans les 30 derniers jours.",
-      whatToDo: "Mettez à jour vos frais (carburant, électricité, ouvriers) dans l'onglet Dépenses.",
-      whyItMatters: "Sans données exactes, les calculs de rentabilité et le ROI sont faussés. Vous naviguez à l'aveugle."
+      whatIsHappening: "Aucune dépense n'a été enregistrée au cours des 30 derniers jours.",
+      whatToDo: "Prenez quelques minutes pour saisir vos derniers frais (carburant, main d'œuvre) afin de garder vos scores à jour.",
+      whyItMatters: "Une comptabilité précise est indispensable pour calculer votre ROI réel et détecter les gaspillages."
     });
   }
 

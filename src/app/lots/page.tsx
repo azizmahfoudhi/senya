@@ -248,7 +248,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between min-w-0 gap-4">
           <div>
-            <CardTitle className="truncate text-lg mb-1">{lot.nom}</CardTitle>
+            <CardTitle className="truncate text-lg mb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">{lot.nom}</CardTitle>
             <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1">
               {lot.typeId && type ? (
                 <span className="font-medium text-foreground/80">{type.nom}</span>
@@ -333,19 +333,30 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
             Invest: <span className="font-semibold text-foreground">{formatMoneyDT(cost)}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" className="text-muted opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0" onClick={() => setIsEditing(true)}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-muted opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
+              onClick={() => setIsEditing(true)}
+              title="Modifier le lot"
+            >
               <Edit2 className="w-4 h-4" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
               className="text-danger opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
-              onClick={() => farm.actions.removeBatch(lot.id)}
+              onClick={() => {
+                if (confirm(`Voulez-vous vraiment supprimer le lot "${lot.nom}" ? Cette action est irréversible.`)) {
+                  farm.actions.removeBatch(lot.id);
+                }
+              }}
+              title="Supprimer le lot"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
             <Link href={`/lots/${lot.id}`}>
-              <Button size="sm" variant="secondary" className="h-8 ml-1">Détails</Button>
+              <Button size="sm" variant="secondary" className="h-8 ml-1" title="Voir les détails et l'historique">Détails</Button>
             </Link>
           </div>
         </div>

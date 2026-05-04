@@ -19,7 +19,8 @@ import { computeGlobalHealth } from "@/lib/intelligence";
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useFarmData } from "@/lib/useFarmData";
-import { Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit } from "lucide-react";
+import { Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit, Sun, Cloud, Snowflake, CloudRain, Moon } from "lucide-react";
+import { useHistoricalRain } from "@/lib/useHistoricalRain";
 
 export default function HomePage() {
   const farm = useFarmData();
@@ -42,7 +43,7 @@ export default function HomePage() {
     month: p.monthISO.slice(5, 7),
   }));
   
-  const projectedRainMm = weather ? (weather.daily as any).precipitation?.reduce((a: number, b: number) => a + b, 0) ?? 300 : 300;
+  const { projectedRainMm, loading: historyLoading } = useHistoricalRain();
   const globalHealth = computeGlobalHealth(state, projectedRainMm);
 
   if (farm.loading) {
@@ -154,7 +155,7 @@ export default function HomePage() {
                 <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Évaluation Globale</span>
                 <div className="flex items-center gap-1.5">
                   <div className={`h-2.5 w-2.5 rounded-full ${globalHealth >= 80 ? 'bg-success' : globalHealth >= 50 ? 'bg-warning' : 'bg-danger'}`} />
-                  <span className="font-bold text-lg">{globalHealth}<span className="text-sm opacity-60">/100</span></span>
+                  <span className="font-bold text-lg">{historyLoading ? "..." : globalHealth}<span className="text-sm opacity-60">/100</span></span>
                 </div>
               </div>
             </div>
@@ -300,11 +301,11 @@ export default function HomePage() {
                       <span className="text-2xl">🤖</span>
                     </div>
                     <div>
-                      <CardTitle className="text-lg">Assistant Senya</CardTitle>
-                      <CardDescription>
-                        {weather ? `Météo : ${weather.current.temp}°C · ` : "Analyse..."}
-                        {lastFetched && <span className="text-[10px] opacity-70">Màj: {lastFetched}</span>}
-                      </CardDescription>
+                        <CardTitle className="text-lg bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">Assistant Senya</CardTitle>
+                        <CardDescription>
+                          {weather ? `Météo : ${weather.current.temp}°C · ` : "Analyse..."}
+                          {lastFetched && <span className="text-[10px] opacity-70">Màj: {lastFetched}</span>}
+                        </CardDescription>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -381,7 +382,7 @@ export default function HomePage() {
             <Card className="md:col-span-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-[800ms] fill-mode-both border-border/50 bg-card/50 backdrop-blur-xl shadow-sm hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all">
               <CardHeader>
                 <div>
-                  <CardTitle>Météo Agricole (5 Jours)</CardTitle>
+                  <CardTitle className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">Météo Agricole (5 Jours)</CardTitle>
                   <CardDescription className="flex items-center justify-between">
                     <span>Prévisions pour votre oliveraie</span>
                     {lastFetched && <span className="text-[10px] opacity-60">Màj: {lastFetched}</span>}
@@ -398,8 +399,16 @@ export default function HomePage() {
                         <div className="text-xs font-semibold text-muted uppercase tracking-wider">
                           {new Date(date).toLocaleDateString("fr-FR", { weekday: "short" })}
                         </div>
-                        <div className="text-2xl">
-                          {weather.daily.maxTemps[i] > 30 ? "☀️" : weather.daily.maxTemps[i] < 10 ? "❄️" : "⛅"}
+                        <div className="text-2xl py-1">
+                          {weather.daily.precipitation[i] > 2 ? (
+                            <CloudRain className="w-6 h-6 text-primary" />
+                          ) : weather.daily.maxTemps[i] > 30 ? (
+                            <Sun className="w-6 h-6 text-warning" />
+                          ) : weather.daily.maxTemps[i] < 10 ? (
+                            <Snowflake className="w-6 h-6 text-blue-300" />
+                          ) : (
+                            <Cloud className="w-6 h-6 text-muted" />
+                          )}
                         </div>
                         <div className="text-sm font-bold">{Math.round(weather.daily.maxTemps[i])}°</div>
                         <div className="text-xs text-muted">{Math.round(weather.daily.minTemps[i])}°</div>

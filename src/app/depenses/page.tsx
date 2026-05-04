@@ -146,31 +146,39 @@ function OneOffExpenses() {
               </Select>
             </label>
           </div>
-          <label className="grid gap-1.5">
-            <div className="text-sm font-medium text-foreground/80">Lier à un/des lot(s) (Optionnel, répartition proportionnelle)</div>
-            <div className="flex flex-wrap gap-2">
-              {farm.lots.map(l => {
-                const isSelected = selectedLotIds.has(l.id);
-                return (
-                  <button
-                    key={l.id}
-                    type="button"
-                    onClick={() => {
-                      const next = new Set(selectedLotIds);
-                      if (next.has(l.id)) next.delete(l.id);
-                      else next.add(l.id);
-                      setSelectedLotIds(next);
-                    }}
-                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${isSelected ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted border-border/60 text-muted-foreground'}`}
-                  >
-                    {l.nom}
-                  </button>
-                );
-              })}
-            </div>
-            {selectedLotIds.size === 0 && <div className="text-xs text-muted-foreground">Aucun lot sélectionné = Dépense globale répartie sur toute la ferme</div>}
-            {selectedLotIds.size > 1 && <div className="text-xs text-primary font-medium">Répartition proportionnelle ({selectedLotIds.size} lots)</div>}
-          </label>
+            <label className="grid gap-1.5">
+              <div className="text-sm font-medium text-foreground/80">Affecter à des parcelles (Optionnel)</div>
+              <div className="flex flex-wrap gap-2">
+                {farm.lots.map(l => {
+                  const isSelected = selectedLotIds.has(l.id);
+                  return (
+                    <button
+                      key={l.id}
+                      type="button"
+                      onClick={() => {
+                        const next = new Set(selectedLotIds);
+                        if (next.has(l.id)) next.delete(l.id);
+                        else next.add(l.id);
+                        setSelectedLotIds(next);
+                      }}
+                      className={`px-3 py-1 text-xs rounded-full border transition-all ${isSelected ? 'bg-primary text-primary-foreground border-primary shadow-sm scale-105' : 'bg-background hover:bg-muted border-border/60 text-muted-foreground'}`}
+                      title={isSelected ? "Retirer ce lot de la répartition" : "Inclure ce lot dans la répartition"}
+                    >
+                      {l.nom}
+                    </button>
+                  );
+                })}
+              </div>
+              {selectedLotIds.size === 0 ? (
+                <div className="text-[10px] text-muted-foreground italic bg-muted/5 p-2 rounded-lg border border-dashed border-border/40">
+                  💡 Sans sélection, la dépense est considérée comme <strong>globale</strong> (répartie sur toute la surface).
+                </div>
+              ) : (
+                <div className="text-[10px] text-primary font-bold uppercase tracking-wider bg-primary/5 p-2 rounded-lg border border-primary/20 animate-in fade-in zoom-in-95">
+                  ✨ Répartition automatique basée sur le nombre d'arbres ({selectedLotIds.size} lots)
+                </div>
+              )}
+            </label>
           <label className="grid gap-1.5">
             <div className="text-sm font-medium text-foreground/80">Note (Optionnel)</div>
             <Input placeholder="Description..." value={note} onChange={(e) => setNote(e.target.value)} className="bg-background/50" />
@@ -268,7 +276,7 @@ function ExpenseRow({ d, farm }: { d: any; farm: ReturnType<typeof useFarmData> 
         </div>
       </div>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity print:hidden">
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted" onClick={() => setIsEditing(true)}>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted" onClick={() => setIsEditing(true)} title="Modifier la dépense">
           <Edit2 className="w-4 h-4" />
         </Button>
         <Button 
@@ -276,10 +284,11 @@ function ExpenseRow({ d, farm }: { d: any; farm: ReturnType<typeof useFarmData> 
           size="sm" 
           className="h-8 w-8 p-0 text-danger" 
           onClick={() => {
-            if (confirm(`Voulez-vous vraiment supprimer cette dépense ?`)) {
+            if (confirm(`Voulez-vous vraiment supprimer cette dépense de ${formatMoneyDT(d.montant)} ?`)) {
               farm.actions.removeExpense(d.id);
             }
           }}
+          title="Supprimer la dépense"
         >
           <Trash2 className="w-4 h-4" />
         </Button>
