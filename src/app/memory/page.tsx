@@ -33,6 +33,7 @@ export default function MemoryPage() {
   const [selectedLotIds, setSelectedLotIds] = React.useState<Set<string>>(new Set());
   const [yDate, setYDate] = React.useState(new Date().toISOString().slice(0, 10));
   const [yQuantite, setYQuantite] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   if (farm.loading) return <AppShell title="Mémoire Agricole"><div className="p-8 text-center animate-pulse">Chargement de l'historique...</div></AppShell>;
 
@@ -108,25 +109,33 @@ export default function MemoryPage() {
   async function handleAddYield(e: React.FormEvent) {
     e.preventDefault();
     if (selectedLotIds.size === 0 || !yQuantite || !yDate) return;
-    
-    const totalQuantite = Number(yQuantite);
-    const selectedLots = farm.lots.filter(l => selectedLotIds.has(l.id));
-    const totalTrees = selectedLots.reduce((sum, l) => sum + l.nbArbres, 0);
-    
-    for (const lot of selectedLots) {
-      const proportion = totalTrees > 0 ? (lot.nbArbres / totalTrees) : (1 / selectedLots.length);
-      const lotQuantite = Number((totalQuantite * proportion).toFixed(2));
-      
-      await farm.actions.addYield({
-        lotId: lot.id,
-        dateISO: yDate,
-        quantiteKg: lotQuantite,
-      });
-    }
 
-    setIsAddYieldOpen(false);
-    setSelectedLotIds(new Set());
-    setYQuantite("");
+    setIsSubmitting(true);
+    try {
+      const totalQuantite = Number(yQuantite);
+      const selectedLots = farm.lots.filter(l => selectedLotIds.has(l.id));
+      const totalTrees = selectedLots.reduce((sum, l) => sum + l.nbArbres, 0);
+      
+      for (const lot of selectedLots) {
+        const proportion = totalTrees > 0 ? (lot.nbArbres / totalTrees) : (1 / selectedLots.length);
+        const lotQuantite = Number((totalQuantite * proportion).toFixed(2));
+        
+        await farm.actions.addYield({
+          lotId: lot.id,
+          dateISO: yDate,
+          quantiteKg: lotQuantite,
+        });
+      }
+
+      setIsAddYieldOpen(false);
+      setSelectedLotIds(new Set());
+      setYQuantite("");
+    } catch (err: any) {
+      console.error("Erreur lors de l'enregistrement:", err);
+      alert("Erreur Supabase : " + (err.message || "Impossible d'enregistrer la récolte. Vérifiez que vous avez bien créé la table 'yields' dans Supabase."));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -196,10 +205,12 @@ export default function MemoryPage() {
                       <label className="text-sm font-medium">Quantité totale (kg)</label>
                       <Input type="number" min="0" value={yQuantite} onChange={e => setYQuantite(e.target.value)} required placeholder="Ex: 1200" />
                     </div>
-                    <div className="flex gap-2 pt-2">
-                      <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsAddYieldOpen(false)}>Annuler</Button>
-                      <Button type="submit" className="flex-1">Enregistrer</Button>
-                    </div>
+                      <div className="flex gap-2 pt-2">
+                        <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsAddYieldOpen(false)} disabled={isSubmitting}>Annuler</Button>
+                        <Button type="submit" className="flex-1" disabled={isSubmitting || selectedLotIds.size === 0}>
+                          {isSubmitting ? "Envoi..." : "Enregistrer"}
+                        </Button>
+                      </div>
                   </form>
                 </div>
               </div>
