@@ -244,7 +244,6 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
     );
   }
 
-  return (
   const maturity = age < 3 ? "Pépinière" : age < 7 ? "Jeune" : age < 25 ? "Adulte" : "Ancien";
   const maturityColor = age < 3 ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : age < 7 ? "bg-primary/10 text-primary border-primary/20" : age < 25 ? "bg-success/10 text-success border-success/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20";
 
