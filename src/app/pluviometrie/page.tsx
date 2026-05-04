@@ -3,6 +3,7 @@
 import * as React from "react";
 import { AppShell } from "@/components/AppShell";
 import { useWeather } from "@/lib/useWeather";
+import { useHistoricalRain } from "@/lib/useHistoricalRain";
 import { useFarmData } from "@/lib/useFarmData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { CloudRain, Droplets, Sun, Wind, Umbrella, MapPin, Activity } from "lucide-react";
@@ -13,8 +14,10 @@ import { formatNumber } from "@/lib/format";
 export default function PluviometriePage() {
   const farm = useFarmData();
   const { data: weather, loading: weatherLoading } = useWeather();
+  const { ytdRainMm, projectedRainMm, history, loading: historyLoading } = useHistoricalRain();
 
-  const rainMm = farm.settings.pluviometrieAnnuelleMm ?? 300;
+  // On utilise la projection de la pluie si elle existe, sinon on se rabat sur le paramètre manuel
+  const rainMm = projectedRainMm || farm.settings.pluviometrieAnnuelleMm || 300;
   
   // Calcule de l'impact multiplicateur sur la production basé sur engine.ts
   let bourImpact = 0.6;
@@ -134,12 +137,21 @@ export default function PluviometriePage() {
               
               <div className="flex justify-between items-end">
                 <div>
-                  <div className="text-sm font-medium text-foreground/80 mb-1">Pluviométrie Annuelle</div>
-                  <div className="text-3xl font-black text-foreground">{formatNumber(rainMm)} <span className="text-base font-normal text-muted">mm/an</span></div>
+                  <div className="text-sm font-medium text-foreground/80 mb-1">Pluie Actuelle (Cette année)</div>
+                  <div className="text-3xl font-black text-foreground">{historyLoading ? "..." : formatNumber(ytdRainMm)} <span className="text-base font-normal text-muted">mm</span></div>
                 </div>
-                <Link href="/structure" className="text-xs text-primary hover:underline font-medium bg-background px-3 py-1.5 rounded-full border border-primary/20">
-                  Modifier
-                </Link>
+                <div className="text-right flex flex-col items-end gap-1">
+                  <div className="text-xs text-muted">Projection Annuelle</div>
+                  <div className="text-sm font-bold text-primary">{historyLoading ? "..." : formatNumber(projectedRainMm)} mm/an</div>
+                  {projectedRainMm > 0 && Math.abs(projectedRainMm - (farm.settings.pluviometrieAnnuelleMm || 0)) > 10 && (
+                    <button 
+                      onClick={() => farm.actions.setSettings({ pluviometrieAnnuelleMm: projectedRainMm })}
+                      className="text-[10px] uppercase font-bold tracking-wider bg-primary/10 text-primary px-2 py-1 rounded-md mt-1 hover:bg-primary/20 transition-colors"
+                    >
+                      Utiliser pour calculs
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-3">
@@ -191,6 +203,32 @@ export default function PluviometriePage() {
                 💡 <strong>Note :</strong> Un olivier nécessite environ 400 à 600 mm d'eau par an pour maximiser son potentiel de production. Les déficits sont compensés par l'irrigation, tandis que la pluie naturelle offre un bonus de productivité aux cultures sèches (Bour).
               </div>
 
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Historique des Précipitations</CardTitle>
+              <CardDescription>Cumul annuel des années précédentes via Open-Meteo.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {historyLoading ? (
+                <Skeleton className="h-32 w-full" />
+              ) : (
+                <div className="space-y-3">
+                  {history.map(h => (
+                    <div key={h.year} className="flex items-center justify-between p-3 bg-background/50 border border-border/40 rounded-xl">
+                      <span className="font-bold">{h.year}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 bg-muted/30 rounded-full h-1.5">
+                          <div className="bg-primary h-1.5 rounded-full" style={{ width: `${Math.min(100, (h.totalMm / 500) * 100)}%` }}></div>
+                        </div>
+                        <span className="text-sm font-medium w-12 text-right">{h.totalMm} mm</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -59,9 +59,20 @@ export function useFarmData() {
         listTreatments(),
         listYields(),
       ]);
+      let fetchedTypes = t;
+      if (fetchedTypes.length === 0) {
+        await Promise.all([
+          createTreeType({ nom: "Chemlali", rendementMaxKgParArbre: 60 }),
+          createTreeType({ nom: "Koroneiki", rendementMaxKgParArbre: 45 }),
+          createTreeType({ nom: "Chétoui", rendementMaxKgParArbre: 55 }),
+          createTreeType({ nom: "Arbequina", rendementMaxKgParArbre: 40 }),
+        ]);
+        fetchedTypes = await listTreeTypes();
+      }
+
       setSettingsRowId(s.rowId);
       setSettings(s.settings);
-      setTypes(t);
+      setTypes(fetchedTypes);
       setLots(l);
       setDepenses(d);
       setScenarios(sc);

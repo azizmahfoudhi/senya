@@ -9,7 +9,8 @@ import { ageYearsFromISO, batchEstimatedProductionKg, sumExpensesForBatch } from
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { todayISO } from "@/lib/derive";
 import { useFarmData } from "@/lib/useFarmData";
-import { Trees, Plus, Map as MapIcon, Droplets, DropletOff, Edit2, X, Check, Trash2, Star } from "lucide-react";
+import { computeLotHealth } from "@/lib/intelligence";
+import { Trees, Plus, Map as MapIcon, Droplets, DropletOff, Edit2, X, Check, Trash2, Star, ShieldAlert } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 
 export default function LotsPage() {
@@ -113,6 +114,18 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
     lot.id,
   );
 
+  const farmState = {
+    settings: farm.settings,
+    types: farm.types,
+    lots: farm.lots,
+    depenses: farm.depenses,
+    yields: farm.yields,
+    tasks: farm.tasks,
+    treatments: farm.treatments,
+    scenarios: farm.scenarios,
+  };
+  const health = computeLotHealth(farmState, lot.id);
+
   async function handleSave() {
     if (!nom.trim() || !typeId) return;
     await farm.actions.updateBatch(lot.id, {
@@ -210,7 +223,13 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
           <div>
             <CardTitle className="truncate text-lg mb-1">{lot.nom}</CardTitle>
             <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="font-medium text-foreground/80">{type?.nom ?? "Type inconnu"}</span>
+              {type ? (
+                <span className="font-medium text-foreground/80">{type.nom}</span>
+              ) : (
+                <span className="font-bold text-danger flex items-center gap-1">
+                  <ShieldAlert className="w-3.5 h-3.5" /> Type inconnu
+                </span>
+              )}
               <span>•</span>
               <span>{formatNumber(age, 1)} ans</span>
               <span>•</span>
@@ -252,6 +271,22 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
             <div className="text-xs text-muted font-medium mb-1">Rendement estimé</div>
             <div className="text-lg font-bold text-primary">{formatKg(prod)}</div>
           </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-1 mt-1">
+          {[
+            { label: "Rendement", val: health.breakdown.yield },
+            { label: "Eau", val: health.breakdown.water },
+            { label: "Finances", val: health.breakdown.financial },
+            { label: "Stress", val: health.breakdown.stress },
+          ].map((p, idx) => (
+            <div key={idx} className="flex flex-col items-center gap-1">
+              <div className="h-10 w-full bg-background rounded-md overflow-hidden flex flex-col justify-end border border-border/40">
+                <div className={`w-full transition-all duration-500 ${p.val < 50 ? 'bg-danger' : p.val < 80 ? 'bg-warning' : 'bg-success'}`} style={{ height: `${p.val}%` }} />
+              </div>
+              <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium truncate w-full text-center">{p.label}</span>
+            </div>
+          ))}
         </div>
 
         <div className="mt-auto flex items-center justify-between pt-2">
