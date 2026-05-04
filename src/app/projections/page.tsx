@@ -52,50 +52,55 @@ export default function ProjectionsPage() {
   }));
 
   return (
-    <AppShell title="Moteur de Prévisions">
-      <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <AppShell title="Projections & IA">
+      <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
         
         {/* HEADER */}
-        <div>
-          <h1 className="text-2xl font-black flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-primary" />
-            Prévisions Saison Prochaine
-          </h1>
-          <p className="text-sm text-muted">Générées par l'IA en fonction de l'âge, l'historique et des pratiques.</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
+          <div>
+            <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+              Moteur de Projections
+            </h1>
+            <p className="text-muted-foreground font-medium max-w-md pt-1">Analyse prédictive basée sur l'âge des arbres, les cycles climatiques et vos données historiques.</p>
+          </div>
+          <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-2xl border border-primary/20 animate-pulse-glow">
+            <TrendingUp className="w-4 h-4" />
+            <span className="text-xs font-bold uppercase tracking-widest">IA Active</span>
+          </div>
         </div>
 
         {/* TOP KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
+          <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5 hover:scale-[1.02] transition-transform duration-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1"><Sprout className="w-3 h-3" /> Rendement Prévu</CardTitle>
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Sprout className="w-3.5 h-3.5 text-primary" /> Rendement Prévu</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatKg(totalYield)}</div>
+              <div className="text-3xl font-black tracking-tighter">{formatKg(totalYield)}</div>
             </CardContent>
           </Card>
-          <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
+          <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5 hover:scale-[1.02] transition-transform duration-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1"><Coins className="w-3 h-3 text-warning" /> Coût Total Estimé</CardTitle>
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Coins className="w-3.5 h-3.5 text-warning" /> Coût Estimé</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatMoneyDT(totalCost)}</div>
+              <div className="text-3xl font-black tracking-tighter">{formatMoneyDT(totalCost)}</div>
             </CardContent>
           </Card>
-          <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
+          <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5 hover:scale-[1.02] transition-transform duration-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1"><Coins className="w-3 h-3 text-success" /> Recettes Prévues</CardTitle>
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Coins className="w-3.5 h-3.5 text-success" /> Recettes IA</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-success">{formatMoneyDT(revenue)}</div>
+              <div className="text-3xl font-black tracking-tighter text-success">{formatMoneyDT(revenue)}</div>
             </CardContent>
           </Card>
-          <Card className="border-border/50 bg-primary/5 backdrop-blur-sm">
+          <Card className="glass-card rounded-[2rem] border-primary/30 bg-primary/5 shadow-xl shadow-primary/5 hover:scale-[1.02] transition-transform duration-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-primary font-bold">Bénéfice Net Attendu</CardTitle>
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Bénéfice Net</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-black ${totalProfit >= 0 ? "text-primary" : "text-danger"}`}>
+              <div className={`text-3xl font-black tracking-tighter ${totalProfit >= 0 ? "text-primary" : "text-danger"}`}>
                 {formatMoneyDT(totalProfit)}
               </div>
             </CardContent>
@@ -104,81 +109,71 @@ export default function ProjectionsPage() {
 
         {/* RISKS SECTION */}
         {allRisks.size > 0 && (
-          <Card className="border-danger/30 bg-danger/5">
+          <Card className="border-danger/30 bg-danger/5 rounded-[2rem] overflow-hidden relative group">
+            <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:rotate-12 transition-transform duration-1000">
+              <AlertTriangle className="w-24 h-24 text-danger" />
+            </div>
             <CardHeader className="pb-2">
-              <CardTitle className="text-danger flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5" /> Risques Systémiques Détectés
+              <CardTitle className="text-danger flex items-center gap-2 font-black">
+                <AlertTriangle className="w-5 h-5 animate-pulse" /> Risques Systémiques Détectés
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-1">
+              <div className="flex flex-wrap gap-2">
                 {Array.from(allRisks).map((r, i) => (
-                  <li key={i} className="text-sm font-medium flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-danger inline-block" />
+                  <div key={i} className="text-xs font-bold bg-danger/10 text-danger px-4 py-2 rounded-xl border border-danger/20">
                     {r}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </CardContent>
           </Card>
         )}
 
-        {/* CHART BY LOT */}
-        <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Détail Financier par Lot</CardTitle>
-            <CardDescription>Revenus attendus VS Coûts prévus</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 -ml-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 12 }} dy={10} />
-                  <Tooltip
-                    cursor={{ fill: 'var(--muted)', opacity: 0.1 }}
-                    contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--card)", color: "var(--foreground)" }}
-                    formatter={(v: unknown) => formatMoneyDT(Number(v))}
-                  />
-                  <Bar dataKey="Revenus" fill="var(--success)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Coûts" fill="var(--danger)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* LONG TERM ANTICIPATION SECTION */}
-        <div className="pt-8 mt-4 border-t border-border/50">
-          <div className="mb-6">
-            <h2 className="text-2xl font-black flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-primary" />
-              Anticipation à Long Terme (15 ans)
-            </h2>
-            <p className="text-sm text-muted">Évolution de la production et de la rentabilité au fil du temps.</p>
+        <div className="pt-12 mt-4 space-y-8 relative">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          
+          <div className="text-center space-y-1">
+            <h2 className="text-3xl font-black tracking-tighter">Trajectoire sur 15 Ans</h2>
+            <p className="text-muted-foreground font-medium">Simulation de la maturité biologique de l'oliveraie.</p>
           </div>
           
-          <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Production Chart */}
-            <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
+            <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-2xl relative overflow-hidden group">
               <CardHeader>
-                <CardTitle>Évolution de la Production</CardTitle>
-                <CardDescription>Rendement global attendu (Kg)</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-black tracking-tight">Potentiel de Production</CardTitle>
+                    <CardDescription className="font-medium">Rendement cumulé en Kg</CardDescription>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                    <Sprout className="w-5 h-5" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="h-64 -ml-4">
+                <div className="h-64 -ml-4 pr-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={computeMultiYearForecast(baseState, 15)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
-                      <XAxis dataKey="year" tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 12 }} dy={10} />
-                      <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 12 }} dx={-10} width={45} />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.3} />
+                      <XAxis dataKey="year" tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 10, fontWeight: 700 }} dy={10} />
+                      <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 10, fontWeight: 700 }} dx={-5} width={40} />
                       <Tooltip
-                        cursor={{ stroke: 'var(--muted)', strokeWidth: 1, strokeDasharray: '3 3' }}
-                        contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--card)", color: "var(--foreground)" }}
-                        formatter={(v: unknown) => formatKg(Number(v))}
-                        labelStyle={{ fontWeight: 'bold', color: 'var(--foreground)' }}
+                        cursor={{ stroke: 'var(--primary)', strokeWidth: 2, strokeDasharray: '5 5' }}
+                        contentStyle={{ borderRadius: 20, border: "1px solid var(--border)", background: "rgba(var(--card-rgb), 0.8)", backdropFilter: "blur(12px)", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
+                        formatter={(v: unknown) => [formatKg(Number(v)), "Production"]}
+                        labelStyle={{ fontWeight: 800, color: 'var(--foreground)', marginBottom: '4px' }}
                       />
-                      <Line type="monotone" dataKey="yieldKg" name="Production" stroke="var(--primary)" strokeWidth={3} dot={{ r: 3, fill: 'var(--background)', strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="yieldKg" 
+                        stroke="var(--primary)" 
+                        strokeWidth={4} 
+                        dot={{ r: 4, fill: 'var(--primary)', strokeWidth: 0 }} 
+                        activeDot={{ r: 8, fill: 'var(--primary)', stroke: 'white', strokeWidth: 2 }} 
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -186,27 +181,34 @@ export default function ProjectionsPage() {
             </Card>
 
             {/* Financial Chart */}
-            <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
+            <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-2xl relative overflow-hidden group">
               <CardHeader>
-                <CardTitle>Trajectoire Financière</CardTitle>
-                <CardDescription>Chiffre d'Affaires vs Profit Net</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-black tracking-tight">Rentabilité Future</CardTitle>
+                    <CardDescription className="font-medium">Chiffre d'Affaires vs Profit Net</CardDescription>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center text-success border border-success/20">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="h-64 -ml-4">
+                <div className="h-64 -ml-4 pr-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={computeMultiYearForecast(baseState, 15)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
-                      <XAxis dataKey="year" tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 12 }} dy={10} />
-                      <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 12 }} dx={-10} width={45} />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.3} />
+                      <XAxis dataKey="year" tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 10, fontWeight: 700 }} dy={10} />
+                      <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted)', fontSize: 10, fontWeight: 700 }} dx={-5} width={40} />
                       <Tooltip
-                        cursor={{ stroke: 'var(--muted)', strokeWidth: 1, strokeDasharray: '3 3' }}
-                        contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--card)", color: "var(--foreground)" }}
+                        cursor={{ stroke: 'var(--muted)', strokeWidth: 2, strokeDasharray: '5 5' }}
+                        contentStyle={{ borderRadius: 20, border: "1px solid var(--border)", background: "rgba(var(--card-rgb), 0.8)", backdropFilter: "blur(12px)", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
                         formatter={(v: unknown) => formatMoneyDT(Number(v))}
-                        labelStyle={{ fontWeight: 'bold', color: 'var(--foreground)' }}
+                        labelStyle={{ fontWeight: 800, color: 'var(--foreground)', marginBottom: '4px' }}
                       />
-                      <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                      <Line type="monotone" dataKey="revenueDt" name="Chiffre d'Affaires" stroke="var(--success)" strokeWidth={3} dot={{ r: 0 }} activeDot={{ r: 6 }} />
-                      <Line type="monotone" dataKey="profitDt" name="Profit Net" stroke="var(--primary)" strokeWidth={3} dot={{ r: 0 }} activeDot={{ r: 6 }} />
+                      <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 700, paddingTop: '20px', textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                      <Line type="monotone" dataKey="revenueDt" name="Revenus" stroke="var(--success)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} strokeDasharray="5 5" />
+                      <Line type="monotone" dataKey="profitDt" name="Profit" stroke="var(--primary)" strokeWidth={4} dot={false} activeDot={{ r: 8 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
