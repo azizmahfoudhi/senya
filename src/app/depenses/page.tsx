@@ -241,6 +241,7 @@ function OneOffExpenses() {
         </CardContent>
       </Card>
 
+      <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-xl overflow-hidden">
         <CardHeader className="border-b border-border/40 bg-muted/5">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
