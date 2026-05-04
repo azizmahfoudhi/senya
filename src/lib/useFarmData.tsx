@@ -26,6 +26,7 @@ import {
   createTreatment,
   updateTreatment as dbUpdateTreatment,
   deleteTreatment,
+  updateYield as dbUpdateYield,
 } from "@/lib/db";
 
 export function useFarmData() {
@@ -153,6 +154,10 @@ export function useFarmData() {
       async removeYield(id: UUID) {
         await deleteYield(id);
         setYields((prev) => prev.filter((x) => x.id !== id));
+      },
+      async updateYield(id: UUID, input: Partial<Omit<YieldRecord, "id">>) {
+        await dbUpdateYield(id, input);
+        setYields((prev) => prev.map((x) => (x.id === id ? { ...x, ...input } : x)));
       },
     }),
     [settingsRowId],

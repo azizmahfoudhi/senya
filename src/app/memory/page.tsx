@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useFarmData } from "@/lib/useFarmData";
 import { formatDateLong, formatMoneyDT, formatKg } from "@/lib/format";
-import { BrainCircuit, Search, Wallet, ShieldAlert, CheckCircle2, Sprout, Plus, Printer } from "lucide-react";
+import { BrainCircuit, Search, Wallet, ShieldAlert, CheckCircle2, Sprout, Plus, Printer, Trash2, Edit2 } from "lucide-react";
 import { Select } from "@/components/ui/Select";
 
 type MemoryEvent = {
@@ -34,6 +34,7 @@ export default function MemoryPage() {
   const [yDate, setYDate] = React.useState(new Date().toISOString().slice(0, 10));
   const [yQuantite, setYQuantite] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [editingEvent, setEditingEvent] = React.useState<MemoryEvent | null>(null);
 
   if (farm.loading) return <AppShell title="Mémoire Agricole"><div className="p-8 text-center animate-pulse">Chargement de l'historique...</div></AppShell>;
 
@@ -113,28 +114,63 @@ export default function MemoryPage() {
     setIsSubmitting(true);
     try {
       const totalQuantite = Number(yQuantite);
-      const selectedLots = farm.lots.filter(l => selectedLotIds.has(l.id));
-      const totalTrees = selectedLots.reduce((sum, l) => sum + l.nbArbres, 0);
       
-      for (const lot of selectedLots) {
-        const proportion = totalTrees > 0 ? (lot.nbArbres / totalTrees) : (1 / selectedLots.length);
-        const lotQuantite = Number((totalQuantite * proportion).toFixed(2));
-        
-        await farm.actions.addYield({
-          lotId: lot.id,
-          dateISO: yDate,
-          quantiteKg: lotQuantite,
+      if (editingEvent) {
+        const id = editingEvent.id.split("-")[1];
+        await farm.actions.updateYield(id, {
+          quantiteKg: totalQuantite,
+          dateISO: yDate
         });
+      } else {
+        const selectedLots = farm.lots.filter(l => selectedLotIds.has(l.id));
+        const totalTrees = selectedLots.reduce((sum, l) => sum + l.nbArbres, 0);
+        
+        for (const lot of selectedLots) {
+          const proportion = totalTrees > 0 ? (lot.nbArbres / totalTrees) : (1 / selectedLots.length);
+          const lotQuantite = Number((totalQuantite * proportion).toFixed(2));
+          
+          await farm.actions.addYield({
+            lotId: lot.id,
+            dateISO: yDate,
+            quantiteKg: lotQuantite,
+          });
+        }
       }
 
       setIsAddYieldOpen(false);
+      setEditingEvent(null);
       setSelectedLotIds(new Set());
       setYQuantite("");
     } catch (err: any) {
       console.error("Erreur lors de l'enregistrement:", err);
-      alert("Erreur Supabase : " + (err.message || "Impossible d'enregistrer la récolte. Vérifiez que vous avez bien créé la table 'yields' dans Supabase."));
+      alert("Erreur Supabase : " + (err.message || "Impossible d'enregistrer."));
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  function openEditModal(e: MemoryEvent) {
+    setEditingEvent(e);
+    setYQuantite(String(e.amount || ""));
+    setYDate(e.dateISO);
+    if (e.lotId) setSelectedLotIds(new Set([e.lotId]));
+    setIsAddYieldOpen(true);
+  }
+
+  async function handleDeleteEvent(e: MemoryEvent) {
+    if (!confirm("Voulez-vous vraiment supprimer cet événement ?")) return;
+    
+    try {
+      const id = e.id.split("-")[1];
+      if (e.type === "yield") {
+        await farm.actions.removeYield(id);
+      } else if (e.type === "expense") {
+        await farm.actions.removeExpense(id);
+      } else if (e.type === "treatment") {
+        await farm.actions.removeTreatment(id);
+      }
+    } catch (err: any) {
+      alert("Erreur lors de la suppression : " + err.message);
     }
   }
 
@@ -170,9 +206,10 @@ export default function MemoryPage() {
             {isAddYieldOpen && (
               <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
                 <div className="bg-card w-full max-w-md p-6 rounded-2xl shadow-xl border border-border/50 relative animate-in zoom-in-95 duration-200">
-                  <h2 className="text-xl font-bold mb-4">Enregistrer une récolte</h2>
+                  <h2 className="text-xl font-bold mb-4">{editingEvent ? "Modifier la récolte" : "Enregistrer une récolte"}</h2>
                   <form onSubmit={handleAddYield} className="space-y-4">
-                    <div className="space-y-1.5">
+                    {!editingEvent && (
+                      <div className="space-y-1.5">
                       <label className="text-sm font-medium">Lier à un/des lot(s) (Répartition proportionnelle)</label>
                       <div className="flex flex-wrap gap-2">
                         {farm.lots.map(l => {
@@ -197,6 +234,7 @@ export default function MemoryPage() {
                       {selectedLotIds.size === 0 && <div className="text-xs text-danger mt-1">Veuillez sélectionner au moins un lot</div>}
                       {selectedLotIds.size > 1 && <div className="text-xs text-primary font-medium mt-1">Répartition automatique entre {selectedLotIds.size} lots</div>}
                     </div>
+                    )}
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium">Date / Année</label>
                       <Input type="date" value={yDate} onChange={e => setYDate(e.target.value)} required />
@@ -206,9 +244,9 @@ export default function MemoryPage() {
                       <Input type="number" min="0" value={yQuantite} onChange={e => setYQuantite(e.target.value)} required placeholder="Ex: 1200" />
                     </div>
                       <div className="flex gap-2 pt-2">
-                        <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsAddYieldOpen(false)} disabled={isSubmitting}>Annuler</Button>
-                        <Button type="submit" className="flex-1" disabled={isSubmitting || selectedLotIds.size === 0}>
-                          {isSubmitting ? "Envoi..." : "Enregistrer"}
+                        <Button type="button" variant="secondary" className="flex-1" onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }} disabled={isSubmitting}>Annuler</Button>
+                        <Button type="submit" className="flex-1" disabled={isSubmitting || (!editingEvent && selectedLotIds.size === 0)}>
+                          {isSubmitting ? "Envoi..." : editingEvent ? "Mettre à jour" : "Enregistrer"}
                         </Button>
                       </div>
                   </form>
@@ -252,7 +290,7 @@ export default function MemoryPage() {
                 
                 <Card className="border-border/50 bg-card/40 backdrop-blur-md shadow-sm group-hover:shadow-md transition-all group-hover:border-primary/20 overflow-hidden">
                   <div className="p-4 flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{formatDateLong(event.dateISO)}</span>
                         {event.lotName && (
@@ -264,11 +302,33 @@ export default function MemoryPage() {
                       <h3 className="font-semibold text-base">{event.title}</h3>
                       {event.subtitle && <p className="text-sm text-muted mt-0.5">{event.subtitle}</p>}
                     </div>
-                    {event.amount !== undefined && (
-                      <div className={`text-lg font-black shrink-0 ${event.type === 'expense' ? 'text-danger' : 'text-success'}`}>
-                        {event.type === 'expense' ? `-${formatMoneyDT(event.amount)}` : `+${formatKg(event.amount)}`}
+                    
+                    <div className="flex items-center gap-4 shrink-0">
+                      {event.amount !== undefined && (
+                        <div className={`text-lg font-black ${event.type === 'expense' ? 'text-danger' : 'text-success'}`}>
+                          {event.type === 'expense' ? `-${formatMoneyDT(event.amount)}` : `+${formatKg(event.amount)}`}
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {event.type === "yield" && (
+                          <button 
+                            onClick={() => openEditModal(event)}
+                            className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                            title="Modifier"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => handleDeleteEvent(event)}
+                          className="p-2 rounded-xl hover:bg-danger/10 text-muted-foreground hover:text-danger transition-colors"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </Card>
               </div>

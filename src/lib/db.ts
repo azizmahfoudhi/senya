@@ -285,6 +285,18 @@ export async function deleteYield(id: UUID) {
   if (error) throw error;
 }
 
+export async function updateYield(id: UUID, input: Partial<Omit<YieldRecord, "id">>) {
+  const sb = supabaseBrowser();
+  const payload: any = {};
+  if (input.quantiteKg !== undefined) payload.quantite_kg = input.quantiteKg;
+  if (input.dateISO !== undefined) payload.annee = new Date(input.dateISO).getFullYear().toString();
+  if (input.rendementHuilePct !== undefined) payload.rendement_huile_pct = input.rendementHuilePct;
+  if (input.note !== undefined) payload.note = input.note;
+  
+  const { error } = await sb.from("yields").update(payload).eq("id", id);
+  if (error) throw error;
+}
+
 export async function listScenarios(): Promise<Scenario[]> {
   const sb = supabaseBrowser();
   const { data, error } = await sb.from("scenarios").select("*").order("created_at", { ascending: false });
