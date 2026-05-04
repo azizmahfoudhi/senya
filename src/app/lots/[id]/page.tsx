@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { ageYearsFromISO, batchEstimatedProductionKg, sumExpensesForBatch, estimatedYieldKgPerTree } from "@/lib/engine";
 import { computeLotHealth, computeLotForecast } from "@/lib/intelligence";
 import { todayISO } from "@/lib/derive";
-import { formatDateLong, formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
+import { formatDateLong, formatKg, formatMoneyDT, formatNumber, formatProduction } from "@/lib/format";
 import { useFarmData } from "@/lib/useFarmData";
 import { useHistoricalRain } from "@/lib/useHistoricalRain";
 import { Star, ShieldAlert, Bug, Plus, Trash2, Edit2, Check, X, Sprout } from "lucide-react";
@@ -201,8 +201,8 @@ export default function LotDetailPage() {
           <CardContent className="grid grid-cols-2 gap-2 mt-4">
             <Kpi label="Total Dépenses" value={formatMoneyDT(cost)} className="text-danger" />
             <Kpi label="Dépense / arbre" value={formatMoneyDT(perTreeCost)} />
-            <Kpi label="Production estimée (Année)" value={formatKg(prod)} />
-            <Kpi label="Rendement estimé / arbre" value={`${formatNumber(yieldPerTree, 1)} kg`} />
+            <Kpi label="Production estimée (Année)" value={formatProduction(prod, lotAge)} />
+            <Kpi label="Rendement estimé / arbre" value={prod > 0 ? `${formatNumber(yieldPerTree, 1)} kg` : "N/A"} />
           </CardContent>
         </Card>
 

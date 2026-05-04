@@ -18,6 +18,13 @@ export function formatKg(value: number) {
   return `${formatNumber(value, 0)} kg`;
 }
 
+export function formatProduction(kg: number, ageYears: number) {
+  if (kg === 0 && ageYears < 5) {
+    return "En croissance";
+  }
+  return formatKg(kg);
+}
+
 export function formatDateLong(iso: string) {
   return format(parseISO(iso), "d MMM yyyy", { locale: fr });
 }

@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ageYearsFromISO, batchEstimatedProductionKg, sumExpensesForBatch } from "@/lib/engine";
-import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
+import { formatKg, formatMoneyDT, formatNumber, formatProduction } from "@/lib/format";
 import { todayISO } from "@/lib/derive";
 import { useFarmData } from "@/lib/useFarmData";
 import { computeLotHealth } from "@/lib/intelligence";
@@ -271,7 +271,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
           </div>
           <div className="rounded-xl border border-border/40 bg-background/50 p-3">
             <div className="text-xs text-muted font-medium mb-1">Rendement estimé</div>
-            <div className="text-lg font-bold text-primary">{formatKg(prod)}</div>
+            <div className="text-lg font-bold text-primary">{formatProduction(prod, age)}</div>
           </div>
         </div>
 
