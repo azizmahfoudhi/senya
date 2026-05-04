@@ -249,11 +249,20 @@ export function computeLotForecast(state: FarmState, lotId: UUID, rainMm?: numbe
   };
 }
 
-export function computeGlobalHealth(state: FarmState): number {
+export function computeGlobalHealth(state: FarmState, rainMm?: number): number {
   if (state.lots.length === 0) return 0;
-  const scores = state.lots.map(l => computeLotHealth(state, l.id).total);
-  const sum = scores.reduce((a, b) => a + b, 0);
-  return Math.round(sum / scores.length);
+  
+  let totalWeightedScore = 0;
+  let totalTrees = 0;
+
+  for (const lot of state.lots) {
+    const health = computeLotHealth(state, lot.id, rainMm);
+    totalWeightedScore += (health.total * lot.nbArbres);
+    totalTrees += lot.nbArbres;
+  }
+
+  if (totalTrees === 0) return 0;
+  return Math.round(totalWeightedScore / totalTrees);
 }
 
 export type MultiYearForecast = {

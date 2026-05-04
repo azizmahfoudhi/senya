@@ -16,6 +16,7 @@ export type WeatherData = {
     maxTemps: number[];
     minTemps: number[];
     uvIndex: number[];
+    precipitation: number[];
   };
 };
 
@@ -53,6 +54,7 @@ export function useWeather() {
             maxTemps: json.daily?.data?.map((d: any) => d.all_day?.temperature_max ?? 0) ?? [],
             minTemps: json.daily?.data?.map((d: any) => d.all_day?.temperature_min ?? 0) ?? [],
             uvIndex: json.daily?.data?.map((d: any) => 0) ?? [], // Free tier might not have UV
+            precipitation: json.daily?.data?.map((d: any) => d.all_day?.precipitation?.total ?? 0) ?? [],
           }
         });
       } catch (err: any) {
@@ -73,6 +75,7 @@ export function useWeather() {
             maxTemps: [26, 28, 27, 24, 25],
             minTemps: [14, 15, 16, 13, 12],
             uvIndex: [6, 7, 6, 5, 6],
+            precipitation: [0, 0, 0, 0, 0],
           }
         });
         setError(null); // Clear error since we have fallback

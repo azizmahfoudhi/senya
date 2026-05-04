@@ -41,6 +41,9 @@ export default function HomePage() {
     ...p,
     month: p.monthISO.slice(5, 7),
   }));
+  
+  const projectedRainMm = weather ? (weather.daily as any).precipitation?.reduce((a: number, b: number) => a + b, 0) ?? 300 : 300;
+  const globalHealth = computeGlobalHealth(state, projectedRainMm);
 
   if (farm.loading) {
     return (
@@ -148,10 +151,10 @@ export default function HomePage() {
                 Ferme de {farm.settings.surfaceHa} ha.
               </p>
               <div className="mt-4 inline-flex items-center gap-2 bg-background/50 px-4 py-2 rounded-2xl border border-border/50">
-                <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Santé Globale</span>
+                <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Évaluation Globale</span>
                 <div className="flex items-center gap-1.5">
-                  <div className={`h-2.5 w-2.5 rounded-full ${computeGlobalHealth(state) >= 80 ? 'bg-success' : computeGlobalHealth(state) >= 50 ? 'bg-warning' : 'bg-danger'}`} />
-                  <span className="font-bold text-lg">{computeGlobalHealth(state)}<span className="text-sm opacity-60">/100</span></span>
+                  <div className={`h-2.5 w-2.5 rounded-full ${globalHealth >= 80 ? 'bg-success' : globalHealth >= 50 ? 'bg-warning' : 'bg-danger'}`} />
+                  <span className="font-bold text-lg">{globalHealth}<span className="text-sm opacity-60">/100</span></span>
                 </div>
               </div>
             </div>
