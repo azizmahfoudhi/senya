@@ -74,12 +74,14 @@ export default function DepensesPage() {
           <div className="md:w-72 glass-card rounded-[2.5rem] p-6 flex flex-col justify-center">
             <div className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 text-center">Répartition Rapide</div>
             <div className="space-y-3">
-              {categories.slice(0, 6).map(cat => {
+              {categories.map(cat => {
                 const amount = farm.depenses.filter(d => d.categorie === cat).reduce((sum, d) => sum + d.montant, 0);
+                if (amount <= 0) return null;
+                
                 const pct = totalPonctuel > 0 ? (amount / totalPonctuel) * 100 : 0;
                 const Icon = CATEGORY_ICONS[cat];
                 return (
-                  <div key={cat} className="space-y-1">
+                  <div key={cat} className="space-y-1 animate-in fade-in slide-in-from-right-2 duration-500">
                     <div className="flex justify-between text-[10px] font-bold uppercase">
                       <span className="flex items-center gap-1.5"><Icon className="w-3 h-3 text-primary" /> {EXPENSE_CATEGORY_LABEL[cat]}</span>
                       <span className="text-muted">{Math.round(pct)}%</span>
