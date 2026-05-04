@@ -9,6 +9,7 @@ import { useFarmData } from "@/lib/useFarmData";
 import { formatDateLong, formatMoneyDT, formatKg } from "@/lib/format";
 import { BrainCircuit, Search, Wallet, ShieldAlert, CheckCircle2, Sprout, Plus, Printer, Trash2, Edit2 } from "lucide-react";
 import { Select } from "@/components/ui/Select";
+import { cn } from "@/lib/cn";
 
 type MemoryEvent = {
   id: string;
