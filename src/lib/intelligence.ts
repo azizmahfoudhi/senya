@@ -50,13 +50,24 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
   yieldScore = clamp(yieldScore);
 
   // --- 2. Water Efficiency (20%) ---
-  // Based on irrigation status and growth state
   let waterScore = 50;
-  if (lot.irrigation === "irrigue") {
-    waterScore = 90;
-    if (growth < 3) waterScore = 70; // Irrigated but poor growth = bad efficiency
-  } else {
-    waterScore = growth >= 3 ? 80 : 40; // Dry but good growth = great efficiency
+  const rain = state.settings.pluviometrieAnnuelleMm ?? 300;
+
+  if (lot.irrigation === "optimal") {
+    waterScore = 100;
+  } else if (lot.irrigation === "normal") {
+    waterScore = 80;
+    if (rain >= 400) waterScore += 20;
+    else if (rain >= 300) waterScore += 10;
+  } else if (lot.irrigation === "faible") {
+    waterScore = 50;
+    if (rain >= 400) waterScore += 30;
+    else if (rain >= 300) waterScore += 20;
+    else if (rain >= 200) waterScore += 10;
+  } else if (lot.irrigation === "non_irrigue") {
+    if (rain >= 400) waterScore = 90;
+    else if (rain >= 300) waterScore = 70;
+    else waterScore = 40;
   }
   waterScore = clamp(waterScore);
 
@@ -94,10 +105,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
     }
   });
 
-  // L'état de croissance est un signe vital de stress
-  if (growth < 3) {
-    stressScore -= (3 - growth) * 20; // 1 étoile = -40, 2 étoiles = -20
-  }
+  // Growth state no longer affects stress (stars only affect yield production)
 
   stressScore = clamp(stressScore);
 

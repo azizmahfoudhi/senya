@@ -5,6 +5,7 @@ create table if not exists public.farm_settings (
   id uuid primary key default gen_random_uuid(),
   surface_ha numeric not null default 0,
   prix_kg_olives numeric not null default 0,
+  pluviometrie_annuelle_mm numeric null default 300,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -22,7 +23,7 @@ create table if not exists public.batches (
   type_id uuid not null references public.tree_types(id) on delete restrict,
   date_plantation date not null,
   nb_arbres int not null check (nb_arbres >= 0),
-  irrigation text not null check (irrigation in ('irrigue','non_irrigue')),
+  irrigation text not null check (irrigation in ('non_irrigue','faible','normal','optimal')),
   created_at timestamptz not null default now()
 );
 

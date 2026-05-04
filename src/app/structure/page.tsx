@@ -122,6 +122,24 @@ function SettingsCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
             💡 Exemple: 6.5 → {formatMoneyDT(6.5)} / kg
           </div>
         </label>
+
+        <label className="grid gap-1.5 pt-2 border-t border-border/50">
+          <div className="text-sm font-medium text-foreground/80">Pluviométrie annuelle (Estimation)</div>
+          <div className="relative">
+            <Input
+              inputMode="numeric"
+              className="pr-12 bg-background/50"
+              defaultValue={String(farm.settings.pluviometrieAnnuelleMm ?? 300)}
+              onBlur={(e) => handleSave({ pluviometrieAnnuelleMm: Number(e.target.value || 300) })}
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted pointer-events-none">
+              mm/an
+            </div>
+          </div>
+          <div className="text-xs text-muted mt-1">
+            Utilisé pour évaluer la santé des lots non irrigués (Bour).
+          </div>
+        </label>
       </CardContent>
     </Card>
   );
@@ -276,8 +294,10 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
               value={irrig}
               onChange={(e) => setIrrig(e.target.value as any)}
             >
-              <option value="non_irrigue">Non irrigué</option>
-              <option value="irrigue">Irrigué</option>
+              <option value="non_irrigue">Bour (Non irrigué)</option>
+              <option value="faible">Irrigué (Faible)</option>
+              <option value="normal">Irrigué (Normal)</option>
+              <option value="optimal">Irrigué (Optimal)</option>
             </select>
           </label>
         </div>

@@ -160,8 +160,10 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
               value={irrig}
               onChange={(e) => setIrrig(e.target.value as any)}
             >
-              <option value="non_irrigue">Bour</option>
-              <option value="irrigue">Irrigué</option>
+              <option value="non_irrigue">Bour (Non irrigué)</option>
+              <option value="faible">Irrigué (Faible)</option>
+              <option value="normal">Irrigué (Normal)</option>
+              <option value="optimal">Irrigué (Optimal)</option>
             </select>
           </div>
 
@@ -213,8 +215,12 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
               <span>{formatNumber(age, 1)} ans</span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                {lot.irrigation === "irrigue" ? (
-                  <><Droplets className="w-3 h-3 text-blue-500" /> Irrigué</>
+                {lot.irrigation === "optimal" ? (
+                  <><Droplets className="w-3 h-3 text-blue-500" /> Optimal</>
+                ) : lot.irrigation === "normal" ? (
+                  <><Droplets className="w-3 h-3 text-blue-400" /> Normal</>
+                ) : lot.irrigation === "faible" ? (
+                  <><DropletOff className="w-3 h-3 text-blue-300" /> Faible</>
                 ) : (
                   <><DropletOff className="w-3 h-3 text-muted" /> Bour</>
                 )}

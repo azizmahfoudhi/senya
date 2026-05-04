@@ -39,7 +39,7 @@ export type FarmActions = {
 type Store = FarmState & FarmActions;
 
 const initial: FarmState = {
-  settings: { surfaceHa: 0, prixKgOlives: 0 },
+  settings: { surfaceHa: 0, prixKgOlives: 0, pluviometrieAnnuelleMm: 300 },
   types: [],
   lots: [],
   depenses: [],

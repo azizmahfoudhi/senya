@@ -299,7 +299,7 @@ export default function HomePage() {
                     <div>
                       <CardTitle className="text-lg">Assistant Senya</CardTitle>
                       <CardDescription>
-                        {weather ? `Météo en direct : ${weather.current.temp}°C, Vent ${weather.current.windSpeed}km/h` : "Analyse en temps réel..."}
+                        {weather ? `Météo en direct : ${weather.current.temp}°C, Pluie ${weather.current.precipitation}mm` : "Analyse en temps réel..."}
                       </CardDescription>
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 export type UUID = string;
 
-export type IrrigationStatus = "irrigue" | "non_irrigue";
+export type IrrigationStatus = "non_irrigue" | "faible" | "normal" | "optimal";
 
 export type ExpenseCategory =
   | "plantation"
@@ -80,6 +80,7 @@ export type YieldRecord = {
 export type FarmSettings = {
   surfaceHa: number;
   prixKgOlives: number;
+  pluviometrieAnnuelleMm?: number;
 };
 
 export type Scenario = {

@@ -16,6 +16,7 @@ type DbSettingsRow = {
   id: UUID;
   surface_ha: number;
   prix_kg_olives: number;
+  pluviometrie_annuelle_mm: number | null;
 };
 
 type DbTypeRow = {
@@ -71,7 +72,11 @@ type DbScenarioRow = {
 };
 
 function mapSettings(r: DbSettingsRow): FarmSettings {
-  return { surfaceHa: Number(r.surface_ha), prixKgOlives: Number(r.prix_kg_olives) };
+  return { 
+    surfaceHa: Number(r.surface_ha), 
+    prixKgOlives: Number(r.prix_kg_olives),
+    pluviometrieAnnuelleMm: r.pluviometrie_annuelle_mm != null ? Number(r.pluviometrie_annuelle_mm) : 300
+  };
 }
 function mapType(r: DbTypeRow): TreeType {
   return { id: r.id, nom: r.nom, rendementMaxKgParArbre: Number(r.rendement_max_kg_par_arbre) };
@@ -145,7 +150,7 @@ export async function getOrCreateSettings(): Promise<{ rowId: UUID; settings: Fa
 
   const { data: created, error: e2 } = await sb
     .from("farm_settings")
-    .insert({ surface_ha: 0, prix_kg_olives: 0 })
+    .insert({ surface_ha: 0, prix_kg_olives: 0, pluviometrie_annuelle_mm: 300 })
     .select("*")
     .single();
   if (e2) throw e2;
@@ -157,6 +162,7 @@ export async function updateSettings(rowId: UUID, patch: Partial<FarmSettings>) 
   const payload: Partial<DbSettingsRow> = {};
   if (patch.surfaceHa !== undefined) payload.surface_ha = patch.surfaceHa;
   if (patch.prixKgOlives !== undefined) payload.prix_kg_olives = patch.prixKgOlives;
+  if (patch.pluviometrieAnnuelleMm !== undefined) payload.pluviometrie_annuelle_mm = patch.pluviometrieAnnuelleMm;
   const { error } = await sb.from("farm_settings").update(payload).eq("id", rowId);
   if (error) throw error;
 }
