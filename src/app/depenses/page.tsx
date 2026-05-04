@@ -74,7 +74,7 @@ export default function DepensesPage() {
           <div className="md:w-72 glass-card rounded-[2.5rem] p-6 flex flex-col justify-center">
             <div className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 text-center">Répartition Rapide</div>
             <div className="space-y-3">
-              {categories.slice(0, 4).map(cat => {
+              {categories.slice(0, 6).map(cat => {
                 const amount = farm.depenses.filter(d => d.categorie === cat).reduce((sum, d) => sum + d.montant, 0);
                 const pct = totalPonctuel > 0 ? (amount / totalPonctuel) * 100 : 0;
                 const Icon = CATEGORY_ICONS[cat];
