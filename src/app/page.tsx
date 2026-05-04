@@ -173,8 +173,16 @@ export default function HomePage() {
             </div>
 
             {/* QUICK HEALTH GRID (Visual Map) */}
-            <div className="sm:w-64 glass-card rounded-[2.5rem] p-6 flex flex-col">
-              <div className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 px-1">État des Parcelles</div>
+            <div className="sm:w-64 glass-card rounded-[2.5rem] p-6 flex flex-col group/grid">
+              <div className="flex items-center justify-between mb-4 px-1">
+                <div className="text-[10px] font-black uppercase tracking-widest text-muted">Santé des Parcelles</div>
+                <div className="flex gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-success/60" title="Saine" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-warning/60" title="Stress" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-danger/60" title="Critique" />
+                </div>
+              </div>
+              
               <div className="grid grid-cols-4 gap-2 flex-1">
                 {farm.lots.slice(0, 16).map((lot) => {
                   const h = computeLotHealth(state, lot.id, projectedRainMm);
@@ -185,17 +193,26 @@ export default function HomePage() {
                       title={`${lot.nom}: ${h.total}/100`}
                       className={cn(
                         "aspect-square rounded-lg transition-all hover:scale-110 hover:z-10 shadow-sm",
-                        h.total >= 80 ? 'bg-success/40 border border-success/30' : h.total >= 50 ? 'bg-warning/40 border border-warning/30' : 'bg-danger/40 border border-danger/30'
+                        h.total >= 80 ? 'bg-success/40 border border-success/30 hover:bg-success/60' : h.total >= 50 ? 'bg-warning/40 border border-warning/30 hover:bg-warning/60' : 'bg-danger/40 border border-danger/30 hover:bg-danger/60'
                       )}
                     />
                   );
                 })}
-                {Array.from({ length: Math.max(0, 8 - farm.lots.length) }).map((_, i) => (
+                {Array.from({ length: Math.max(0, 12 - farm.lots.length) }).map((_, i) => (
                   <div key={i} className="aspect-square rounded-lg bg-muted/5 border border-dashed border-border/20" />
                 ))}
               </div>
-              <div className="mt-4 text-[10px] text-muted-foreground font-medium text-center italic">
-                Vue schématique
+              
+              <div className="mt-4 flex flex-col gap-1">
+                <div className="text-[10px] text-muted-foreground font-bold flex justify-between uppercase tracking-tighter">
+                  <span>{farm.lots.filter(l => computeLotHealth(state, l.id, projectedRainMm).total >= 80).length} Saines</span>
+                  <span>{farm.lots.filter(l => computeLotHealth(state, l.id, projectedRainMm).total < 50).length} Critiques</span>
+                </div>
+                <div className="h-1 w-full bg-muted/10 rounded-full overflow-hidden flex">
+                  <div className="bg-success h-full" style={{ width: `${(farm.lots.filter(l => computeLotHealth(state, l.id, projectedRainMm).total >= 80).length / Math.max(1, farm.lots.length)) * 100}%` }} />
+                  <div className="bg-warning h-full" style={{ width: `${(farm.lots.filter(l => computeLotHealth(state, l.id, projectedRainMm).total >= 50 && computeLotHealth(state, l.id, projectedRainMm).total < 80).length / Math.max(1, farm.lots.length)) * 100}%` }} />
+                  <div className="bg-danger h-full" style={{ width: `${(farm.lots.filter(l => computeLotHealth(state, l.id, projectedRainMm).total < 50).length / Math.max(1, farm.lots.length)) * 100}%` }} />
+                </div>
               </div>
             </div>
           </div>
