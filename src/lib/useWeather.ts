@@ -24,6 +24,7 @@ export function useWeather() {
   const [data, setData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastFetched, setLastFetched] = useState<string | null>(null);
 
   // Coordonnées exactes de Nasrallah, Kairouan
   const lat = 35.3524;
@@ -59,6 +60,7 @@ export function useWeather() {
             precipitation: json.daily?.data?.map((d: any) => d.all_day?.precipitation?.total ?? 0) ?? [],
           }
         });
+        setLastFetched(new Date().toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' }));
       } catch (err: any) {
         console.warn("Meteosource API failed, using fallback data:", err.message);
         // Fallback mock data
@@ -80,6 +82,7 @@ export function useWeather() {
             precipitation: [0, 0, 0, 0, 0],
           }
         });
+        setLastFetched(new Date().toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' }));
         setError(null); // Clear error since we have fallback
       } finally {
         setLoading(false);
@@ -89,5 +92,5 @@ export function useWeather() {
     fetchWeather();
   }, []);
 
-  return { data, loading, error };
+  return { data, loading, error, lastFetched };
 }

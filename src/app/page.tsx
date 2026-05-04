@@ -23,7 +23,7 @@ import { Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit 
 
 export default function HomePage() {
   const farm = useFarmData();
-  const { data: weather, loading: weatherLoading } = useWeather();
+  const { data: weather, loading: weatherLoading, lastFetched } = useWeather();
 
   const state = {
     settings: farm.settings,
@@ -302,7 +302,8 @@ export default function HomePage() {
                     <div>
                       <CardTitle className="text-lg">Assistant Senya</CardTitle>
                       <CardDescription>
-                        {weather ? `Météo en direct : ${weather.current.temp}°C, Pluie ${weather.current.precipitation}mm` : "Analyse en temps réel..."}
+                        {weather ? `Météo : ${weather.current.temp}°C · ` : "Analyse..."}
+                        {lastFetched && <span className="text-[10px] opacity-70">Màj: {lastFetched}</span>}
                       </CardDescription>
                     </div>
                   </div>
