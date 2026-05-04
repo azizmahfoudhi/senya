@@ -25,43 +25,44 @@ export default function LotsPage() {
 
   return (
     <AppShell 
-      title="Mes Lots" 
+      title="Patrimoine Végétal" 
       actions={
         <Link href="/structure">
-          <Button size="sm" className="gap-2">
+          <Button size="sm" variant="primary" className="gap-2 rounded-xl shadow-lg shadow-primary/20 font-bold uppercase tracking-widest text-[10px]">
             <Plus className="w-4 h-4" />
             Nouveau lot
           </Button>
         </Link>
       }
     >
-      <div className="grid gap-4">
+      <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
+        {/* HEADER */}
+        <div className="px-2">
+          <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            Vos Parcelles
+          </h1>
+          <p className="text-muted-foreground font-medium pt-1 max-w-md text-lg">Inventaire vivant et diagnostic de santé de vos oliveraies en temps réel.</p>
+        </div>
+
         {/* Summary Header */}
-        <div className="grid grid-cols-2 gap-3 mb-2">
-          <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm">
-            <CardHeader className="p-4 pb-2">
-              <CardTitle className="text-xs font-medium text-muted uppercase tracking-wider">Total Arbres</CardTitle>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5">
+            <CardHeader className="p-5 pb-2">
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Trees className="w-3.5 h-3.5 text-primary" /> Patrimoine</CardTitle>
             </CardHeader>
-            <CardContent className="p-4 pt-0 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                <Trees className="w-5 h-5" />
-              </div>
-              <div className="text-2xl font-bold tracking-tight">
-                {formatNumber(totalTrees)}
-              </div>
+            <CardContent className="p-5 pt-0 flex items-baseline gap-2">
+              <div className="text-3xl font-black tracking-tighter">{formatNumber(totalTrees)}</div>
+              <span className="text-[10px] font-bold text-muted uppercase">arbres</span>
             </CardContent>
           </Card>
-          <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm">
-            <CardHeader className="p-4 pb-2">
-              <CardTitle className="text-xs font-medium text-muted uppercase tracking-wider">Nombre de Lots</CardTitle>
+          
+          <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5">
+            <CardHeader className="p-5 pb-2">
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><MapIcon className="w-3.5 h-3.5 text-success" /> Sectorisation</CardTitle>
             </CardHeader>
-            <CardContent className="p-4 pt-0 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                <MapIcon className="w-5 h-5" />
-              </div>
-              <div className="text-2xl font-bold tracking-tight">
-                {farm.lots.length}
-              </div>
+            <CardContent className="p-5 pt-0 flex items-baseline gap-2">
+              <div className="text-3xl font-black tracking-tighter">{farm.lots.length}</div>
+              <span className="text-[10px] font-bold text-muted uppercase">lots</span>
             </CardContent>
           </Card>
         </div>
@@ -244,44 +245,52 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
   }
 
   return (
-    <Card className="glass-card rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 group flex flex-col relative overflow-hidden border-border/40">
-      <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-500 pointer-events-none">
-        <Trees className="w-24 h-24" />
+  const maturity = age < 3 ? "Pépinière" : age < 7 ? "Jeune" : age < 25 ? "Adulte" : "Ancien";
+  const maturityColor = age < 3 ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : age < 7 ? "bg-primary/10 text-primary border-primary/20" : age < 25 ? "bg-success/10 text-success border-success/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20";
+
+  return (
+    <Card className="glass-card rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-700 group flex flex-col relative overflow-hidden border-border/40 hover:-translate-y-1">
+      <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-125 group-hover:rotate-12 transition-all duration-1000 pointer-events-none">
+        <Trees className="w-32 h-32" />
       </div>
-      <CardHeader className="pb-3 relative z-10">
+      <CardHeader className="pb-4 relative z-10 p-6">
         <div className="flex items-start justify-between min-w-0 gap-4">
-          <div>
-            <CardTitle className="truncate text-xl mb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent font-black">{lot.nom}</CardTitle>
-            <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              {lot.typeId && type ? (
-                <span className="font-medium text-foreground/80">{type.nom}</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className={cn("px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border", maturityColor)}>
+                {maturity}
+              </span>
+              {lot.irrigation === "non_irrigue" ? (
+                <span className="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-muted/10 text-muted border border-border/20 flex items-center gap-1">
+                  <DropletOff className="w-2.5 h-2.5" /> Bour
+                </span>
               ) : (
-                <span className="font-bold text-primary flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 flex items-center gap-1">
+                  <Droplets className="w-2.5 h-2.5" /> Irrigué
+                </span>
+              )}
+            </div>
+            <CardTitle className="truncate text-3xl mb-1 bg-gradient-to-br from-foreground via-foreground to-foreground/50 bg-clip-text text-transparent font-black tracking-tighter leading-none">
+              {lot.nom}
+            </CardTitle>
+            <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1 font-bold text-xs">
+              {lot.typeId && type ? (
+                <span className="text-foreground/80">{type.nom}</span>
+              ) : (
+                <span className="text-primary flex items-center gap-1">
                   <ShieldAlert className="w-3.5 h-3.5" /> {type?.nom || "Chemlali"} (Défaut)
                 </span>
               )}
-              <span>•</span>
-              <span>{formatNumber(age, 1)} ans</span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                {lot.irrigation === "optimal" ? (
-                  <><Droplets className="w-3 h-3 text-blue-500" /> Optimal</>
-                ) : lot.irrigation === "normal" ? (
-                  <><Droplets className="w-3 h-3 text-blue-400" /> Normal</>
-                ) : lot.irrigation === "faible" ? (
-                  <><DropletOff className="w-3 h-3 text-blue-300" /> Faible</>
-                ) : (
-                  <><DropletOff className="w-3 h-3 text-muted" /> Bour</>
-                )}
-              </span>
+              <span className="w-1 h-1 rounded-full bg-border" />
+              <span className="text-muted-foreground">{formatNumber(age, 1)} ans</span>
               {lot.etatCroissance !== 3 && (
                 <>
-                  <span>•</span>
+                  <span className="w-1 h-1 rounded-full bg-border" />
                   <span className="flex items-center gap-0.5" title="État de production">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className={`w-3 h-3 ${star <= (lot.etatCroissance ?? 3) ? "text-warning fill-current" : "text-muted"}`}
+                        className={`w-3 h-3 ${star <= (lot.etatCroissance ?? 3) ? "text-warning fill-current" : "text-muted/40"}`}
                       />
                     ))}
                   </span>
@@ -291,20 +300,20 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
           </div>
         </div>
       </CardHeader>
-      <CardContent className="grid gap-4 flex-1 flex flex-col">
-        <div className="grid grid-cols-3 gap-2">
-          <div className="rounded-xl border border-border/40 bg-background/50 p-3">
-            <div className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1">Arbres</div>
-            <div className="text-base font-bold">{formatNumber(lot.nbArbres)}</div>
+      <CardContent className="px-6 pb-6 pt-0 grid gap-5 flex-1 flex flex-col relative z-10">
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
+            <div className="text-[9px] uppercase tracking-widest text-muted font-black mb-1 opacity-60">Arbres</div>
+            <div className="text-lg font-black tracking-tighter">{formatNumber(lot.nbArbres)}</div>
           </div>
-          <div className="rounded-xl border border-border/40 bg-background/50 p-3">
-            <div className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1">Rendement</div>
-            <div className="text-base font-bold text-primary truncate">{formatProduction(prod, age)}</div>
+          <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
+            <div className="text-[9px] uppercase tracking-widest text-muted font-black mb-1 opacity-60">Potentiel</div>
+            <div className="text-lg font-black tracking-tighter text-primary truncate">{formatProduction(prod, age)}</div>
           </div>
-          <div className="rounded-xl border border-border/40 bg-background/50 p-3">
-            <div className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1">Évaluation</div>
-            <div className={`text-base font-black ${health.colorClass}`}>
-              {health.total}<span className="text-[10px] opacity-50">/100</span>
+          <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
+            <div className="text-[9px] uppercase tracking-widest text-muted font-black mb-1 opacity-60">Santé IA</div>
+            <div className={`text-lg font-black tracking-tighter ${health.colorClass}`}>
+              {health.total}<span className="text-[10px] opacity-40">/100</span>
             </div>
           </div>
         </div>

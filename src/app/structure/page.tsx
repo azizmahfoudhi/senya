@@ -14,19 +14,66 @@ export default function StructurePage() {
   const farm = useFarmData();
 
   return (
-    <AppShell title="Structure & Paramètres">
-      <div className="mb-6 animate-in fade-in slide-in-from-top-4">
-        <h1 className="text-2xl font-black flex items-center gap-2">
-          <Settings className="w-6 h-6 text-primary" />
-          Structure de la Ferme
-        </h1>
-        <p className="text-sm text-muted mt-1">Gérez la surface globale, le marché et ajoutez vos parcelles d'arbres.</p>
-      </div>
+    <AppShell title="Architecture & Paramètres">
+      <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
+        
+        {/* HEADER */}
+        <div className="px-2">
+          <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            Architecture de la Ferme
+          </h1>
+          <p className="text-muted-foreground font-medium pt-1 max-w-md text-lg">Configuration structurelle, modèles botaniques et paramètres économiques.</p>
+        </div>
 
-      <div className="grid gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="flex flex-col gap-6 max-w-2xl">
-          <SettingsCard farm={farm} />
-          <CreateBatchCard farm={farm} />
+        <div className="grid lg:grid-cols-[1fr_400px] gap-8">
+          <div className="flex flex-col gap-8">
+            <SettingsCard farm={farm} />
+            
+            {/* VARIETIES SECTION (Botanical Profiles) */}
+            <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-xl overflow-hidden">
+              <CardHeader className="border-b border-border/40 bg-muted/5 p-8">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-black tracking-tighter">Modèles Botaniques</CardTitle>
+                    <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Profils de croissance et rendements théoriques</CardDescription>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                    <Trees className="w-6 h-6" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-border/40">
+                  {farm.types.map(type => (
+                    <div key={type.id} className="p-6 flex items-center justify-between group hover:bg-primary/[0.02] transition-colors relative">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform duration-500" />
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-muted/5 flex items-center justify-center border border-border/30 group-hover:bg-primary/10 group-hover:border-primary/20 transition-all">
+                          <Sprout className="w-6 h-6 text-muted group-hover:text-primary transition-colors" />
+                        </div>
+                        <div>
+                          <div className="text-lg font-black tracking-tight">{type.nom}</div>
+                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                            {type.isIntensive ? "Système Intensif" : "Système Traditionnel"} • Max {type.rendementMaxKgParArbre}kg/arbre
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-right px-4">
+                          <div className="text-[10px] font-black uppercase text-muted">Potentiel</div>
+                          <div className="text-sm font-bold text-primary">Haute Performance</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="lg:sticky lg:top-8 h-fit">
+            <CreateBatchCard farm={farm} />
+          </div>
         </div>
       </div>
     </AppShell>
@@ -44,69 +91,65 @@ function SettingsCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   };
 
   return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm">
-      <CardHeader>
+    <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-xl overflow-hidden group">
+      <div className="absolute top-0 right-0 p-10 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-1000 pointer-events-none">
+        <Settings className="w-32 h-32" />
+      </div>
+      <CardHeader className="p-8 pb-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-              <Settings className="w-5 h-5" />
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+              <Settings className="w-6 h-6" />
             </div>
             <div>
-              <CardTitle>Paramètres généraux</CardTitle>
-              <CardDescription>Surface et prix de vente estimés</CardDescription>
+              <CardTitle className="text-2xl font-black tracking-tighter">Configuration Globale</CardTitle>
+              <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Dimensions et économie de l'exploitation</CardDescription>
             </div>
           </div>
           {saving === "saved" && (
-            <div className="flex items-center gap-1 text-xs text-primary animate-in fade-in slide-in-from-right-2">
-              <CheckCircle2 className="w-4 h-4" /> Enregistré
+            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary animate-in fade-in slide-in-from-right-2 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Enregistré
             </div>
           )}
         </div>
       </CardHeader>
-      <CardContent className="grid gap-4">
-        <label className="grid gap-1.5">
-          <div className="text-sm font-medium text-foreground/80">Surface de la ferme (hectares)</div>
+      <CardContent className="p-8 pt-4 grid sm:grid-cols-2 gap-6 relative z-10">
+        <div className="space-y-2">
+          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
+            <Map className="w-3 h-3" /> Surface Totale
+          </div>
           <div className="relative">
             <Input
               inputMode="decimal"
-              className="pr-12 bg-background/50"
+              className="h-14 rounded-2xl bg-background/40 border-border/40 focus:bg-background/60 transition-all pr-12 text-lg font-bold"
               defaultValue={String(farm.settings.surfaceHa ?? 0)}
               onBlur={(e) => handleSave({ surfaceHa: Number(e.target.value || 0) })}
             />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted pointer-events-none">
-              ha
-            </div>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted uppercase tracking-tighter">ha</div>
           </div>
-        </label>
+        </div>
 
-        <label className="grid gap-1.5">
-          <div className="text-sm font-medium text-foreground/80">Prix de vente estimé (par kg)</div>
+        <div className="space-y-2">
+          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
+            <DollarSign className="w-3 h-3" /> Prix de Vente (Moy.)
+          </div>
           <div className="relative">
             <Input
               inputMode="decimal"
-              className="pr-12 bg-background/50"
+              className="h-14 rounded-2xl bg-background/40 border-border/40 focus:bg-background/60 transition-all pr-12 text-lg font-bold"
               defaultValue={String(farm.settings.prixKgOlives ?? 0)}
               onBlur={(e) => handleSave({ prixKgOlives: Number(e.target.value || 0) })}
             />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted pointer-events-none">
-              DT
-            </div>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted uppercase tracking-tighter">DT/kg</div>
           </div>
-          <div className="text-xs text-muted mt-1 bg-muted/20 p-2 rounded-md inline-flex">
-            💡 Exemple: 6.5 → {formatMoneyDT(6.5)} / kg
-          </div>
-        </label>
-
-        {/* Manual Rain Estimation removed - replaced by live Open-Meteo data in useHistoricalRain */}
+        </div>
       </CardContent>
     </Card>
   );
 }
 
-
-
 function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
-  const [nom, setNom] = React.useState("Lot 1");
+  const [nom, setNom] = React.useState("Lot A");
   const [typeId, setTypeId] = React.useState<string>("");
   const [datePlantation, setDatePlantation] = React.useState<string>(new Date().toISOString().slice(0, 10));
   const [nb, setNb] = React.useState<string>("100");
@@ -121,7 +164,7 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
       nom: nom.trim() || "Lot",
       typeId: chosen,
       datePlantationISO: datePlantation,
-      nbArbres: Math.max(1, Number(nb || 0)), // Prevent negative or zero
+      nbArbres: Math.max(1, Number(nb || 0)),
       irrigation: irrig,
       etatCroissance: croissance,
       stressLevel: stress,
@@ -131,129 +174,86 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   }
 
   return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center text-success">
-            <Sprout className="w-5 h-5" />
+    <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-2xl relative overflow-hidden group">
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-scanning" />
+      <CardHeader className="p-8 pb-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-success/10 flex items-center justify-center text-success border border-success/20">
+            <Plus className="w-6 h-6" />
           </div>
           <div>
-            <CardTitle>Création d'un Lot</CardTitle>
-            <CardDescription>Ajoutez un groupe d'arbres (même variété, même âge)</CardDescription>
+            <CardTitle className="text-xl font-black tracking-tighter">Nouveau Lot</CardTitle>
+            <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Extension du patrimoine</CardDescription>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="grid gap-4">
-        <label className="grid gap-1.5">
-          <div className="text-sm font-medium text-foreground/80">Nom du lot</div>
-          <Input value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Ex: Lot Ouest" className="bg-background/50" />
-        </label>
-        
-        <div className="grid grid-cols-2 gap-3">
-          <label className="grid gap-1.5">
-            <div className="text-sm font-medium text-foreground/80">Date de plantation</div>
-            <Input
-              type="date"
-              value={datePlantation}
-              onChange={(e) => setDatePlantation(e.target.value)}
-              className="bg-background/50"
-            />
-          </label>
-          <label className="grid gap-1.5">
-            <div className="text-sm font-medium text-foreground/80">Nombre d'arbres</div>
-            <Input inputMode="numeric" min="1" value={nb} onChange={(e) => setNb(e.target.value)} className="bg-background/50" />
-          </label>
+      <CardContent className="p-8 pt-4 grid gap-6">
+        <div className="space-y-2">
+          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Identifiant</div>
+          <Input value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Nom du lot" className="h-12 rounded-xl bg-background/50 border-border/40 font-bold" />
         </div>
         
-        <div className="grid grid-cols-2 gap-3">
-          <label className="grid gap-1.5">
-            <div className="text-sm font-medium text-foreground/80">Variété</div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Plantation</div>
+            <Input type="date" value={datePlantation} onChange={(e) => setDatePlantation(e.target.value)} className="h-12 rounded-xl bg-background/50 border-border/40 font-bold" />
+          </div>
+          <div className="space-y-2">
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Population</div>
+            <Input inputMode="numeric" min="1" value={nb} onChange={(e) => setNb(e.target.value)} className="h-12 rounded-xl bg-background/50 border-border/40 font-bold" />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Variété</div>
             <select
-              className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-12 w-full rounded-xl border border-border/40 bg-background/50 px-3 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
               value={typeId}
               onChange={(e) => setTypeId(e.target.value)}
             >
               <option value="">Sélectionner...</option>
               {farm.types.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.nom}
-                </option>
+                <option key={t.id} value={t.id}>{t.nom}</option>
               ))}
             </select>
-          </label>
-          <label className="grid gap-1.5">
-            <div className="text-sm font-medium text-foreground/80">Irrigation</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Régime</div>
             <select
-              className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-12 w-full rounded-xl border border-border/40 bg-background/50 px-3 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
               value={irrig}
               onChange={(e) => setIrrig(e.target.value as any)}
             >
-              <option value="non_irrigue">Bour (Non irrigué)</option>
+              <option value="non_irrigue">Bour (Sec)</option>
               <option value="faible">Irrigué (Faible)</option>
               <option value="normal">Irrigué (Normal)</option>
               <option value="optimal">Irrigué (Optimal)</option>
             </select>
-          </label>
+          </div>
         </div>
 
-        <label className="grid gap-1.5">
-          <div className="text-sm font-medium text-foreground/80 flex items-center justify-between">
-            <span>État de production</span>
-            <span className="text-xs text-muted">
-              {croissance === 1 && "Critique (0.4x)"}
-              {croissance === 2 && "Faible (0.7x)"}
-              {croissance === 3 && "Normal (1.0x)"}
-              {croissance === 4 && "Bon (1.2x)"}
-              {croissance === 5 && "Excellent (1.5x)"}
-            </span>
+        <div className="space-y-3">
+          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center justify-between">
+            <span>Évaluation Vigueur</span>
+            <span className="text-primary font-black">{(croissance * 20)}%</span>
           </div>
-          <div className="flex items-center gap-1 bg-background/50 p-2 rounded-md border border-input">
+          <div className="flex items-center justify-center gap-2 bg-background/30 p-4 rounded-2xl border border-border/20">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
                 onClick={() => setCroissance(star)}
-                className={`p-1 rounded-md transition-colors ${
-                  star <= croissance ? "text-warning hover:text-warning/80" : "text-muted hover:text-muted/80"
-                }`}
+                className={`transition-all duration-300 ${star <= croissance ? "text-warning scale-110 drop-shadow-sm" : "text-muted/30 hover:text-muted/60"}`}
               >
-                <Star className={`w-6 h-6 ${star <= croissance ? "fill-current" : ""}`} />
+                <Star className={`w-8 h-8 ${star <= croissance ? "fill-current" : ""}`} />
               </button>
             ))}
-          </div>
-        </label>
-        
-        <div className="grid gap-1.5">
-          <div className="text-sm font-medium text-foreground/80 px-0.5">Niveau de Stress Environnemental (Sécheresse, etc.)</div>
-          <div className="flex gap-2">
-            {[
-              { id: "bas", label: "Bas", desc: "Sain" },
-              { id: "moyen", label: "Moyen", desc: "Stressé" },
-              { id: "eleve", label: "Élevé", desc: "Critique" },
-            ].map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setStress(s.id as any)}
-                className={cn(
-                  "flex-1 flex flex-col items-center py-2.5 px-2 rounded-2xl border-2 transition-all",
-                  stress === s.id 
-                    ? "bg-primary border-primary text-primary-foreground shadow-md" 
-                    : "bg-background/50 border-border/40 hover:border-primary/30 text-muted-foreground"
-                )}
-              >
-                <span className="text-xs font-black uppercase tracking-tight">{s.label}</span>
-                <span className="text-[10px] opacity-70 font-bold">{s.desc}</span>
-              </button>
-            ))}
-          </div>
-          <div className="text-[10px] text-muted italic px-1">
-            Réduit directement le rendement (Sécheresse prolongée, maladie chronique).
           </div>
         </div>
         
-        <Button onClick={submit} disabled={farm.types.length === 0} className="w-full mt-2 gap-2">
-          <Sprout className="w-4 h-4" />
-          Ajouter le lot
+        <Button onClick={submit} disabled={farm.types.length === 0} className="w-full h-14 rounded-2xl shadow-xl shadow-success/20 font-black uppercase tracking-widest text-xs mt-2">
+          Créer le lot
         </Button>
       </CardContent>
     </Card>
