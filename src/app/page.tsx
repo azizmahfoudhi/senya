@@ -142,61 +142,65 @@ export default function HomePage() {
       ) : (
         <>
           {/* HERO SECTION */}
-          <div className="flex flex-col sm:flex-row gap-6 items-stretch mb-8 mt-2 px-2">
-            <div className="flex-1 space-y-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-8 rounded-[2.5rem] border border-primary/20 shadow-inner relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
+          <div className="flex flex-col sm:flex-row gap-6 items-stretch mb-10 mt-4 px-2">
+            <div className="flex-1 space-y-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-10 rounded-[3rem] border border-primary/20 shadow-xl shadow-primary/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
               
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight flex items-center gap-3">
-                <span className="animate-float inline-block">👋</span> 
+              <h2 className="text-5xl sm:text-6xl font-black tracking-tighter flex items-center gap-4">
+                <span className="animate-float inline-block drop-shadow-sm">👋</span> 
                 Bonjour.
               </h2>
-              <p className="text-muted-foreground font-medium text-xl pt-1">
-                Oliveraie de {farm.settings.surfaceHa} ha <span className="text-sm opacity-50 font-normal">({farm.lots.length} parcelles)</span>
+              <p className="text-muted-foreground font-medium text-2xl pt-2 tracking-tight">
+                Oliveraie de {farm.settings.surfaceHa} ha <span className="text-sm opacity-40 font-bold uppercase tracking-widest ml-2">({farm.lots.length} parcelles actives)</span>
               </p>
               
-              <div className="mt-8 flex flex-wrap gap-3">
-                <div className="inline-flex items-center gap-3 bg-background/60 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-border/50 shadow-sm animate-pulse-glow">
-                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Santé Moyenne</span>
-                  <div className="flex items-center gap-2">
+              <div className="mt-10 flex flex-wrap gap-4 relative z-10">
+                <div className="inline-flex items-center gap-4 bg-background/60 backdrop-blur-xl px-6 py-3.5 rounded-2xl border border-border/40 shadow-xl shadow-black/5 animate-pulse-glow">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Indice Santé</span>
+                  <div className="flex items-center gap-3">
                     <div className={cn(
-                      "h-3 w-3 rounded-full animate-pulse",
-                      globalHealth >= 80 ? 'bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]' : globalHealth >= 50 ? 'bg-warning shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 'bg-danger shadow-[0_0_8px_rgba(239,68,68,0.5)]'
+                      "h-3.5 w-3.5 rounded-full animate-pulse",
+                      globalHealth >= 80 ? 'bg-success shadow-[0_0_12px_rgba(16,185,129,0.6)]' : globalHealth >= 50 ? 'bg-warning shadow-[0_0_12px_rgba(245,158,11,0.6)]' : 'bg-danger shadow-[0_0_12px_rgba(239,68,68,0.6)]'
                     )} />
-                    <span className="font-black text-2xl tracking-tighter">{historyLoading ? "..." : globalHealth}<span className="text-sm opacity-40 font-bold">/100</span></span>
+                    <span className="font-black text-3xl tracking-tighter tabular-nums">{historyLoading ? "..." : globalHealth}<span className="text-xs opacity-40 font-bold ml-0.5">/100</span></span>
                   </div>
                 </div>
                 
-                <Link href="/lots" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-2xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20">
-                  Gérer les lots <ArrowRight className="w-4 h-4" />
+                <Link href="/lots" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/30 group/btn">
+                  Gérer les lots <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
-
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
             <MetricCard
-              title="Arbres"
+              title="Population"
               value={formatNumber(totals.totalTrees)}
-              sub={`${state.lots.length} lot(s)`}
+              sub={`${state.lots.length} parcelles`}
               delay="delay-[100ms]"
+              icon={<Trees className="w-3 h-3" />}
             />
             <MetricCard
-              title="Investissement"
+              title="Investi"
               value={formatMoneyDT(totals.totalInvestment)}
-              sub="Dépenses totales"
+              sub="Capex total"
               delay="delay-[200ms]"
+              icon={<Wallet className="w-3 h-3" />}
             />
             <MetricCard
-              title="Dépenses / 12 mois"
+              title="OPEX / 12 mois"
               value={formatMoneyDT(totals.estimatedYearlyCosts)}
-              sub="Dépenses totales"
+              sub="Coûts tournants"
               delay="delay-[300ms]"
+              icon={<TrendingUp className="w-3 h-3" />}
             />
             <MetricCard
-              title="Production annuelle"
+              title="Rendement"
               value={formatKg(totals.estimatedYearlyProductionKg)}
-              sub="Estimée"
+              sub="Production estimée"
               delay="delay-[400ms]"
+              icon={<Sprout className="w-3 h-3" />}
             />
           </div>
 
@@ -388,45 +392,111 @@ export default function HomePage() {
                 )}
               </CardContent>
             </Card>
-            <Card className="md:col-span-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-[800ms] fill-mode-both border-border/50 bg-card/50 backdrop-blur-xl shadow-sm hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all">
-              <CardHeader>
-                <div>
-                  <CardTitle className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">Météo Agricole (5 Jours)</CardTitle>
-                  <CardDescription className="flex items-center justify-between">
-                    <span>Prévisions pour votre oliveraie</span>
-                    {lastFetched && <span className="text-[10px] opacity-60">Màj: {lastFetched}</span>}
-                  </CardDescription>
+            <Card className="md:col-span-2 glass-card rounded-[2.5rem] shadow-xl overflow-hidden group border-border/40">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-black tracking-tighter">Météo Agricole</CardTitle>
+                    <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Conditions actuelles et prévisions à 5 jours</CardDescription>
+                  </div>
+                  {weather && (
+                    <div className="text-right">
+                      <div className="text-3xl font-black tracking-tighter text-primary">{weather.current.temp}°C</div>
+                      <div className="text-[10px] font-bold text-muted uppercase tracking-widest">Nasrallah, Kairouan</div>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-0">
                 {weatherLoading ? (
-                  <div className="flex justify-center py-4"><Skeleton className="h-16 w-full" /></div>
+                  <div className="flex justify-center py-8"><Skeleton className="h-24 w-full rounded-2xl" /></div>
                 ) : weather ? (
-                  <div className="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
-                    {weather.daily.dates.slice(0, 5).map((date, i) => (
-                      <div key={date} className="flex-1 min-w-[80px] bg-background/50 border border-border/40 rounded-2xl p-3 flex flex-col items-center justify-center gap-2">
-                        <div className="text-xs font-semibold text-muted uppercase tracking-wider">
-                          {new Date(date).toLocaleDateString("fr-FR", { weekday: "short" })}
-                        </div>
-                        <div className="text-2xl py-1">
-                          {weather.daily.precipitation[i] > 2 ? (
-                            <CloudRain className="w-6 h-6 text-primary" />
-                          ) : weather.daily.maxTemps[i] > 30 ? (
-                            <Sun className="w-6 h-6 text-warning" />
-                          ) : weather.daily.maxTemps[i] < 10 ? (
-                            <Snowflake className="w-6 h-6 text-blue-300" />
-                          ) : (
-                            <Cloud className="w-6 h-6 text-muted" />
-                          )}
-                        </div>
-                        <div className="text-sm font-bold">{Math.round(weather.daily.maxTemps[i])}°</div>
-                        <div className="text-xs text-muted">{Math.round(weather.daily.minTemps[i])}°</div>
+                  <div className="space-y-8">
+                    {/* CURRENT DETAILS */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
+                        <div className="text-[10px] font-black uppercase text-muted mb-1">Humidité</div>
+                        <div className="text-lg font-black">{weather.current.humidity}%</div>
                       </div>
-                    ))}
+                      <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
+                        <div className="text-[10px] font-black uppercase text-muted mb-1">Vent</div>
+                        <div className="text-lg font-black">{weather.current.windSpeed} km/h</div>
+                      </div>
+                      <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
+                        <div className="text-[10px] font-black uppercase text-muted mb-1">UV</div>
+                        <div className="text-lg font-black">{weather.daily.uvIndex[0] || 6}</div>
+                      </div>
+                    </div>
+
+                    {/* 5-DAY STRIP */}
+                    <div className="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
+                      {weather.daily.dates.slice(0, 5).map((date, i) => (
+                        <div key={date} className="flex-1 min-w-[100px] bg-background/30 border border-border/20 rounded-3xl p-5 flex flex-col items-center justify-center gap-3 group/day hover:bg-primary/5 transition-all">
+                          <div className="text-[10px] font-black text-muted uppercase tracking-widest">
+                            {new Date(date).toLocaleDateString("fr-FR", { weekday: "short" })}
+                          </div>
+                          <div className="py-2 transform group-hover/day:scale-110 transition-transform">
+                            {weather.daily.precipitation[i] > 2 ? (
+                              <CloudRain className="w-8 h-8 text-primary" />
+                            ) : weather.daily.maxTemps[i] > 30 ? (
+                              <Sun className="w-8 h-8 text-warning" />
+                            ) : weather.daily.maxTemps[i] < 10 ? (
+                              <Snowflake className="w-8 h-8 text-blue-300" />
+                            ) : (
+                              <Cloud className="w-8 h-8 text-muted" />
+                            )}
+                          </div>
+                          <div className="text-center">
+                            <div className="text-lg font-black tracking-tight">{Math.round(weather.daily.maxTemps[i])}°</div>
+                            <div className="text-[10px] font-bold text-muted">{Math.round(weather.daily.minTemps[i])}°</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : (
-                  <div className="text-sm text-muted text-center py-4">Météo indisponible</div>
+                  <div className="text-sm text-muted text-center py-8">Données météo temporairement indisponibles</div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* RECENT ACTIVITY SECTION */}
+            <Card className="md:col-span-2 glass-card rounded-[2.5rem] shadow-xl overflow-hidden group border-border/40">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-black tracking-tighter">Opérations Récentes</CardTitle>
+                    <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Historique direct des derniers flux</CardDescription>
+                  </div>
+                  <Link href="/depenses">
+                    <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest">
+                      Voir tout <ArrowRight className="w-3.5 h-3.5" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-border/40">
+                  {farm.depenses.slice(0, 4).map((d) => (
+                    <div key={d.id} className="p-6 flex items-center justify-between hover:bg-primary/[0.02] transition-colors group/row">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-muted/5 flex items-center justify-center border border-border/30 group-hover/row:bg-primary/10 group-hover/row:border-primary/20 transition-all">
+                          <Wallet className="w-6 h-6 text-muted group-hover/row:text-primary transition-colors" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-black tracking-tight">{formatMoneyDT(d.montant)}</div>
+                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                            {d.categorie} • {new Date(d.dateISO).toLocaleDateString("fr-FR")}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] font-black uppercase text-muted">Statut</div>
+                        <div className="text-xs font-bold text-success">Validé</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
@@ -442,26 +512,31 @@ function MetricCard({
   value,
   sub,
   delay = "delay-0",
+  icon,
 }: {
   title: string;
   value: string;
   sub: string;
   delay?: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <Card className={cn(
-      "border-border/50 bg-card/50 backdrop-blur-xl shadow-sm hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden",
-      "animate-in fade-in zoom-in-95 duration-500 fill-mode-both",
+      "glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5 hover:shadow-primary/10 hover:border-primary/30 transition-all duration-500 hover:-translate-y-1 group relative overflow-hidden",
+      "animate-in fade-in zoom-in-95 duration-700 fill-mode-both",
       delay
     )}>
-      <CardHeader className="p-4 pb-2">
-        <CardTitle className="text-xs font-medium text-muted uppercase tracking-wider line-clamp-1">{title}</CardTitle>
+      <CardHeader className="p-6 pb-2">
+        <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+          {icon}
+          {title}
+        </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <div className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/80 bg-clip-text text-transparent group-hover:scale-[1.02] transition-transform origin-left">
+      <CardContent className="p-6 pt-0">
+        <div className="text-2xl sm:text-3xl font-black tracking-tighter bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent group-hover:scale-[1.02] transition-transform origin-left">
           {value}
         </div>
-        <CardDescription className="text-[10px] sm:text-xs mt-1 line-clamp-1">{sub}</CardDescription>
+        <CardDescription className="text-[10px] font-bold text-muted uppercase tracking-widest mt-1 line-clamp-1">{sub}</CardDescription>
       </CardContent>
     </Card>
   );
