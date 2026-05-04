@@ -92,7 +92,7 @@ export default function LotDetailPage() {
               <div>
                 <CardTitle className="text-xl">Résumé</CardTitle>
                 <CardDescription>
-                  {type?.nom ?? "Type inconnu"} · {formatNumber(lot.nbArbres)} arbres ·{" "}
+                  {lot.typeId && type ? type.nom : `${type?.nom || "Chemlali"} (Défaut)`} · {formatNumber(lot.nbArbres)} arbres ·{" "}
                   {formatNumber(lotAge, 1)} ans · {lot.irrigation === "optimal" ? "Irrigué (Optimal)" : lot.irrigation === "normal" ? "Irrigué (Normal)" : lot.irrigation === "faible" ? "Irrigué (Faible)" : "Bour (Non irrigué)"}
                   {lot.etatCroissance !== 3 && (
                     <>

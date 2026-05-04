@@ -2,8 +2,8 @@ import { v4 as uuid } from "uuid";
 import type { FarmState } from "@/lib/domain";
 
 export function demoSeed(): FarmState {
-  const typeKor = { id: uuid(), nom: "Koroneiki", rendementMaxKgParArbre: 25 };
-  const typeChe = { id: uuid(), nom: "Chemlali", rendementMaxKgParArbre: 20 };
+  const typeKor = { id: uuid(), nom: "Koroneiki", rendementMaxKgParArbre: 25, isIntensive: true };
+  const typeChe = { id: uuid(), nom: "Chemlali", rendementMaxKgParArbre: 20, isIntensive: false };
 
   const lot1 = {
     id: uuid(),

@@ -223,11 +223,11 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
           <div>
             <CardTitle className="truncate text-lg mb-1">{lot.nom}</CardTitle>
             <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              {type ? (
+              {lot.typeId && type ? (
                 <span className="font-medium text-foreground/80">{type.nom}</span>
               ) : (
-                <span className="font-bold text-danger flex items-center gap-1">
-                  <ShieldAlert className="w-3.5 h-3.5" /> Type inconnu
+                <span className="font-bold text-primary flex items-center gap-1">
+                  <ShieldAlert className="w-3.5 h-3.5" /> {type?.nom || "Chemlali"} (Défaut)
                 </span>
               )}
               <span>•</span>

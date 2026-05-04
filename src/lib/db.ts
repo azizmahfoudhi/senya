@@ -23,6 +23,7 @@ type DbTypeRow = {
   id: UUID;
   nom: string;
   rendement_max_kg_par_arbre: number;
+  is_intensive: boolean;
 };
 
 type DbBatchRow = {
@@ -79,7 +80,12 @@ function mapSettings(r: DbSettingsRow): FarmSettings {
   };
 }
 function mapType(r: DbTypeRow): TreeType {
-  return { id: r.id, nom: r.nom, rendementMaxKgParArbre: Number(r.rendement_max_kg_par_arbre) };
+  return { 
+    id: r.id, 
+    nom: r.nom, 
+    rendementMaxKgParArbre: Number(r.rendement_max_kg_par_arbre),
+    isIntensive: Boolean(r.is_intensive) 
+  };
 }
 function mapBatch(r: DbBatchRow): Batch {
   return {
@@ -174,13 +180,14 @@ export async function listTreeTypes(): Promise<TreeType[]> {
   return (data as any[]).map(mapType);
 }
 
-export async function createTreeType(input: { nom: string; rendementMaxKgParArbre: number }) {
+export async function createTreeType(input: { nom: string; rendementMaxKgParArbre: number; isIntensive: boolean }) {
   const sb = supabaseBrowser();
   const { data, error } = await sb
     .from("tree_types")
     .insert({
       nom: input.nom,
       rendement_max_kg_par_arbre: input.rendementMaxKgParArbre,
+      is_intensive: input.isIntensive,
     })
     .select("*")
     .single();
@@ -297,6 +304,7 @@ export async function updateTreeType(id: UUID, input: Partial<Omit<TreeType, "id
   const payload: any = {};
   if (input.nom !== undefined) payload.nom = input.nom;
   if (input.rendementMaxKgParArbre !== undefined) payload.rendement_max_kg_par_arbre = input.rendementMaxKgParArbre;
+  if (input.isIntensive !== undefined) payload.is_intensive = input.isIntensive;
   const { error } = await sb.from("tree_types").update(payload).eq("id", id);
   if (error) throw error;
 }

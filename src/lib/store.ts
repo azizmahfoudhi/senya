@@ -21,7 +21,7 @@ export type FarmActions = {
   resetToDemo(): void;
   setSettings(patch: Partial<FarmSettings>): void;
 
-  addTreeType(nom: string, rendementMaxKgParArbre: number): void;
+  addTreeType(nom: string, rendementMaxKgParArbre: number, isIntensive: boolean): void;
   updateTreeType(id: UUID, patch: Partial<TreeType>): void;
   removeTreeType(id: UUID): void;
 
@@ -62,8 +62,8 @@ export const useFarmStore = create<Store>()(
         set((s) => ({ settings: { ...s.settings, ...patch } }));
       },
 
-      addTreeType(nom, rendementMaxKgParArbre) {
-        const newType: TreeType = { id: uuid(), nom, rendementMaxKgParArbre };
+      addTreeType(nom, rendementMaxKgParArbre, isIntensive) {
+        const newType: TreeType = { id: uuid(), nom, rendementMaxKgParArbre, isIntensive };
         set((s) => ({ types: [newType, ...s.types] }));
       },
       updateTreeType(id, patch) {

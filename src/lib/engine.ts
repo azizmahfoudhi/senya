@@ -12,11 +12,10 @@ export function ageYearsFromISO(datePlantationISO: string, atISO: string) {
   return Math.max(0, months / 12);
 }
 
-function yieldPercentageByAge(ageYears: number, typeNom: string) {
+function yieldPercentageByAge(ageYears: number, type: TreeType) {
   let pts: Array<[number, number]>;
-  const nomLC = typeNom.toLowerCase();
 
-  if (nomLC.includes("chemlali") || nomLC.includes("chetoui")) {
+  if (!type.isIntensive) {
     // Variétés traditionnelles (Chemlali, Chétoui) : entrée en production tardive, pic tardif
     pts = [
       [0, 0],
@@ -29,7 +28,7 @@ function yieldPercentageByAge(ageYears: number, typeNom: string) {
       [40, 1.00],   // Longue durée de vie
       [50, 0.90],
     ];
-  } else if (nomLC.includes("koroneiki") || nomLC.includes("arbequina") || nomLC.includes("arbosana")) {
+  } else {
     // Variétés intensives (Koroneiki, Arbequina) : entrée très rapide, pic rapide
     pts = [
       [0, 0],
@@ -41,20 +40,6 @@ function yieldPercentageByAge(ageYears: number, typeNom: string) {
       [7, 1.00],    // Pic à 7 ans
       [20, 1.00],
       [25, 0.85],   // Déclin plus rapide
-    ];
-  } else {
-    // Standard / Moyen par défaut
-    pts = [
-      [0, 0],
-      [2, 0],
-      [3, 0.05],
-      [4, 0.20],
-      [5, 0.45],
-      [6, 0.70],
-      [7, 0.90],
-      [8, 1.00],
-      [25, 1.00],
-      [30, 0.90],
     ];
   }
 
@@ -79,7 +64,7 @@ export function estimatedYieldKgPerTree(args: {
   growthStatus?: number;
   rainMm?: number;
 }) {
-  const yieldPct = yieldPercentageByAge(args.ageYears, args.type.nom);
+  const yieldPct = yieldPercentageByAge(args.ageYears, args.type);
   const scaled = yieldPct * args.type.rendementMaxKgParArbre;
   
   // L'irrigation a un impact énorme en année sèche, ou un impact standard de +30/40%

@@ -14,6 +14,7 @@ create table if not exists public.tree_types (
   id uuid primary key default gen_random_uuid(),
   nom text not null,
   rendement_max_kg_par_arbre numeric not null default 20,
+  is_intensive boolean not null default false,
   created_at timestamptz not null default now()
 );
 

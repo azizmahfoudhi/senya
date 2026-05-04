@@ -37,7 +37,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
 
   const nowISO = new Date().toISOString();
 
-  // --- 1. Yield Performance (30%) ---
+  // --- 1. Yield Performance (35%) ---
   // Compares estimated yield vs theoretical maximum based on age
   const estimatedYield = batchEstimatedProductionKg({ batch: lot, type, atISO: nowISO, rainMm: state.settings.pluviometrieAnnuelleMm });
   const theoreticalMax = lot.nbArbres * type.rendementMaxKgParArbre;
@@ -49,7 +49,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
   }
   yieldScore = clamp(yieldScore);
 
-  // --- 2. Water Efficiency (20%) ---
+  // --- 2. Water Efficiency (25%) ---
   let waterScore = 50;
   const rain = state.settings.pluviometrieAnnuelleMm ?? 300;
 
@@ -71,7 +71,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
   }
   waterScore = clamp(waterScore);
 
-  // --- 3. Financial Efficiency (20%) ---
+  // --- 3. Financial Efficiency (25%) ---
   const currentCost = sumExpensesForBatch(state, lotId);
   const revenue = estimatedYield * (state.settings.prixKgOlives || 1);
   const margin = revenue - currentCost;
@@ -88,7 +88,7 @@ export function computeLotHealth(state: FarmState, lotId: UUID): HealthScore {
 
 
 
-  // --- 5. Environmental Stress (15%) ---
+  // --- 4. Environmental Stress (15%) ---
   const lotTreatments = state.treatments.filter(t => t.lotId === lotId);
   let stressScore = 100;
   

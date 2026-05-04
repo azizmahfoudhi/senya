@@ -25,6 +25,7 @@ export type TreeType = {
   id: UUID;
   nom: string;
   rendementMaxKgParArbre: number; // à maturité
+  isIntensive: boolean;
 };
 
 export type Batch = {

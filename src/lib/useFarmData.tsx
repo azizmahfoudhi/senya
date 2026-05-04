@@ -62,10 +62,10 @@ export function useFarmData() {
       let fetchedTypes = t;
       if (fetchedTypes.length === 0) {
         await Promise.all([
-          createTreeType({ nom: "Chemlali", rendementMaxKgParArbre: 60 }),
-          createTreeType({ nom: "Koroneiki", rendementMaxKgParArbre: 45 }),
-          createTreeType({ nom: "Chétoui", rendementMaxKgParArbre: 55 }),
-          createTreeType({ nom: "Arbequina", rendementMaxKgParArbre: 40 }),
+          createTreeType({ nom: "Chemlali", rendementMaxKgParArbre: 60, isIntensive: false }),
+          createTreeType({ nom: "Koroneiki", rendementMaxKgParArbre: 45, isIntensive: true }),
+          createTreeType({ nom: "Chétoui", rendementMaxKgParArbre: 55, isIntensive: false }),
+          createTreeType({ nom: "Arbequina", rendementMaxKgParArbre: 40, isIntensive: true }),
         ]);
         fetchedTypes = await listTreeTypes();
       }
@@ -98,8 +98,8 @@ export function useFarmData() {
         setSettings((s) => ({ ...s, ...patch }));
       },
 
-      async addTreeType(nom: string, rendementMaxKgParArbre: number) {
-        const created = await createTreeType({ nom, rendementMaxKgParArbre });
+      async addTreeType(nom: string, rendementMaxKgParArbre: number, isIntensive: boolean = false) {
+        const created = await createTreeType({ nom, rendementMaxKgParArbre, isIntensive });
         setTypes((t) => [created, ...t]);
       },
       async updateTreeType(id: UUID, input: Partial<Omit<TreeType, "id">>) {
