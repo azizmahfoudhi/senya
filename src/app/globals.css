@@ -27,8 +27,7 @@
   --font-sans: var(--font-outfit);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+html.dark {
     --background: #020617; /* Very dark slate */
     --foreground: #f1f5f9;
     --card: rgba(30, 41, 59, 0.4);
@@ -40,7 +39,6 @@
     --warning: #fbbf24;
     --success: #34d399;
   }
-}
 
 body {
   background-color: var(--background);
@@ -55,13 +53,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
+html.dark body {
     background-image: 
       radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
       radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
   }
-}
 
 * {
   -webkit-tap-highlight-color: transparent;

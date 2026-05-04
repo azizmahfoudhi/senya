@@ -13,7 +13,10 @@ import {
   BrainCircuit,
   TrendingUp,
   CloudRain,
+  Moon,
+  Sun,
 } from "lucide-react";
+import { useTheme } from "./ThemeProvider";
 
 const nav = [
   { href: "/", label: "Résumé", icon: BarChart3 },
@@ -35,6 +38,7 @@ export function AppShell({
   actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const { theme, toggle } = useTheme();
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
@@ -61,7 +65,16 @@ export function AppShell({
               )}
             </div>
           </div>
-          <div className="shrink-0">{actions}</div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggle}
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-muted/10 text-muted hover:bg-muted/20 hover:text-foreground transition-all duration-300 border border-border/20"
+              aria-label="Changer de thème"
+            >
+              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <div className="shrink-0">{actions}</div>
+          </div>
         </div>
       </header>
 
