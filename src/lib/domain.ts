@@ -49,18 +49,7 @@ export type Expense = {
   note?: string;
 };
 
-export type TaskStatus = "a_faire" | "en_cours" | "termine";
-export type TaskType = "taille" | "labour" | "traitement" | "irrigation" | "recolte" | "autre";
 
-export type FarmTask = {
-  id: UUID;
-  titre: string;
-  datePrevueISO: string;
-  dateRealiseeISO?: string;
-  statut: TaskStatus;
-  typeTache: TaskType;
-  lotId?: UUID;
-};
 
 export type Treatment = {
   id: UUID;
@@ -102,7 +91,6 @@ export type FarmState = {
   lots: Batch[];
   depenses: Expense[];
   yields: YieldRecord[];
-  tasks: FarmTask[];
   treatments: Treatment[];
 
   scenarios: Scenario[];

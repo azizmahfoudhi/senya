@@ -146,19 +146,7 @@ export function buildInsights(state: FarmState, weather: WeatherData | null = nu
     }
   }
 
-  // 2. TASK REMINDERS
-  const overdueTasks = state.tasks.filter(tk => tk.statut !== "termine" && tk.datePrevueISO < tISO);
-  if (overdueTasks.length > 0) {
-    addInsight({
-      level: "danger",
-      titre: "Interventions en retard",
-      icon: "⏰",
-      priorityScore: 95,
-      whatIsHappening: `Vous avez ${overdueTasks.length} tâche(s) planifiée(s) dont la date est dépassée (ex: ${overdueTasks[0].titre}).`,
-      whatToDo: "Consultez l'onglet Calendrier et réaffectez ou exécutez ces tâches en priorité.",
-      whyItMatters: "Le retard dans les traitements phytosanitaires ou la taille entraîne une perte de rendement irrattrapable."
-    });
-  }
+
 
   // 3. FINANCIAL WARNINGS
   const thirtyDaysAgo = formatISO(subMonths(today, 1), { representation: "date" });
