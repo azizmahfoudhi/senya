@@ -14,8 +14,10 @@ export function ageYearsFromISO(datePlantationISO: string, atISO: string) {
 
 function yieldPercentageByAge(ageYears: number, type: TreeType) {
   let pts: Array<[number, number]>;
+  const name = (type.nom || "").toLowerCase();
+  const isIntensive = type.isIntensive || name.includes("koroneiki") || name.includes("arbequina");
 
-  if (!type.isIntensive) {
+  if (!isIntensive) {
     // Variétés traditionnelles (Chemlali, Chétoui) : entrée en production tardive, pic tardif
     pts = [
       [0, 0],
