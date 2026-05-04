@@ -102,6 +102,7 @@ export function useFarmData() {
         setTypes((t) => t.map((x) => (x.id === id ? { ...x, ...input } : x)));
       },
       async removeTreeType(id: UUID) {
+        if (!confirm("Voulez-vous vraiment supprimer cette variété ? Cela peut affecter les lots qui l'utilisent.")) return;
         await deleteTreeType(id);
         setTypes((t) => t.filter((x) => x.id !== id));
       },
@@ -115,6 +116,7 @@ export function useFarmData() {
         setLots((l) => l.map((x) => (x.id === id ? { ...x, ...input } : x)));
       },
       async removeBatch(id: UUID) {
+        if (!confirm("Voulez-vous vraiment supprimer ce lot ? Toutes les données associées seront perdues.")) return;
         await deleteBatch(id);
         setLots((l) => l.filter((x) => x.id !== id));
       },
@@ -128,6 +130,7 @@ export function useFarmData() {
         setDepenses((d) => d.map((x) => (x.id === id ? { ...x, ...input } : x)));
       },
       async removeExpense(id: UUID) {
+        if (!confirm("Supprimer cette dépense ?")) return;
         await deleteExpense(id);
         setDepenses((d) => d.filter((x) => x.id !== id));
       },
@@ -143,6 +146,7 @@ export function useFarmData() {
         setTreatments((prev) => prev.map((x) => (x.id === id ? { ...x, ...input } : x)));
       },
       async removeTreatment(id: UUID) {
+        if (!confirm("Supprimer ce traitement ?")) return;
         await deleteTreatment(id);
         setTreatments((prev) => prev.filter((x) => x.id !== id));
       },
@@ -152,6 +156,7 @@ export function useFarmData() {
         setYields((prev) => [created, ...prev]);
       },
       async removeYield(id: UUID) {
+        if (!confirm("Supprimer cette récolte ?")) return;
         await deleteYield(id);
         setYields((prev) => prev.filter((x) => x.id !== id));
       },

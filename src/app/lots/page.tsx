@@ -340,11 +340,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
               variant="ghost" 
               size="sm" 
               className="text-danger opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
-              onClick={() => {
-                if (confirm(`Voulez-vous vraiment supprimer le lot "${lot.nom}" ? Cette action est irréversible.`)) {
-                  farm.actions.removeBatch(lot.id);
-                }
-              }}
+              onClick={() => farm.actions.removeBatch(lot.id)}
             >
               <Trash2 className="w-4 h-4" />
             </Button>
