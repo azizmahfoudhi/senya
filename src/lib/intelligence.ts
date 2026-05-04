@@ -189,9 +189,15 @@ export function computeLotForecast(state: FarmState, lotId: UUID, rainMm?: numbe
     // Check for alternating bearing (alternance)
     // If last year was huge, this year drops
     const lastYield = lotYields.sort((a, b) => b.dateISO.localeCompare(a.dateISO))[0];
-    if (lastYield && lastYield.quantiteKg > predictedYield * 1.2) {
-      predictedYield *= 0.8; // Lower prediction due to alternating year
-      risks.push("Baisse de rendement attendue (Alternance bi-annuelle)");
+    if (lastYield) {
+      const yieldYear = parseInt(lastYield.dateISO.slice(0, 4));
+      const currentYear = new Date().getFullYear();
+      
+      // Alternance detection: only if the last yield was last year
+      if (yieldYear === currentYear - 1 && lastYield.quantiteKg > predictedYield * 1.2) {
+        predictedYield *= 0.8; // Lower prediction due to alternating year
+        risks.push("Baisse de rendement attendue (Alternance bi-annuelle)");
+      }
     }
   } else {
     risks.push("Manque de données historiques de récolte");

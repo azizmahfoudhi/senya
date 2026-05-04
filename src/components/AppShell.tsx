@@ -23,7 +23,6 @@ const nav = [
   { href: "/pluviometrie", label: "Météo", icon: CloudRain },
   { href: "/lots", label: "Lots", icon: Layers },
   { href: "/depenses", label: "Dépenses", icon: Wallet },
-  { href: "/memory", label: "Mémoire", icon: BrainCircuit },
   { href: "/projections", label: "Prévisions", icon: TrendingUp },
 ];
 

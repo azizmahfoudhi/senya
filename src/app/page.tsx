@@ -306,12 +306,20 @@ export default function HomePage() {
                       </CardDescription>
                     </div>
                   </div>
-                  {weather && (
-                    <div className="text-right hidden sm:block">
-                      <div className="text-2xl font-black">{weather.current.temp}°C</div>
-                      <div className="text-xs text-muted">{weather.current.isDay ? "Ensoleillé" : "Nuit Claire"}</div>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <Link href="/memory">
+                      <Button variant="ghost" size="sm" className="h-8 gap-2 text-muted-foreground hover:text-primary">
+                        <BrainCircuit className="w-4 h-4" />
+                        <span className="hidden sm:inline">Mémoire</span>
+                      </Button>
+                    </Link>
+                    {weather && (
+                      <div className="text-right hidden sm:block border-l border-border/50 pl-4">
+                        <div className="text-2xl font-black">{weather.current.temp}°C</div>
+                        <div className="text-xs text-muted">{weather.current.isDay ? "Ensoleillé" : "Nuit Claire"}</div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-4 space-y-4">
