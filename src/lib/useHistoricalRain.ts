@@ -68,10 +68,39 @@ export function useHistoricalRain() {
     fetchRain();
   }, []);
 
-  // Calcul du projeté pour la fin de l'année
+  // Répartition saisonnière moyenne des précipitations en climat méditerranéen (Tunisie)
+  // Mois (0 = Janvier, 11 = Décembre) : Pourcentages du total annuel
+  const monthlyWeights = [
+    0.15, // Jan: 15%
+    0.12, // Feb: 12%
+    0.12, // Mar: 12%
+    0.10, // Apr: 10%
+    0.06, // May: 6%
+    0.02, // Jun: 2%
+    0.00, // Jul: 0%
+    0.02, // Aug: 2%
+    0.08, // Sep: 8%
+    0.13, // Oct: 13%
+    0.10, // Nov: 10%
+    0.10, // Dec: 10%
+  ];
+
   const now = new Date();
-  const daysPassed = Math.max(1, (now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / (1000 * 60 * 60 * 24));
-  const projectedRainMm = Math.round((ytdRainMm / daysPassed) * 365);
+  const currentMonth = now.getMonth();
+  const currentDay = now.getDate();
+  const daysInCurrentMonth = new Date(now.getFullYear(), currentMonth + 1, 0).getDate();
+  
+  // Calculer le pourcentage de l'année écoulée "météorologiquement"
+  let accumulatedWeight = 0;
+  for (let i = 0; i < currentMonth; i++) {
+    accumulatedWeight += monthlyWeights[i];
+  }
+  // Ajouter la fraction du mois en cours
+  accumulatedWeight += monthlyWeights[currentMonth] * (currentDay / daysInCurrentMonth);
+
+  // Éviter la division par zéro en tout début d'année
+  const safeWeight = Math.max(0.01, accumulatedWeight);
+  const projectedRainMm = Math.round(ytdRainMm / safeWeight);
 
   return { ytdRainMm, projectedRainMm, history, loading };
 }

@@ -187,7 +187,7 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
 
           <label className="grid gap-1.5">
             <div className="text-xs font-medium text-foreground/80 flex items-center justify-between">
-              <span>État de croissance</span>
+              <span>État de production</span>
               <span className="text-[10px] text-muted">
                 {croissance === 1 && "Critique (0.4x)"}
                 {croissance === 2 && "Faible (0.7x)"}
@@ -247,7 +247,7 @@ function LotCard({ lot, farm, typeById, tISO }: { lot: any; farm: ReturnType<typ
               {lot.etatCroissance !== 3 && (
                 <>
                   <span>•</span>
-                  <span className="flex items-center gap-0.5" title="État de croissance">
+                  <span className="flex items-center gap-0.5" title="État de production">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}

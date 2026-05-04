@@ -78,11 +78,6 @@ export default function PluviometriePage() {
                       <div className="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Vent</div>
                       <div className="text-xl font-bold">{weather.current.windSpeed} <span className="text-sm font-normal text-muted">km/h</span></div>
                     </div>
-                    <div className="bg-background/50 rounded-2xl p-4 border border-border/50 flex flex-col items-center justify-center text-center">
-                      <Droplets className="w-6 h-6 text-blue-400 mb-2" />
-                      <div className="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Humidité</div>
-                      <div className="text-xl font-bold">{weather.current.humidity} <span className="text-sm font-normal text-muted">%</span></div>
-                    </div>
                     <div className="bg-primary/10 rounded-2xl p-4 border border-primary/20 flex flex-col items-center justify-center text-center">
                       <Umbrella className="w-6 h-6 text-primary mb-2" />
                       <div className="text-xs text-primary uppercase tracking-wider font-semibold mb-1">Précipitations</div>
@@ -141,7 +136,9 @@ export default function PluviometriePage() {
                   <div className="text-3xl font-black text-foreground">{historyLoading ? "..." : formatNumber(ytdRainMm)} <span className="text-base font-normal text-muted">mm</span></div>
                 </div>
                 <div className="text-right flex flex-col items-end gap-1">
-                  <div className="text-xs text-muted">Projection Annuelle</div>
+                  <div className="text-xs text-muted" title="Estimation basée sur la vitesse actuelle des précipitations rapportée sur 365 jours.">
+                    Projection Annuelle ℹ️
+                  </div>
                   <div className="text-sm font-bold text-primary">{historyLoading ? "..." : formatNumber(projectedRainMm)} mm/an</div>
                   {projectedRainMm > 0 && Math.abs(projectedRainMm - (farm.settings.pluviometrieAnnuelleMm || 0)) > 10 && (
                     <button 

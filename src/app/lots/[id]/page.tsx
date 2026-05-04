@@ -22,6 +22,14 @@ export default function LotDetailPage() {
   const typeById = useMemo(() => new Map(farm.types.map((t) => [t.id, t])), [farm.types]);
   const tISO = todayISO();
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editNom, setEditNom] = useState(lot?.nom || "");
+  const [editTypeId, setEditTypeId] = useState(lot?.typeId || "");
+  const [editNb, setEditNb] = useState(String(lot?.nbArbres || 1));
+  const [editIrrig, setEditIrrig] = useState(lot?.irrigation || "non_irrigue");
+  const [editCroissance, setEditCroissance] = useState(lot?.etatCroissance ?? 3);
+  const [editDate, setEditDate] = useState(lot?.datePlantationISO || "");
+
   if (!lot) {
     return (
       <AppShell title="Lot">
@@ -59,6 +67,20 @@ export default function LotDetailPage() {
 
   const lotTreatments = farm.treatments.filter(t => t.lotId === lot.id);
 
+  async function handleSave() {
+    if (!lot) return;
+    if (!editNom.trim() || !editTypeId) return;
+    await farm.actions.updateBatch(lot.id, {
+      nom: editNom.trim(),
+      typeId: editTypeId,
+      nbArbres: Math.max(1, Number(editNb)),
+      irrigation: editIrrig,
+      etatCroissance: editCroissance,
+      datePlantationISO: editDate,
+    });
+    setIsEditing(false);
+  }
+
   return (
     <AppShell title={lot.nom}>
       <div className="flex flex-col gap-6">
@@ -87,9 +109,94 @@ export default function LotDetailPage() {
                   )}
                 </CardDescription>
               </div>
+              <Button variant="secondary" size="sm" onClick={() => setIsEditing(!isEditing)} className="shrink-0 gap-2">
+                {isEditing ? <><X className="w-4 h-4" /> Annuler</> : <><Edit2 className="w-4 h-4" /> Modifier</>}
+              </Button>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-2">
+
+          {isEditing && (
+            <div className="px-6 pb-4 border-b border-border/50 bg-muted/5 grid gap-4 animate-in fade-in slide-in-from-top-2">
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <label className="grid gap-1.5">
+                  <div className="text-xs font-medium text-foreground/80">Nom du lot</div>
+                  <Input value={editNom} onChange={e => setEditNom(e.target.value)} className="bg-background h-9" />
+                </label>
+                <label className="grid gap-1.5">
+                  <div className="text-xs font-medium text-foreground/80">Variété</div>
+                  <select
+                    className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    value={editTypeId}
+                    onChange={(e) => setEditTypeId(e.target.value)}
+                  >
+                    <option value="">Sélectionner...</option>
+                    {farm.types.map((t) => (
+                      <option key={t.id} value={t.id}>{t.nom}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-3">
+                <label className="grid gap-1.5">
+                  <div className="text-xs font-medium text-foreground/80">Nb Arbres</div>
+                  <Input type="number" min="1" value={editNb} onChange={e => setEditNb(e.target.value)} className="bg-background h-9" />
+                </label>
+                <label className="grid gap-1.5">
+                  <div className="text-xs font-medium text-foreground/80">Irrigation</div>
+                  <select
+                    className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    value={editIrrig}
+                    onChange={(e) => setEditIrrig(e.target.value as any)}
+                  >
+                    <option value="non_irrigue">Bour</option>
+                    <option value="faible">Irrigué (Faible)</option>
+                    <option value="normal">Irrigué (Normal)</option>
+                    <option value="optimal">Irrigué (Optimal)</option>
+                  </select>
+                </label>
+                <label className="grid gap-1.5">
+                  <div className="text-xs font-medium text-foreground/80">Plantation</div>
+                  <Input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="bg-background h-9" />
+                </label>
+              </div>
+
+              <label className="grid gap-1.5">
+                <div className="text-xs font-medium text-foreground/80 flex items-center justify-between">
+                  <span>État de production</span>
+                  <span className="text-[10px] text-muted">
+                    {editCroissance === 1 && "Critique (0.4x)"}
+                    {editCroissance === 2 && "Faible (0.7x)"}
+                    {editCroissance === 3 && "Normal (1.0x)"}
+                    {editCroissance === 4 && "Bon (1.2x)"}
+                    {editCroissance === 5 && "Excellent (1.5x)"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 bg-background/50 p-1.5 rounded-md border border-input">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setEditCroissance(star)}
+                      className={`p-1 rounded-md transition-colors ${
+                        star <= editCroissance ? "text-warning hover:text-warning/80" : "text-muted hover:text-muted/80"
+                      }`}
+                    >
+                      <Star className={`w-5 h-5 ${star <= editCroissance ? "fill-current" : ""}`} />
+                    </button>
+                  ))}
+                </div>
+              </label>
+              
+              <div className="flex justify-end mt-1">
+                <Button onClick={handleSave} className="gap-2" size="sm">
+                  <Check className="w-4 h-4" /> Enregistrer
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <CardContent className="grid grid-cols-2 gap-2 mt-4">
             <Kpi label="Total Dépenses" value={formatMoneyDT(cost)} className="text-danger" />
             <Kpi label="Dépense / arbre" value={formatMoneyDT(perTreeCost)} />
             <Kpi label="Production estimée (Année)" value={formatKg(prod)} />
@@ -322,7 +429,7 @@ function TreatmentRow({ t, farm }: { t: any; farm: ReturnType<typeof useFarmData
         <div className="flex-1 min-w-0">
           <div className="text-sm font-semibold truncate">{t.maladie}</div>
           <div className="text-xs flex flex-wrap items-center gap-1.5 mt-0.5">
-            <span className="text-muted">{formatDateLong(t.dateISO)}</span>
+            <span className="text-muted">{t.dateISO}</span>
             <span className="text-muted">•</span>
             <span className="text-foreground/80 font-medium">Produit: {t.produit}</span>
           </div>

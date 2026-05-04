@@ -12,8 +12,6 @@ import { CheckCircle2, Trees, Trash2, Sprout, Edit2, X, Check, Star, Settings, D
 export default function StructurePage() {
   const farm = useFarmData();
 
-  const [activeTab, setActiveTab] = React.useState<"params" | "varietes" | "lots">("params");
-
   return (
     <AppShell title="Structure & Paramètres">
       <div className="mb-6 animate-in fade-in slide-in-from-top-4">
@@ -24,35 +22,10 @@ export default function StructurePage() {
         <p className="text-sm text-muted mt-1">Gérez la surface globale, le marché et ajoutez vos parcelles d'arbres.</p>
       </div>
 
-      <div className="flex flex-wrap gap-2 pb-2 mb-6 animate-in fade-in slide-in-from-bottom-2">
-        <Button 
-          variant={activeTab === "params" ? "primary" : "secondary"} 
-          onClick={() => setActiveTab("params")}
-          className="rounded-full"
-        >
-          <Settings className="w-4 h-4 mr-2" /> Paramètres Généraux
-        </Button>
-        <Button 
-          variant={activeTab === "varietes" ? "primary" : "secondary"} 
-          onClick={() => setActiveTab("varietes")}
-          className="rounded-full"
-        >
-          <Trees className="w-4 h-4 mr-2" /> Variétés d'olives
-        </Button>
-        <Button 
-          variant={activeTab === "lots" ? "primary" : "secondary"} 
-          onClick={() => setActiveTab("lots")}
-          className="rounded-full"
-        >
-          <Sprout className="w-4 h-4 mr-2" /> Création de lot
-        </Button>
-      </div>
-
       <div className="grid gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="flex flex-col gap-4 max-w-2xl">
-          {activeTab === "params" && <SettingsCard farm={farm} />}
-          {activeTab === "lots" && <CreateBatchCard farm={farm} />}
-          {activeTab === "varietes" && <TreeTypesCard farm={farm} />}
+        <div className="flex flex-col gap-6 max-w-2xl">
+          <SettingsCard farm={farm} />
+          <CreateBatchCard farm={farm} />
         </div>
       </div>
     </AppShell>
@@ -145,73 +118,7 @@ function SettingsCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   );
 }
 
-function TreeTypesCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
-  const [nom, setNom] = React.useState("");
-  const [rend, setRend] = React.useState("20");
 
-  async function submit() {
-    if (!nom.trim()) return;
-    await farm.actions.addTreeType(nom.trim(), Number(rend || 0));
-    setNom("");
-    setRend("20");
-  }
-
-  return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-sm h-full">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center text-warning-foreground">
-            <Trees className="w-5 h-5" />
-          </div>
-          <div>
-            <CardTitle>Variétés d’oliviers</CardTitle>
-            <CardDescription>Définissez les types d'arbres et leurs rendements max</CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="grid gap-5">
-        <div className="p-4 rounded-xl border border-border/50 bg-background/40">
-          <div className="text-sm font-medium mb-3">Ajouter une nouvelle variété</div>
-          <div className="grid grid-cols-[1fr_100px] gap-2 mb-3">
-            <Input 
-              placeholder="Ex: Koroneiki, Chemlali..." 
-              value={nom} 
-              onChange={(e) => setNom(e.target.value)} 
-              className="bg-background"
-            />
-            <div className="relative">
-              <Input
-                inputMode="decimal"
-                value={rend}
-                onChange={(e) => setRend(e.target.value)}
-                className="bg-background pr-8"
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted pointer-events-none">
-                kg
-              </div>
-            </div>
-          </div>
-          <Button onClick={submit} className="w-full" disabled={!nom.trim()}>
-            Ajouter la variété
-          </Button>
-        </div>
-
-        <div className="grid gap-2">
-          {farm.types.map((t) => (
-            <TreeTypeRow key={t.id} t={t} farm={farm} />
-          ))}
-          {farm.types.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-6 text-center border border-dashed border-border rounded-xl bg-muted/10">
-              <Trees className="w-8 h-8 text-muted mb-2" />
-              <div className="text-sm font-medium">Aucune variété</div>
-              <div className="text-xs text-muted mt-1">Ajoutez au moins une variété pour pouvoir créer vos lots.</div>
-            </div>
-          ) : null}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   const [nom, setNom] = React.useState("Lot 1");
@@ -304,7 +211,7 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
 
         <label className="grid gap-1.5">
           <div className="text-sm font-medium text-foreground/80 flex items-center justify-between">
-            <span>État de croissance</span>
+            <span>État de production</span>
             <span className="text-xs text-muted">
               {croissance === 1 && "Critique (0.4x)"}
               {croissance === 2 && "Faible (0.7x)"}
@@ -338,73 +245,4 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   );
 }
 
-function TreeTypeRow({ t, farm }: { t: any; farm: ReturnType<typeof useFarmData> }) {
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [editNom, setEditNom] = React.useState(t.nom);
-  const [editRend, setEditRend] = React.useState(String(t.rendementMaxKgParArbre));
 
-  async function handleSave() {
-    if (!editNom.trim()) return;
-    await farm.actions.updateTreeType(t.id, {
-      nom: editNom.trim(),
-      rendementMaxKgParArbre: Number(editRend || 0),
-    });
-    setIsEditing(false);
-  }
-
-  if (isEditing) {
-    return (
-      <div className="flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/5 p-3 animate-in fade-in zoom-in-95">
-        <div className="flex-1 grid grid-cols-[1fr_80px] gap-2">
-          <Input 
-            value={editNom} 
-            onChange={e => setEditNom(e.target.value)} 
-            className="h-8 text-sm bg-background" 
-          />
-          <Input 
-            inputMode="decimal"
-            value={editRend} 
-            onChange={e => setEditRend(e.target.value)} 
-            className="h-8 text-sm bg-background" 
-          />
-        </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-primary" onClick={handleSave}>
-            <Check className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted" onClick={() => {
-            setIsEditing(false);
-            setEditNom(t.nom);
-            setEditRend(String(t.rendementMaxKgParArbre));
-          }}>
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="group flex items-center justify-between gap-3 rounded-xl border border-border/40 bg-card p-3 hover:border-border transition-colors">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-          <Trees className="w-5 h-5" />
-        </div>
-        <div>
-          <div className="text-sm font-semibold truncate">{t.nom}</div>
-          <div className="text-xs text-muted flex items-center gap-1">
-            Rendement max: <span className="font-medium text-foreground">{t.rendementMaxKgParArbre} kg</span>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted hover:text-primary" onClick={() => setIsEditing(true)}>
-          <Edit2 className="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-danger" onClick={() => farm.actions.removeTreeType(t.id)}>
-          <Trash2 className="w-4 h-4" />
-        </Button>
-      </div>
-    </div>
-  );
-}
