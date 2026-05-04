@@ -177,14 +177,21 @@ export function buildInsights(state: FarmState, weather: WeatherData | null = nu
   }
 
   if (t.costPerKg && state.settings.prixKgOlives && t.costPerKg > (state.settings.prixKgOlives * 0.8)) {
+    const isOver = t.costPerKg > state.settings.prixKgOlives;
     addInsight({
       level: "danger",
-      titre: "Marge critique détectée",
+      titre: isOver ? "Production à perte" : "Marge critique détectée",
       icon: "💸",
-      priorityScore: 85,
-      whatIsHappening: `Votre coût de production (${t.costPerKg.toFixed(2)} DT/kg) se rapproche dangereusement de votre prix de vente (${state.settings.prixKgOlives} DT/kg).`,
-      whatToDo: "Analysez le graphique des dépenses. Réduisez les coûts de main d'œuvre ou cherchez à vendre vos olives plus cher (circuit direct).",
-      whyItMatters: "Une marge nette inférieure à 20% met votre exploitation en risque financier au moindre aléa climatique."
+      priorityScore: isOver ? 100 : 85,
+      whatIsHappening: isOver
+        ? `Votre coût de production (${t.costPerKg.toFixed(2)} DT/kg) est supérieur à votre prix de vente (${state.settings.prixKgOlives} DT/kg).`
+        : `Votre coût de production (${t.costPerKg.toFixed(2)} DT/kg) se rapproche dangereusement de votre prix de vente (${state.settings.prixKgOlives} DT/kg).`,
+      whatToDo: isOver
+        ? "Réduisez drastiquement vos coûts opérationnels ou transformez vos olives (huile) pour capter plus de valeur."
+        : "Analysez le graphique des dépenses. Réduisez les coûts de main d'œuvre ou cherchez à vendre vos olives plus cher (circuit direct).",
+      whyItMatters: isOver
+        ? "Chaque kilo produit actuellement creuse votre déficit financier. Votre modèle économique n'est plus viable à ce stade."
+        : "Une marge nette inférieure à 20% met votre exploitation en risque financier au moindre aléa climatique."
     });
   }
 
