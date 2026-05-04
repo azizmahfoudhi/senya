@@ -129,9 +129,22 @@ export function sumExpensesTotal(state: FarmState) {
 }
 
 export function sumExpensesForBatch(state: FarmState, lotId: UUID) {
-  return state.depenses
+  const direct = state.depenses
     .filter((e) => e.lotId === lotId)
     .reduce((acc, e) => acc + e.montant, 0);
+
+  const lot = state.lots.find(l => l.id === lotId);
+  if (!lot) return direct;
+
+  const totalTrees = state.lots.reduce((sum, l) => sum + l.nbArbres, 0);
+  if (totalTrees <= 0) return direct;
+
+  const globalExpenses = state.depenses
+    .filter((e) => !e.lotId)
+    .reduce((acc, e) => acc + e.montant, 0);
+
+  const ratio = lot.nbArbres / totalTrees;
+  return direct + (globalExpenses * ratio);
 }
 
 export function buildScenarioState(base: FarmState, scenarioId?: UUID) {
