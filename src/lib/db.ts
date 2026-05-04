@@ -129,13 +129,15 @@ function mapTreatment(r: any): Treatment {
   };
 }
 
-function mapYield(r: any) {
+function mapYield(r: any): YieldRecord {
   return {
     id: r.id,
     lotId: r.lot_id,
     quantiteKg: Number(r.quantite_kg),
-    dateISO: r.annee ? `${r.annee}-01-01` : "2000-01-01", // fallback if db is different
+    dateISO: r.annee ? `${r.annee}-01-01` : "2000-01-01",
     rendementHuilePct: r.rendement_huile_pct ? Number(r.rendement_huile_pct) : undefined,
+    quantiteVendueKg: r.quantite_vendue_kg ? Number(r.quantite_vendue_kg) : undefined,
+    prixVenteUnitaire: r.prix_vente_unitaire ? Number(r.prix_vente_unitaire) : undefined,
     note: r.note ?? undefined,
   };
 }
@@ -271,6 +273,8 @@ export async function createYield(input: Omit<YieldRecord, "id">) {
       quantite_kg: input.quantiteKg,
       annee: new Date(input.dateISO).getFullYear().toString(),
       rendement_huile_pct: input.rendementHuilePct ?? null,
+      quantite_vendue_kg: input.quantiteVendueKg ?? null,
+      prix_vente_unitaire: input.prixVenteUnitaire ?? null,
       note: input.note ?? null,
     })
     .select("*")
@@ -291,6 +295,8 @@ export async function updateYield(id: UUID, input: Partial<Omit<YieldRecord, "id
   if (input.quantiteKg !== undefined) payload.quantite_kg = input.quantiteKg;
   if (input.dateISO !== undefined) payload.annee = new Date(input.dateISO).getFullYear().toString();
   if (input.rendementHuilePct !== undefined) payload.rendement_huile_pct = input.rendementHuilePct;
+  if (input.quantiteVendueKg !== undefined) payload.quantite_vendue_kg = input.quantiteVendueKg;
+  if (input.prixVenteUnitaire !== undefined) payload.prix_vente_unitaire = input.prixVenteUnitaire;
   if (input.note !== undefined) payload.note = input.note;
   
   const { error } = await sb.from("yields").update(payload).eq("id", id);

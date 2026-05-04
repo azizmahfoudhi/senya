@@ -66,6 +66,8 @@ export type YieldRecord = {
   quantiteKg: number;
   dateISO: string;
   rendementHuilePct?: number;
+  quantiteVendueKg?: number;
+  prixVenteUnitaire?: number;
   note?: string;
 };
 

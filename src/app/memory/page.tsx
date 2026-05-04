@@ -33,6 +33,8 @@ export default function MemoryPage() {
   const [selectedLotIds, setSelectedLotIds] = React.useState<Set<string>>(new Set());
   const [yDate, setYDate] = React.useState(new Date().toISOString().slice(0, 10));
   const [yQuantite, setYQuantite] = React.useState("");
+  const [yQuantiteVendue, setYQuantiteVendue] = React.useState("");
+  const [yPrixVente, setYPrixVente] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [editingEvent, setEditingEvent] = React.useState<MemoryEvent | null>(null);
 
@@ -114,11 +116,15 @@ export default function MemoryPage() {
     setIsSubmitting(true);
     try {
       const totalQuantite = Number(yQuantite);
+      const totalVendue = yQuantiteVendue ? Number(yQuantiteVendue) : undefined;
+      const unitPrice = yPrixVente ? Number(yPrixVente) : undefined;
       
       if (editingEvent) {
         const id = editingEvent.id.split("-")[1];
         await farm.actions.updateYield(id, {
           quantiteKg: totalQuantite,
+          quantiteVendueKg: totalVendue,
+          prixVenteUnitaire: unitPrice,
           dateISO: yDate
         });
       } else {
@@ -128,11 +134,14 @@ export default function MemoryPage() {
         for (const lot of selectedLots) {
           const proportion = totalTrees > 0 ? (lot.nbArbres / totalTrees) : (1 / selectedLots.length);
           const lotQuantite = Number((totalQuantite * proportion).toFixed(2));
+          const lotVendue = totalVendue !== undefined ? Number((totalVendue * proportion).toFixed(2)) : undefined;
           
           await farm.actions.addYield({
             lotId: lot.id,
             dateISO: yDate,
             quantiteKg: lotQuantite,
+            quantiteVendueKg: lotVendue,
+            prixVenteUnitaire: unitPrice,
           });
         }
       }
@@ -141,6 +150,8 @@ export default function MemoryPage() {
       setEditingEvent(null);
       setSelectedLotIds(new Set());
       setYQuantite("");
+      setYQuantiteVendue("");
+      setYPrixVente("");
     } catch (err: any) {
       console.error("Erreur lors de l'enregistrement:", err);
       alert("Erreur Supabase : " + (err.message || "Impossible d'enregistrer."));
@@ -152,6 +163,12 @@ export default function MemoryPage() {
   function openEditModal(e: MemoryEvent) {
     setEditingEvent(e);
     setYQuantite(String(e.amount || ""));
+    // We need to find the yield record to get vendue and prix
+    const yr = farm.yields.find(y => y.id === e.id.split('-')[1]);
+    if (yr) {
+      setYQuantiteVendue(String(yr.quantiteVendueKg || ""));
+      setYPrixVente(String(yr.prixVenteUnitaire || ""));
+    }
     setYDate(e.dateISO);
     if (e.lotId) setSelectedLotIds(new Set([e.lotId]));
     setIsAddYieldOpen(true);
@@ -240,8 +257,18 @@ export default function MemoryPage() {
                       <Input type="date" value={yDate} onChange={e => setYDate(e.target.value)} required />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium">Quantité totale (kg)</label>
+                      <label className="text-sm font-medium">Quantité totale récoltée (kg)</label>
                       <Input type="number" min="0" value={yQuantite} onChange={e => setYQuantite(e.target.value)} required placeholder="Ex: 1200" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Qté vendue (kg)</label>
+                        <Input type="number" min="0" value={yQuantiteVendue} onChange={e => setYQuantiteVendue(e.target.value)} placeholder="Ex: 1000" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Prix vente (DT/kg)</label>
+                        <Input type="number" step="0.001" min="0" value={yPrixVente} onChange={e => setYPrixVente(e.target.value)} placeholder="Ex: 6.5" />
+                      </div>
                     </div>
                       <div className="flex gap-2 pt-2">
                         <Button type="button" variant="secondary" className="flex-1" onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }} disabled={isSubmitting}>Annuler</Button>
