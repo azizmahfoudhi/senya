@@ -69,15 +69,6 @@ export default function StructurePage() {
             </h1>
             <p className="text-muted-foreground font-medium pt-1 max-w-xl text-lg">Définissez vos modèles biologiques et gérez l'infrastructure de vos parcelles.</p>
           </div>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            onClick={calibrateIA}
-            className="rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 border-primary/20 hover:bg-primary/5 text-primary"
-          >
-            <BrainCircuit className="w-4 h-4" />
-            Calibrer IA (Standards)
-          </Button>
         </div>
 
         {/* PERFORMANCE PIVOT */}
@@ -88,9 +79,20 @@ export default function StructurePage() {
                 <CardTitle className="text-2xl font-black tracking-tighter">Pivot de Rendement Variétal</CardTitle>
                 <CardDescription className="font-medium italic">Automatisation basée sur les piliers de conditions (Eau, Botanique, Climat).</CardDescription>
               </div>
-              <div className="px-4 py-2 bg-primary/10 rounded-xl border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                <BrainCircuit className="w-3.5 h-3.5 animate-pulse" />
-                IA Active
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={calibrateIA}
+                  className="rounded-xl font-black uppercase tracking-widest text-[9px] gap-2 border border-primary/20 hover:bg-primary/10 text-primary h-8 px-3 transition-all"
+                >
+                  <BrainCircuit className="w-3.5 h-3.5" />
+                  Calibrer Standards
+                </Button>
+                <div className="px-4 py-2 bg-primary/10 rounded-xl border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-2 h-8">
+                  <BrainCircuit className="w-3.5 h-3.5 animate-pulse" />
+                  IA Active
+                </div>
               </div>
             </div>
           </CardHeader>
