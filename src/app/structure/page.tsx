@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { Input } from "@/components/ui/Input";
 import { useFarmData } from "@/lib/useFarmData";
 import { formatMoneyDT } from "@/lib/format";
-import { CheckCircle2, Trees, Trash2, Sprout, Edit2, X, Check, Star, Settings, DollarSign, Map } from "lucide-react";
+import { CheckCircle2, Trees, Trash2, Sprout, Edit2, X, Check, Star, Settings, DollarSign, Map, Plus } from "lucide-react";
 
 export default function StructurePage() {
   const farm = useFarmData();
