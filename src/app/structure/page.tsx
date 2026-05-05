@@ -8,60 +8,166 @@ import { cn } from "@/lib/cn";
 import { Input } from "@/components/ui/Input";
 import { useFarmData } from "@/lib/useFarmData";
 import { formatMoneyDT } from "@/lib/format";
-import { CheckCircle2, Trees, Trash2, Sprout, Edit2, X, Check, Star, Settings, DollarSign, Map, Plus } from "lucide-react";
+import { CheckCircle2, Trees, Trash2, Sprout, Edit2, X, Check, Star, Settings, DollarSign, Map, Plus, BrainCircuit } from "lucide-react";
+import { computeLotHealth, computeLotForecast } from "@/lib/intelligence";
 
 export default function StructurePage() {
   const farm = useFarmData();
+  const [isAddingLot, setIsAddingLot] = React.useState(false);
+
+  // Varieties Performance Pivot Logic
+  const varietiesAnalysis = farm.types.map(type => {
+    const typeLots = farm.lots.filter(l => l.typeId === type.id);
+    const totalTrees = typeLots.reduce((sum, l) => sum + l.nbArbres, 0);
+    
+    let avgHealth = 0;
+    let avgYieldPillar = 0;
+    let totalActualYield = 0;
+    
+    if (typeLots.length > 0) {
+      typeLots.forEach(l => {
+        const h = computeLotHealth(farm, l.id);
+        const f = computeLotForecast(farm, l.id);
+        avgHealth += h.total * l.nbArbres;
+        avgYieldPillar += h.breakdown.yield * l.nbArbres;
+        totalActualYield += f.yieldKg;
+      });
+      avgHealth /= totalTrees;
+      avgYieldPillar /= totalTrees;
+    }
+    
+    return {
+      ...type,
+      totalTrees,
+      avgHealth,
+      avgYieldPillar,
+      actualYieldPerTree: totalTrees > 0 ? totalActualYield / totalTrees : 0
+    };
+  });
+
+  if (farm.loading) return <AppShell title="Structure"><div className="p-8 text-center animate-pulse">Chargement de la configuration...</div></AppShell>;
 
   return (
-    <AppShell title="Architecture & Paramètres">
+    <AppShell title="Configuration & Structure">
       <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
         
-        {/* HEADER */}
+        {/* HERO SECTION */}
         <div className="px-2">
           <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
             Architecture de la Ferme
           </h1>
-          <p className="text-muted-foreground font-medium pt-1 max-w-md text-lg">Configuration structurelle, modèles botaniques et paramètres économiques.</p>
+          <p className="text-muted-foreground font-medium pt-1 max-w-xl text-lg">Définissez vos modèles biologiques et gérez l'infrastructure de vos parcelles.</p>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_400px] gap-8">
+        {/* PERFORMANCE PIVOT */}
+        <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-2xl overflow-hidden">
+          <CardHeader className="bg-muted/5 border-b border-border/40 p-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl font-black tracking-tighter">Pivot de Rendement Variétal</CardTitle>
+                <CardDescription className="font-medium italic">Automatisation basée sur les piliers de conditions (Eau, Botanique, Climat).</CardDescription>
+              </div>
+              <div className="px-4 py-2 bg-primary/10 rounded-xl border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                <BrainCircuit className="w-3.5 h-3.5 animate-pulse" />
+                IA Active
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/10">
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Modèle</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40 text-center">Arbres</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Plafond (Max)</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Indice Pilier</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Potentiel Réel</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {varietiesAnalysis.map((v) => (
+                    <tr key={v.id} className="hover:bg-muted/5 transition-colors group">
+                      <td className="p-6 border-b border-border/40">
+                        <div className="font-black text-lg">{v.nom}</div>
+                        <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{v.isIntensive ? "Système Intensif" : "Traditionnel"}</div>
+                      </td>
+                      <td className="p-6 border-b border-border/40 text-center font-bold">
+                        {v.totalTrees}
+                      </td>
+                      <td className="p-6 border-b border-border/40 font-bold text-muted-foreground italic">
+                        {v.rendementMaxKgParArbre} kg/arbre
+                      </td>
+                      <td className="p-6 border-b border-border/40">
+                        <div className="flex items-center gap-3 w-48">
+                           <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className={cn("h-full transition-all duration-1000", v.avgHealth > 70 ? "bg-success" : v.avgHealth > 40 ? "bg-warning" : "bg-danger")} 
+                                style={{ width: `${v.avgHealth}%` }} 
+                              />
+                           </div>
+                           <span className="text-sm font-black tabular-nums">{Math.round(v.avgHealth)}%</span>
+                        </div>
+                      </td>
+                      <td className="p-6 border-b border-border/40">
+                        <div className="text-xl font-black text-primary">
+                          {v.totalTrees > 0 ? (Math.round(v.actualYieldPerTree * 10) / 10) : "—"} <span className="text-xs">{v.totalTrees > 0 ? "kg/arbre" : ""}</span>
+                        </div>
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Projection IA actuelle</div>
+                      </td>
+                      <td className="p-6 border-b border-border/40">
+                         {v.totalTrees === 0 ? (
+                            <span className="bg-muted/10 text-muted-foreground text-[10px] font-black px-3 py-1 rounded-full border border-border/20 uppercase tracking-widest">Inactif</span>
+                         ) : v.avgHealth > 75 ? (
+                           <span className="bg-success/10 text-success text-[10px] font-black px-3 py-1 rounded-full border border-success/20 uppercase tracking-widest">Optimisé</span>
+                         ) : v.avgHealth > 50 ? (
+                           <span className="bg-warning/10 text-warning text-[10px] font-black px-3 py-1 rounded-full border border-warning/20 uppercase tracking-widest">A surveiller</span>
+                         ) : (
+                           <span className="bg-danger/10 text-danger text-[10px] font-black px-3 py-1 rounded-full border border-danger/20 uppercase tracking-widest">Stress Critique</span>
+                         )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="flex flex-col gap-8">
             <SettingsCard farm={farm} />
             
-            {/* VARIETIES SECTION (Botanical Profiles) */}
-            <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-xl overflow-hidden">
-              <CardHeader className="border-b border-border/40 bg-muted/5 p-8">
+            {/* BOTANICAL MODELS */}
+            <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-2xl relative overflow-hidden group">
+              <CardHeader className="bg-muted/5 border-b border-border/40 p-8">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-2xl font-black tracking-tighter">Modèles Botaniques</CardTitle>
-                    <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Profils de croissance et rendements théoriques</CardDescription>
+                    <CardDescription className="font-medium">Profils de production théoriques.</CardDescription>
                   </div>
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:rotate-12 transition-transform duration-500">
                     <Trees className="w-6 h-6" />
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border/40">
-                  {farm.types.map(type => (
-                    <div key={type.id} className="p-6 flex items-center justify-between group hover:bg-primary/[0.02] transition-colors relative">
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform duration-500" />
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-muted/5 flex items-center justify-center border border-border/30 group-hover:bg-primary/10 group-hover:border-primary/20 transition-all">
-                          <Sprout className="w-6 h-6 text-muted group-hover:text-primary transition-colors" />
-                        </div>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {farm.types.map((type) => (
+                    <div key={type.id} className="p-4 rounded-2xl border border-border/40 bg-muted/5 hover:bg-background transition-all group/item">
+                      <div className="flex items-center justify-between">
                         <div>
                           <div className="text-lg font-black tracking-tight">{type.nom}</div>
                           <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                             {type.isIntensive ? "Système Intensif" : "Système Traditionnel"} • Max {type.rendementMaxKgParArbre}kg/arbre
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="text-right px-4">
-                          <div className="text-[10px] font-black uppercase text-muted">Potentiel</div>
-                          <div className="text-sm font-bold text-primary">Haute Performance</div>
+                        <div className="text-right">
+                          <div className="text-xl font-black text-primary">
+                            {Math.round(varietiesAnalysis.find(v => v.id === type.id)?.avgHealth || 0)}%
+                          </div>
+                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Santé Moy.</div>
                         </div>
                       </div>
                     </div>
@@ -153,9 +259,9 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
   const [typeId, setTypeId] = React.useState<string>("");
   const [datePlantation, setDatePlantation] = React.useState<string>(new Date().toISOString().slice(0, 10));
   const [nb, setNb] = React.useState<string>("100");
-  const [irrig, setIrrig] = React.useState<import("@/lib/domain").IrrigationStatus>("non_irrigue");
+  const [irrig, setIrrig] = React.useState<"non_irrigue" | "faible" | "normal" | "optimal">("non_irrigue");
   const [croissance, setCroissance] = React.useState<number>(3);
-  const [stress, setStress] = React.useState<import("@/lib/domain").StressLevel>("bas");
+  const [stress, setStress] = React.useState<"bas" | "moyen" | "eleve">("bas");
 
   async function submit() {
     const chosen = typeId || farm.types[0]?.id;
@@ -259,5 +365,3 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
     </Card>
   );
 }
-
-
