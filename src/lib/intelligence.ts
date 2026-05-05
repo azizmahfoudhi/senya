@@ -214,9 +214,9 @@ export function computeLotForecast(state: FarmState, lotId: UUID, rainMm?: numbe
       const currentYear = new Date().getFullYear();
       
       // Alternance detection: only if the last yield was last year
-      if (yieldYear === currentYear - 1 && lastYield.quantiteKg > predictedYield * 1.2) {
-        predictedYield *= 0.8; // Lower prediction due to alternating year
-        risks.push("Baisse de rendement attendue (Alternance bi-annuelle)");
+      if (yieldYear === currentYear - 1 && lastYield.quantiteKg > predictedYield * 1.1) {
+        predictedYield *= 0.6; // Strong alternance drop (40%) after a peak year
+        risks.push("Risque d'alternance bi-annuelle : Année de repos végétatif suite à un pic de production.");
       }
     }
   } else {
