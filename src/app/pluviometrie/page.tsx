@@ -66,13 +66,14 @@ export default function PluviometriePage() {
             </CardHeader>
             <CardContent>
               {weatherLoading ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Skeleton className="h-24" /><Skeleton className="h-24" />
-                  <Skeleton className="h-24" /><Skeleton className="h-24" />
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Skeleton className="h-24" />
+                  <Skeleton className="h-24" />
+                  <Skeleton className="h-24" />
                 </div>
               ) : weather ? (
                 <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     <div className="bg-background/50 rounded-2xl p-4 border border-border/50 flex flex-col items-center justify-center text-center">
                       <Wind className="w-6 h-6 text-muted mb-2" />
                       <div className="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Vent</div>

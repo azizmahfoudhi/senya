@@ -413,11 +413,7 @@ export default function HomePage() {
                 ) : weather ? (
                   <div className="space-y-8">
                     {/* CURRENT DETAILS */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
-                        <div className="text-[10px] font-black uppercase text-muted mb-1">Humidité</div>
-                        <div className="text-lg font-black">{weather.current.humidity}%</div>
-                      </div>
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
                         <div className="text-[10px] font-black uppercase text-muted mb-1">Vent</div>
                         <div className="text-lg font-black">{weather.current.windSpeed} km/h</div>

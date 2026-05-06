@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 export type WeatherData = {
   current: {
     temp: number;
-    humidity: number;
     windSpeed: number;
     precipitation: number;
     isDay: boolean;
@@ -63,7 +62,6 @@ export function useWeather() {
         const weatherObj: WeatherData = {
           current: {
             temp: json.current?.temperature ?? 0,
-            humidity: json.current?.humidity ?? 0,
             windSpeed: json.current?.wind?.speed ?? 0,
             precipitation: json.current?.precipitation?.total ?? 0,
             isDay: json.current?.icon_num !== undefined ? (json.current.icon_num < 20) : true,
@@ -88,7 +86,7 @@ export function useWeather() {
         // Fallback mock data (no cache storage for mock)
         const tISO = new Date().toISOString().slice(0, 10);
         const fallback: WeatherData = {
-          current: { temp: 24, humidity: 45, windSpeed: 12, precipitation: 0, isDay: true, weatherCode: 2 },
+          current: { temp: 24, windSpeed: 12, precipitation: 0, isDay: true, weatherCode: 2 },
           daily: {
             dates: [tISO, "2026-05-05", "2026-05-06", "2026-05-07", "2026-05-08"],
             maxTemps: [26, 28, 27, 24, 25],
