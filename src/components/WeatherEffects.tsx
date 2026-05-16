@@ -18,7 +18,10 @@ export function WeatherEffects() {
   const [drops, setDrops] = useState<EffectElement[]>([]);
   const [clouds, setClouds] = useState<EffectElement[]>([]);
   const [leaves, setLeaves] = useState<EffectElement[]>([]);
+  const [stars, setStars] = useState<EffectElement[]>([]);
+  const [birds, setBirds] = useState<EffectElement[]>([]);
   const [isHot, setIsHot] = useState(false);
+  const [showMoon, setShowMoon] = useState(false);
 
   useEffect(() => {
     if (!weather) return;
@@ -27,6 +30,10 @@ export function WeatherEffects() {
     const wind = weather.current.windSpeed;
     const temp = weather.current.temp;
     const weatherCode = weather.current.weatherCode; // Meteosource specific: 2-6 is clouds
+    
+    const hour = new Date().getHours();
+    const isNight = !weather.current.isDay || hour >= 20 || hour < 5;
+    const isDay = weather.current.isDay && hour >= 5 && hour < 20;
 
     // 1. RAIN
     if (precip > 0) {
@@ -60,7 +67,7 @@ export function WeatherEffects() {
       setLeaves([]);
     }
 
-    // 3. CLOUDS (If not raining, but cloudy condition)
+    // 3. CLOUDS
     if (precip === 0 && weatherCode >= 3 && weatherCode <= 8) {
       const cloudCount = weatherCode > 5 ? 6 : 3;
       setClouds(Array.from({ length: cloudCount }).map((_, i) => ({
@@ -76,10 +83,42 @@ export function WeatherEffects() {
     }
 
     // 4. HEAT WAVE / SUN
-    if (temp > 35 && weather.current.isDay && precip === 0 && weatherCode < 4) {
+    if (temp > 35 && isDay && precip === 0 && weatherCode < 4) {
       setIsHot(true);
     } else {
       setIsHot(false);
+    }
+
+    // 5. STARS & MOON (Night, clear or partly cloudy)
+    if (isNight && precip === 0) {
+      const starCount = weatherCode > 6 ? 15 : 40; // fewer stars if cloudy
+      setStars(Array.from({ length: starCount }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        top: Math.random() * 50, // Top 50%
+        delay: Math.random() * 3,
+        duration: 2 + Math.random() * 4,
+        size: 1 + Math.random() * 2,
+      })));
+      setShowMoon(weatherCode < 6);
+    } else {
+      setStars([]);
+      setShowMoon(false);
+    }
+
+    // 6. BIRDS (Day, clear to partly cloudy, low wind, no rain)
+    if (isDay && precip === 0 && wind < 30 && weatherCode < 6) {
+      const birdCount = 3 + Math.floor(Math.random() * 4);
+      setBirds(Array.from({ length: birdCount }).map((_, i) => ({
+        id: i,
+        left: 0, 
+        top: 10 + Math.random() * 30, // Top 10-40%
+        delay: Math.random() * 10,
+        duration: 15 + Math.random() * 10,
+        size: 16 + Math.random() * 8, // SVG size
+      })));
+    } else {
+      setBirds([]);
     }
 
   }, [weather]);
@@ -91,6 +130,31 @@ export function WeatherEffects() {
       {/* HEAT SHIMMER */}
       {isHot && (
         <div className="absolute inset-0 bg-gradient-to-tr from-warning/5 via-danger/5 to-transparent animate-heat mix-blend-overlay" />
+      )}
+
+      {/* MOON */}
+      {showMoon && (
+        <div className="absolute top-[8%] right-[15%] w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-100 shadow-[0_0_50px_rgba(255,255,255,0.4)] animate-pulse-glow opacity-80" />
+      )}
+
+      {/* STARS */}
+      {stars.length > 0 && (
+        <div className="absolute inset-0">
+          {stars.map((star) => (
+            <div
+              key={`star-${star.id}`}
+              className="absolute bg-white rounded-full animate-twinkle shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+              style={{
+                left: `${star.left}%`,
+                top: `${star.top}%`,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                animationDelay: `${star.delay}s`,
+                animationDuration: `${star.duration}s`,
+              }}
+            />
+          ))}
+        </div>
       )}
 
       {/* CLOUDS */}
@@ -108,6 +172,33 @@ export function WeatherEffects() {
                 animationDuration: `${cloud.duration}s`,
               }}
             />
+          ))}
+        </div>
+      )}
+
+      {/* BIRDS */}
+      {birds.length > 0 && (
+        <div className="absolute inset-0 text-foreground/40 dark:text-foreground/20">
+          {birds.map((bird) => (
+            <svg
+              key={`bird-${bird.id}`}
+              className="absolute animate-bird"
+              style={{
+                top: `${bird.top}%`,
+                width: `${bird.size}px`,
+                height: `${bird.size}px`,
+                animationDelay: `${bird.delay}s`,
+                animationDuration: `${bird.duration}s`,
+              }}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M2 14c4-4 8-4 10 0 2-4 6-4 10 0" />
+            </svg>
           ))}
         </div>
       )}
