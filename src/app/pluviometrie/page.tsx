@@ -100,11 +100,19 @@ export default function PluviometriePage() {
                             {new Date(date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })}
                           </div>
                           <div className="text-2xl my-1">
-                            {weather.daily.maxTemps[i] > 30 ? "☀️" : weather.daily.maxTemps[i] < 15 ? "❄️" : "⛅"}
+                            {weather.daily.precipitation[i] > 2 ? "🌧️" : weather.daily.maxTemps[i] > 30 ? "☀️" : weather.daily.maxTemps[i] < 15 ? "❄️" : "⛅"}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold">{Math.round(weather.daily.maxTemps[i])}°</span>
-                            <span className="text-xs text-muted">{Math.round(weather.daily.minTemps[i])}°</span>
+                          <div className="flex flex-col items-center gap-1 mt-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-bold">{Math.round(weather.daily.maxTemps[i])}°</span>
+                              <span className="text-xs text-muted">{Math.round(weather.daily.minTemps[i])}°</span>
+                            </div>
+                            {weather.daily.precipitation[i] > 0 && (
+                              <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
+                                <Droplets className="w-2.5 h-2.5" />
+                                {weather.daily.precipitation[i]} mm
+                              </span>
+                            )}
                           </div>
                         </div>
                       ))}
