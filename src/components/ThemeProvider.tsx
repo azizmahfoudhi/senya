@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useWeather } from "@/lib/useWeather";
 
-type Theme = "day" | "night" | "sunrise" | "sunset" | "rain" | "hot";
+type Theme = "day" | "dark" | "sunrise" | "sunset" | "rain" | "hot";
 
 const ThemeContext = React.createContext<{
   theme: Theme;
@@ -25,8 +25,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const hour = new Date().getHours();
     
     // Determine time-based theme
-    if (!weather.current.isDay) {
-        nextTheme = "night";
+    if (!weather.current.isDay || hour >= 20 || hour < 5) {
+        nextTheme = "dark";
     } else if (hour >= 5 && hour < 8) {
         nextTheme = "sunrise";
     } else if (hour >= 17 && hour < 20) {
