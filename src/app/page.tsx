@@ -68,9 +68,17 @@ export default function HomePage() {
     <AppShell
       title="Résumé"
       actions={
-        <Link href="/structure" className="p-2 rounded-full hover:bg-muted transition-colors flex items-center justify-center" title="Configuration de la Structure">
-          <Settings className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
-        </Link>
+        <div className="flex items-center gap-1">
+          <Link href="/notifications" className="p-2 rounded-full hover:bg-muted transition-colors relative flex items-center justify-center" title="Alertes et Notifications">
+            <Bell className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+            {insights.length > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-danger animate-pulse border border-background"></span>
+            )}
+          </Link>
+          <Link href="/structure" className="p-2 rounded-full hover:bg-muted transition-colors flex items-center justify-center" title="Configuration de la Structure">
+            <Settings className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+          </Link>
+        </div>
       }
     >
       {farm.error ? (

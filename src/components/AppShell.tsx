@@ -26,7 +26,6 @@ const nav = [
   { href: "/lots", label: "Lots", icon: Layers },
   { href: "/depenses", label: "Dépenses", icon: Wallet },
   { href: "/projections", label: "Prévisions", icon: TrendingUp },
-  { href: "/notifications", label: "Notifs", icon: Bell },
 ];
 
 import Image from "next/image";
