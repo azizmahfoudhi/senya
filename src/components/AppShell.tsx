@@ -19,6 +19,7 @@ import {
 import { useTheme } from "./ThemeProvider";
 import { CommandPalette } from "./CommandPalette";
 import { Search, Command as CommandIcon, Bell } from "lucide-react";
+import { WeatherEffects } from "./WeatherEffects";
 
 const nav = [
   { href: "/", label: "Résumé", icon: BarChart3 },
@@ -51,6 +52,7 @@ export function AppShell({
 
   return (
     <div className="min-h-dvh flex flex-col bg-background text-foreground transition-colors duration-300">
+      <WeatherEffects />
       <header className="sticky top-0 z-10 border-b border-border/40 bg-background/70 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70 shadow-sm print:hidden">
         <div className="mx-auto w-full max-w-4xl px-4 py-3 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="flex items-center gap-3 min-w-0">
