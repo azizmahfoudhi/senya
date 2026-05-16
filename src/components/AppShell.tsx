@@ -17,7 +17,8 @@ import {
   Sun,
 } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
-import { CommandPalette } from "./CommandPalette";
+import dynamic from "next/dynamic";
+const CommandPalette = dynamic(() => import("./CommandPalette").then(mod => mod.CommandPalette), { ssr: false });
 import { Search, Command as CommandIcon, Bell } from "lucide-react";
 import { WeatherEffects } from "./WeatherEffects";
 

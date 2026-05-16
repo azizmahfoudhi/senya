@@ -1,7 +1,7 @@
 "use client";
 
 import { useWeather } from "@/lib/useWeather";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/cn";
 
 type EffectElement = {
@@ -15,17 +15,11 @@ type EffectElement = {
 
 export function WeatherEffects() {
   const { data: weather } = useWeather();
-  const [drops, setDrops] = useState<EffectElement[]>([]);
-  const [clouds, setClouds] = useState<EffectElement[]>([]);
-  const [leaves, setLeaves] = useState<EffectElement[]>([]);
-  const [stars, setStars] = useState<EffectElement[]>([]);
-  const [birds, setBirds] = useState<EffectElement[]>([]);
-  const [isHot, setIsHot] = useState(false);
-  const [showMoon, setShowMoon] = useState(false);
 
-  useEffect(() => {
-    if (!weather) return;
-    
+  const effects = useMemo(() => {
+    const defaultEffects = { drops: [] as EffectElement[], clouds: [] as EffectElement[], leaves: [] as EffectElement[], stars: [] as EffectElement[], birds: [] as EffectElement[], isHot: false, showMoon: false };
+    if (!weather) return defaultEffects;
+
     const precip = weather.current.precipitation;
     const wind = weather.current.windSpeed;
     const temp = weather.current.temp;
@@ -35,6 +29,8 @@ export function WeatherEffects() {
     const isNight = !weather.current.isDay || hour >= 20 || hour < 5;
     const isDay = weather.current.isDay && hour >= 5 && hour < 20;
 
+    const result = { ...defaultEffects };
+
     // 1. RAIN
     if (precip > 0) {
       let dropCount = 0;
@@ -42,88 +38,78 @@ export function WeatherEffects() {
       else if (precip < 5) dropCount = 80; // Moderate rain
       else dropCount = 150;                // Heavy rain
 
-      setDrops(Array.from({ length: dropCount }).map((_, i) => ({
+      result.drops = Array.from({ length: dropCount }).map((_, i) => ({
         id: i,
         left: Math.random() * 100,
         delay: Math.random() * 2,
         duration: 0.6 + Math.random() * 0.4,
-      })));
-    } else {
-      setDrops([]);
+      }));
     }
 
     // 2. WIND (Leaves/Dust)
     if (wind > 20) {
       const leafCount = wind > 40 ? 30 : 10;
-      setLeaves(Array.from({ length: leafCount }).map((_, i) => ({
+      result.leaves = Array.from({ length: leafCount }).map((_, i) => ({
         id: i,
         left: -10, // Start outside screen left
         top: Math.random() * 100, // random height
         delay: Math.random() * 5,
         duration: 3 + Math.random() * 2,
         size: 5 + Math.random() * 10,
-      })));
-    } else {
-      setLeaves([]);
+      }));
     }
 
     // 3. CLOUDS
     if (precip === 0 && weatherCode >= 3 && weatherCode <= 8) {
       const cloudCount = weatherCode > 5 ? 6 : 3;
-      setClouds(Array.from({ length: cloudCount }).map((_, i) => ({
+      result.clouds = Array.from({ length: cloudCount }).map((_, i) => ({
         id: i,
         left: -20, // Start outside left
         top: Math.random() * 40, // Top half of screen
         delay: Math.random() * 20,
         duration: 30 + Math.random() * 30, // Slow floating
         size: 100 + Math.random() * 200,
-      })));
-    } else {
-      setClouds([]);
+      }));
     }
 
     // 4. HEAT WAVE / SUN
     if (temp > 35 && isDay && precip === 0 && weatherCode < 4) {
-      setIsHot(true);
-    } else {
-      setIsHot(false);
+      result.isHot = true;
     }
 
     // 5. STARS & MOON (Night, clear or partly cloudy)
     if (isNight && precip === 0) {
       const starCount = weatherCode > 6 ? 15 : 40; // fewer stars if cloudy
-      setStars(Array.from({ length: starCount }).map((_, i) => ({
+      result.stars = Array.from({ length: starCount }).map((_, i) => ({
         id: i,
         left: Math.random() * 100,
         top: Math.random() * 50, // Top 50%
         delay: Math.random() * 3,
         duration: 2 + Math.random() * 4,
         size: 1 + Math.random() * 2,
-      })));
-      setShowMoon(weatherCode < 6);
-    } else {
-      setStars([]);
-      setShowMoon(false);
+      }));
+      result.showMoon = weatherCode < 6;
     }
 
     // 6. BIRDS (Day, clear to partly cloudy, low wind, no rain)
     if (isDay && precip === 0 && wind < 30 && weatherCode < 6) {
       const birdCount = 3 + Math.floor(Math.random() * 4);
-      setBirds(Array.from({ length: birdCount }).map((_, i) => ({
+      result.birds = Array.from({ length: birdCount }).map((_, i) => ({
         id: i,
         left: 0, 
         top: 10 + Math.random() * 30, // Top 10-40%
         delay: Math.random() * 10,
         duration: 15 + Math.random() * 10,
         size: 16 + Math.random() * 8, // SVG size
-      })));
-    } else {
-      setBirds([]);
+      }));
     }
 
+    return result;
   }, [weather]);
 
   if (!weather) return null;
+
+  const { drops, clouds, leaves, stars, birds, isHot, showMoon } = effects;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[100] overflow-hidden">
