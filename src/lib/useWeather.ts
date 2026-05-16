@@ -34,6 +34,9 @@ export function useWeather() {
       const CACHE_KEY = "senya_weather_cache";
       const COOLDOWN = 5 * 60 * 1000; // 5 minutes
       
+      const currentHour = new Date().getHours();
+      const isDayTime = currentHour >= 6 && currentHour < 19;
+      
       try {
         // 1. Check local cache first
         const cached = localStorage.getItem(CACHE_KEY);
@@ -59,13 +62,14 @@ export function useWeather() {
         if (!res.ok) throw new Error("Erreur de l'API Meteosource");
         
         const json = await res.json();
-        const weatherObj: WeatherData = {
-          current: {
-            temp: json.current?.temperature ?? 0,
-            windSpeed: json.current?.wind?.speed ?? 0,
-            precipitation: json.current?.precipitation?.total ?? 0,
-            isDay: json.current?.icon_num !== undefined ? (json.current.icon_num < 20) : true,
-            weatherCode: json.current?.icon_num ?? 0,
+          
+          const weatherObj: WeatherData = {
+            current: {
+              temp: json.current?.temperature ?? 0,
+              windSpeed: json.current?.wind?.speed ?? 0,
+              precipitation: json.current?.precipitation?.total ?? 0,
+              isDay: isDayTime,
+              weatherCode: json.current?.icon_num ?? 0,
           },
           daily: {
             dates: json.daily?.data?.map((d: any) => d.day) ?? [],
@@ -86,7 +90,7 @@ export function useWeather() {
         // Fallback mock data (no cache storage for mock)
         const tISO = new Date().toISOString().slice(0, 10);
         const fallback: WeatherData = {
-          current: { temp: 24, windSpeed: 12, precipitation: 0, isDay: true, weatherCode: 2 },
+          current: { temp: 24, windSpeed: 12, precipitation: 0, isDay: isDayTime, weatherCode: 2 },
           daily: {
             dates: [tISO, "2026-05-05", "2026-05-06", "2026-05-07", "2026-05-08"],
             maxTemps: [26, 28, 27, 24, 25],
