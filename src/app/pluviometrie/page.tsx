@@ -93,23 +93,23 @@ export default function PluviometriePage() {
 
                   <div>
                     <h3 className="font-semibold text-sm uppercase tracking-wider text-muted mb-3">Prévisions sur 5 Jours</h3>
-                    <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
+                    <div className="flex flex-nowrap overflow-x-auto gap-3 pb-2 no-scrollbar snap-x">
                       {weather.daily.dates.slice(0, 5).map((date, i) => (
-                        <div key={date} className="flex-1 min-w-[90px] bg-background/50 border border-border/40 rounded-2xl p-3 flex flex-col items-center justify-center gap-2 hover:bg-background/80 transition-colors">
-                          <div className="text-xs font-semibold text-muted uppercase tracking-wider">
-                            {new Date(date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })}
+                        <div key={date} className="shrink-0 w-[110px] sm:w-auto sm:flex-1 bg-background/50 border border-border/40 rounded-2xl p-3 flex flex-col items-center justify-center gap-2 hover:bg-background/80 transition-colors snap-center">
+                          <div className="text-xs font-semibold text-muted uppercase tracking-wider whitespace-nowrap">
+                            {new Date(date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }).replace('.', '')}
                           </div>
                           <div className="text-2xl my-1">
                             {weather.daily.precipitation[i] > 2 ? "🌧️" : weather.daily.maxTemps[i] > 30 ? "☀️" : weather.daily.maxTemps[i] < 15 ? "❄️" : "⛅"}
                           </div>
                           <div className="flex flex-col items-center gap-1 mt-1">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 whitespace-nowrap">
                               <span className="text-sm font-bold">{Math.round(weather.daily.maxTemps[i])}°</span>
                               <span className="text-xs text-muted">{Math.round(weather.daily.minTemps[i])}°</span>
                             </div>
                             {weather.daily.precipitation[i] > 0 && (
-                              <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
-                                <Droplets className="w-2.5 h-2.5" />
+                              <span className="text-[10px] font-bold text-primary flex items-center gap-0.5 whitespace-nowrap">
+                                <Droplets className="w-2.5 h-2.5 shrink-0" />
                                 {weather.daily.precipitation[i]} mm
                               </span>
                             )}
