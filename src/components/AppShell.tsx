@@ -40,7 +40,7 @@ export function AppShell({
   actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const { theme, toggle } = useTheme();
+  const { theme } = useTheme();
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
@@ -79,13 +79,6 @@ export function AppShell({
               <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-background border border-border/40 text-[9px]">
                 <CommandIcon className="w-2.5 h-2.5" /> K
               </div>
-            </button>
-            <button
-              onClick={toggle}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-muted/10 text-muted hover:bg-muted/20 hover:text-foreground transition-all duration-300 border border-border/20"
-              aria-label="Changer de thème"
-            >
-              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
             <div className="shrink-0">{actions}</div>
           </div>

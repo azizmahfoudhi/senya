@@ -1,40 +1,59 @@
 "use client";
 
 import * as React from "react";
+import { useWeather } from "@/lib/useWeather";
 
-type Theme = "light" | "dark";
+type Theme = "day" | "night" | "sunrise" | "sunset" | "rain" | "hot";
 
 const ThemeContext = React.createContext<{
   theme: Theme;
-  toggle: () => void;
 } | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = React.useState<Theme>("dark");
+  const [theme, setTheme] = React.useState<Theme>("day");
   const [mounted, setMounted] = React.useState(false);
+  const { data: weather } = useWeather();
 
   React.useEffect(() => {
-    const saved = localStorage.getItem("senya-theme") as Theme | null;
-    if (saved) {
-      setTheme(saved);
-    } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-      setTheme("light");
-    }
     setMounted(true);
   }, []);
 
   React.useEffect(() => {
+    if (!mounted || !weather) return;
+
+    let nextTheme: Theme = "day";
+    const hour = new Date().getHours();
+    
+    // Determine time-based theme
+    if (!weather.current.isDay) {
+        nextTheme = "night";
+    } else if (hour >= 5 && hour < 8) {
+        nextTheme = "sunrise";
+    } else if (hour >= 17 && hour < 20) {
+        nextTheme = "sunset";
+    }
+
+    // Weather overrides time (if extreme)
+    if (weather.current.precipitation > 0) {
+        nextTheme = "rain";
+    } else if (weather.current.temp > 35 && weather.current.isDay) {
+        nextTheme = "hot";
+    }
+
+    setTheme(nextTheme);
+  }, [weather, mounted]);
+
+  React.useEffect(() => {
     if (!mounted) return;
     const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem("senya-theme", theme);
+    root.classList.remove("day", "night", "sunrise", "sunset", "rain", "hot", "light", "dark");
+    if (theme !== "day") {
+      root.classList.add(theme);
+    }
   }, [theme, mounted]);
 
-  const toggle = () => setTheme((t) => (t === "light" ? "dark" : "light"));
-
   return (
-    <ThemeContext.Provider value={{ theme, toggle }}>
+    <ThemeContext.Provider value={{ theme }}>
       {children}
     </ThemeContext.Provider>
   );

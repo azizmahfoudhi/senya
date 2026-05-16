@@ -27,7 +27,7 @@
   --font-sans: var(--font-outfit);
 }
 
-html.dark {
+html.night {
     --background: #020617; /* Very dark slate */
     --foreground: #f1f5f9;
     --card: rgba(30, 41, 59, 0.4);
@@ -53,12 +53,88 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-html.dark body {
+html.night body {
     background-image: 
       radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
       radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
       radial-gradient(at 50% 100%, rgba(5, 150, 105, 0.08) 0px, transparent 50%);
-  }
+}
+
+html.sunset {
+    --background: #fffbeb;
+    --foreground: #451a03;
+    --card: rgba(254, 243, 199, 0.6);
+    --muted: #78350f;
+    --border: rgba(69, 26, 3, 0.08);
+    --primary: #d97706;
+    --primary-foreground: #fffbeb;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+}
+html.sunset body {
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(217, 119, 6, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
+}
+
+html.sunrise {
+    --background: #fdf4ff;
+    --foreground: #4a044e;
+    --card: rgba(250, 232, 255, 0.6);
+    --muted: #86198f;
+    --border: rgba(74, 4, 78, 0.08);
+    --primary: #c026d3;
+    --primary-foreground: #fdf4ff;
+    --danger: #e11d48;
+    --warning: #f59e0b;
+    --success: #10b981;
+}
+html.sunrise body {
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(192, 38, 211, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(225, 29, 72, 0.08) 0px, transparent 50%);
+}
+
+html.rain {
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card: rgba(241, 245, 249, 0.7);
+    --muted: #475569;
+    --border: rgba(15, 23, 42, 0.08);
+    --primary: #3b82f6;
+    --primary-foreground: #ffffff;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+}
+html.rain body {
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(148, 163, 184, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(51, 65, 85, 0.08) 0px, transparent 50%);
+}
+
+html.hot {
+    --background: #fef2f2;
+    --foreground: #450a0a;
+    --card: rgba(254, 226, 226, 0.6);
+    --muted: #991b1b;
+    --border: rgba(69, 10, 10, 0.08);
+    --primary: #dc2626;
+    --primary-foreground: #ffffff;
+    --danger: #b91c1c;
+    --warning: #d97706;
+    --success: #10b981;
+}
+html.hot body {
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(220, 38, 38, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(234, 88, 12, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
+}
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }
