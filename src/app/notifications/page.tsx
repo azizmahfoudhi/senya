@@ -8,7 +8,7 @@ import { buildInsights } from "@/lib/derive";
 import { cn } from "@/lib/cn";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, X } from "lucide-react";
 
 export default function NotificationsPage() {
   const farm = useFarmData();
@@ -98,22 +98,31 @@ export default function NotificationsPage() {
               </div>
               <div className="flex-1 w-full space-y-3">
                 <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                  <div className={cn(
-                    "text-xl font-black tracking-tight",
-                    i.level === "danger" ? "text-danger" : i.level === "warning" ? "text-warning-foreground" : "text-primary"
-                  )}>
-                    {i.titre}
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      "text-xl font-black tracking-tight",
+                      i.level === "danger" ? "text-danger" : i.level === "warning" ? "text-warning-foreground" : "text-primary"
+                    )}>
+                      {i.titre}
+                    </div>
+                    {i.level === "danger" && (
+                      <span className="px-2 py-0.5 rounded-full bg-danger/10 text-danger text-[10px] font-bold uppercase tracking-wider border border-danger/20">
+                        Critique
+                      </span>
+                    )}
+                    {i.level === "warning" && (
+                      <span className="px-2 py-0.5 rounded-full bg-warning/10 text-warning-foreground text-[10px] font-bold uppercase tracking-wider border border-warning/20">
+                        Attention
+                      </span>
+                    )}
                   </div>
-                  {i.level === "danger" && (
-                    <span className="px-2 py-0.5 rounded-full bg-danger/10 text-danger text-[10px] font-bold uppercase tracking-wider border border-danger/20">
-                      Critique
-                    </span>
-                  )}
-                  {i.level === "warning" && (
-                    <span className="px-2 py-0.5 rounded-full bg-warning/10 text-warning-foreground text-[10px] font-bold uppercase tracking-wider border border-warning/20">
-                      Attention
-                    </span>
-                  )}
+                  <button
+                    onClick={() => farm.actions.setSettings({ readInsights: [...(farm.settings.readInsights || []), i.id] })}
+                    className="p-1.5 -mr-1.5 rounded-full hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                    title="Marquer comme lu"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
 
                 <div className="space-y-3 text-sm">

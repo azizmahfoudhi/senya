@@ -94,7 +94,10 @@ export function buildInsights(state: FarmState, weather: WeatherData | null = nu
   const today = new Date();
 
   function addInsight(insight: Omit<Insight, "id">) {
-    insights.push({ ...insight, id: Math.random().toString(36).slice(2, 9) });
+    // Generate a deterministic ID based on title and today's date so it resets daily if dismissed
+    const slug = insight.titre.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const id = `${slug}-${tISO}`;
+    insights.push({ ...insight, id });
   }
 
   // 1. RISK ALERTS (Weather)
@@ -270,7 +273,10 @@ export function buildInsights(state: FarmState, weather: WeatherData | null = nu
     });
   }
 
-  // Sort by Priority Score descending, then take top 5
-  return insights.sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 5);
+  // Sort by Priority Score descending, filter out read ones, then take top 5
+  return insights
+    .filter(i => !(state.settings.readInsights || []).includes(i.id))
+    .sort((a, b) => b.priorityScore - a.priorityScore)
+    .slice(0, 5);
 }
 

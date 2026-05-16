@@ -19,7 +19,7 @@ import { computeGlobalHealth, computeLotHealth } from "@/lib/intelligence";
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useFarmData } from "@/lib/useFarmData";
-import { Trees, Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit, Sun, Cloud, Snowflake, CloudRain, Moon, Bell } from "lucide-react";
+import { Trees, Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit, Sun, Cloud, Snowflake, CloudRain, Moon, Bell, X } from "lucide-react";
 import { useHistoricalRain } from "@/lib/useHistoricalRain";
 
 export default function HomePage() {
@@ -368,11 +368,20 @@ export default function HomePage() {
                           {i.icon}
                         </div>
                         <div className="flex-1 w-full space-y-3">
-                          <div className={cn(
-                            "text-lg font-bold tracking-tight border-b border-border/40 pb-2",
-                            i.level === "danger" ? "text-danger" : i.level === "warning" ? "text-warning-foreground" : "text-primary"
-                          )}>
-                            {i.titre}
+                          <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                            <div className={cn(
+                              "text-lg font-bold tracking-tight",
+                              i.level === "danger" ? "text-danger" : i.level === "warning" ? "text-warning-foreground" : "text-primary"
+                            )}>
+                              {i.titre}
+                            </div>
+                            <button
+                              onClick={() => farm.actions.setSettings({ readInsights: [...(farm.settings.readInsights || []), i.id] })}
+                              className="p-1 -mr-1 rounded-full hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                              title="Marquer comme lu"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
                           </div>
                           
                           <div className="space-y-2 text-sm">

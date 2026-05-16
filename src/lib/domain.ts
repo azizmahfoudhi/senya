@@ -75,6 +75,7 @@ export type FarmSettings = {
   surfaceHa: number;
   prixKgOlives: number;
   pluviometrieAnnuelleMm?: number;
+  readInsights?: string[];
 };
 
 export type Scenario = {

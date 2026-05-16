@@ -81,8 +81,8 @@ export default function PluviometriePage() {
                     </div>
                     <div className="bg-primary/10 rounded-2xl p-4 border border-primary/20 flex flex-col items-center justify-center text-center">
                       <Umbrella className="w-6 h-6 text-primary mb-2" />
-                      <div className="text-xs text-primary uppercase tracking-wider font-semibold mb-1">Précipitations</div>
-                      <div className="text-xl font-bold text-primary">{weather.current.precipitation} <span className="text-sm font-normal opacity-80">mm</span></div>
+                      <div className="text-xs text-primary uppercase tracking-wider font-semibold mb-1">Précipitations (Auj.)</div>
+                      <div className="text-xl font-bold text-primary">{weather.daily.precipitation[0]} <span className="text-sm font-normal opacity-80">mm</span></div>
                     </div>
                     <div className="bg-background/50 rounded-2xl p-4 border border-border/50 flex flex-col items-center justify-center text-center">
                       <Sun className="w-6 h-6 text-warning mb-2" />
