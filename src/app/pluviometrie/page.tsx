@@ -86,8 +86,8 @@ export default function PluviometriePage() {
                     </div>
                     <div className="bg-background/50 rounded-2xl p-4 border border-border/50 flex flex-col items-center justify-center text-center">
                       <Sun className="w-6 h-6 text-warning mb-2" />
-                      <div className="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Condition</div>
-                      <div className="text-sm font-bold mt-1">{weather.current.isDay ? "Journée" : "Nuit"}</div>
+                      <div className="text-[10px] sm:text-xs text-muted uppercase tracking-widest font-medium mb-1">Condition</div>
+                      <div className="text-sm font-semibold mt-1">{weather.current.isDay ? "Journée" : "Nuit"}</div>
                     </div>
                   </div>
 

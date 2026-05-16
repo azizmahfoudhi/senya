@@ -328,7 +328,7 @@ export default function HomePage() {
                       <span className="text-3xl animate-float">🤖</span>
                     </div>
                     <div>
-                      <CardTitle className="text-xl bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent font-bold tracking-tight">Intelligence Artificielle</CardTitle>
+                      <CardTitle className="text-lg sm:text-xl bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent font-semibold tracking-normal">Intelligence Artificielle</CardTitle>
                       <CardDescription className="font-medium">
                         {weather ? `${weather.current.temp}°C · ${weather.current.isDay ? 'Ensoleillé' : 'Nuit'}` : "Calcul des variables..."}
                         {lastFetched && <span className="ml-2 text-xs opacity-70">Màj: {lastFetched}</span>}
@@ -419,14 +419,14 @@ export default function HomePage() {
               <CardHeader className="p-8 pb-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl font-bold tracking-tighter">Météo Agricole</CardTitle>
-                    <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Conditions actuelles et prévisions à 5 jours</CardDescription>
+                    <CardTitle className="text-2xl font-semibold tracking-tight">Météo Agricole</CardTitle>
+                    <CardDescription className="text-xs font-medium uppercase tracking-wider text-muted-foreground mt-1">Conditions actuelles et prévisions à 5 jours</CardDescription>
                   </div>
                   {weather && (
-                    <div className="text-right">
-                      <div className="text-3xl font-bold tracking-tighter text-primary">{weather.current.temp}°C</div>
-                      <div className="text-xs font-bold text-muted uppercase tracking-widest">Nasrallah, Kairouan</div>
-                    </div>
+                      <div className="text-right flex flex-col items-end">
+                        <div className="text-2xl sm:text-3xl font-semibold tracking-tight text-primary">{weather.current.temp}°C</div>
+                        <div className="text-[10px] sm:text-xs font-semibold text-muted uppercase tracking-widest mt-0.5">Nasrallah, Kairouan</div>
+                      </div>
                   )}
                 </div>
               </CardHeader>
