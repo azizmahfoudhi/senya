@@ -44,7 +44,7 @@ export default function DepensesPage() {
       actions={
         <Button size="sm" variant="outline" className="gap-2 print:hidden rounded-xl border-border/50 bg-background/40 hover:bg-primary/5" onClick={() => window.print()}>
           <Printer className="w-4 h-4" />
-          <span className="hidden sm:inline font-bold uppercase tracking-widest text-[10px]">Exporter PDF</span>
+          <span className="hidden sm:inline font-bold uppercase tracking-widest text-xs">Exporter PDF</span>
         </Button>
       }
     >
@@ -53,7 +53,7 @@ export default function DepensesPage() {
         <div className="flex flex-col md:flex-row gap-6 items-stretch">
           <div className="flex-1 space-y-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-8 rounded-[2.5rem] border border-primary/20 shadow-inner relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
-            <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
               Flux Financier
             </h1>
             <p className="text-muted-foreground font-medium text-lg pt-1">Suivi détaillé de vos investissements et charges opérationnelles.</p>
@@ -64,15 +64,15 @@ export default function DepensesPage() {
                   <Wallet className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Investi</div>
-                  <div className="text-2xl font-black tracking-tighter">{formatMoneyDT(totalPonctuel)}</div>
+                  <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Total Investi</div>
+                  <div className="text-2xl font-bold tracking-tighter">{formatMoneyDT(totalPonctuel)}</div>
                 </div>
               </div>
             </div>
           </div>
           
           <div className="md:w-72 glass-card rounded-[2.5rem] p-6 flex flex-col justify-center">
-            <div className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 text-center">Répartition Rapide</div>
+            <div className="text-xs font-bold uppercase tracking-widest text-muted mb-4 text-center">Répartition Rapide</div>
             <div className="space-y-3">
               {categories.map(cat => {
                 const amount = farm.depenses.filter(d => d.categorie === cat).reduce((sum, d) => sum + d.montant, 0);
@@ -82,7 +82,7 @@ export default function DepensesPage() {
                 const Icon = CATEGORY_ICONS[cat];
                 return (
                   <div key={cat} className="space-y-1 animate-in fade-in slide-in-from-right-2 duration-500">
-                    <div className="flex justify-between text-[10px] font-bold uppercase">
+                    <div className="flex justify-between text-xs font-bold uppercase">
                       <span className="flex items-center gap-1.5"><Icon className="w-3 h-3 text-primary" /> {EXPENSE_CATEGORY_LABEL[cat]}</span>
                       <span className="text-muted">{Math.round(pct)}%</span>
                     </div>
@@ -101,7 +101,7 @@ export default function DepensesPage() {
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
               <Plus className="w-4 h-4" />
             </div>
-            <h2 className="text-xl font-black tracking-tight">Saisie des Opérations</h2>
+            <h2 className="text-xl font-bold tracking-tight">Saisie des Opérations</h2>
           </div>
           <OneOffExpenses />
         </div>
@@ -188,8 +188,8 @@ function OneOffExpenses() {
               <Plus className="w-5 h-5" />
             </div>
             <div>
-              <CardTitle className="text-lg font-black tracking-tight">Nouvelle Dépense</CardTitle>
-              <CardDescription className="text-[10px] font-bold uppercase tracking-wider">Matériel, main d'œuvre, etc.</CardDescription>
+              <CardTitle className="text-lg font-bold tracking-tight">Nouvelle Dépense</CardTitle>
+              <CardDescription className="text-xs font-bold uppercase tracking-wider">Matériel, main d'œuvre, etc.</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -239,11 +239,11 @@ function OneOffExpenses() {
                 })}
               </div>
               {selectedLotIds.size === 0 ? (
-                <div className="text-[10px] text-muted-foreground italic bg-muted/5 p-2 rounded-lg border border-dashed border-border/40">
+                <div className="text-xs text-muted-foreground italic bg-muted/5 p-2 rounded-lg border border-dashed border-border/40">
                   💡 Sans sélection, la dépense est considérée comme <strong>globale</strong> (répartie sur toute la surface).
                 </div>
               ) : (
-                <div className="text-[10px] text-primary font-bold uppercase tracking-wider bg-primary/5 p-2 rounded-lg border border-primary/20 animate-in fade-in zoom-in-95">
+                <div className="text-xs text-primary font-bold uppercase tracking-wider bg-primary/5 p-2 rounded-lg border border-primary/20 animate-in fade-in zoom-in-95">
                   ✨ Répartition automatique basée sur le nombre d'arbres ({selectedLotIds.size} lots)
                 </div>
               )}
@@ -252,7 +252,7 @@ function OneOffExpenses() {
             <div className="text-sm font-medium text-foreground/80">Note (Optionnel)</div>
             <Input placeholder="Description..." value={note} onChange={(e) => setNote(e.target.value)} className="bg-background/50" />
           </label>
-          <Button onClick={submit} disabled={!montant || Number(montant) <= 0} className="w-full gap-2 mt-4 rounded-2xl h-12 shadow-lg shadow-primary/20 font-black uppercase tracking-widest text-xs">
+          <Button onClick={submit} disabled={!montant || Number(montant) <= 0} className="w-full gap-2 mt-4 rounded-2xl h-12 shadow-lg shadow-primary/20 font-bold uppercase tracking-widest text-xs">
             <Plus className="w-4 h-4" /> Enregistrer
           </Button>
         </CardContent>
@@ -263,8 +263,8 @@ function OneOffExpenses() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-black tracking-tight">Historique des Opérations</CardTitle>
-                <CardDescription className="text-[10px] font-bold uppercase tracking-wider">{filteredExpenses.length} mouvement(s) affiché(s)</CardDescription>
+                <CardTitle className="text-lg font-bold tracking-tight">Historique des Opérations</CardTitle>
+                <CardDescription className="text-xs font-bold uppercase tracking-wider">{filteredExpenses.length} mouvement(s) affiché(s)</CardDescription>
               </div>
               <div className="w-10 h-10 rounded-xl bg-muted/10 flex items-center justify-center text-muted border border-border/20">
                 <TrendingUp className="w-5 h-5" />
@@ -286,7 +286,7 @@ function OneOffExpenses() {
                       setFilterCategories(next);
                     }}
                     className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all",
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all",
                       isSelected 
                         ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-105" 
                         : "bg-background text-muted-foreground border-border/40 hover:border-primary/40"
@@ -300,7 +300,7 @@ function OneOffExpenses() {
               {filterCategories.size > 0 && (
                 <button 
                   onClick={() => setFilterCategories(new Set())}
-                  className="px-2 py-1.5 rounded-xl text-[10px] font-bold text-danger hover:bg-danger/10 transition-colors uppercase"
+                  className="px-2 py-1.5 rounded-xl text-xs font-bold text-danger hover:bg-danger/10 transition-colors uppercase"
                 >
                   Effacer
                 </button>
@@ -384,8 +384,8 @@ function ExpenseRow({ d, farm }: { d: any; farm: ReturnType<typeof useFarmData> 
           <Icon className="w-6 h-6 text-muted group-hover:text-primary transition-colors" />
         </div>
         <div>
-          <div className="text-lg font-black tracking-tight">{formatMoneyDT(d.montant)}</div>
-          <div className="text-[10px] font-bold text-muted uppercase tracking-wider flex items-center gap-2 mt-0.5">
+          <div className="text-lg font-bold tracking-tight">{formatMoneyDT(d.montant)}</div>
+          <div className="text-xs font-bold text-muted uppercase tracking-wider flex items-center gap-2 mt-0.5">
             <span className="text-foreground/70">{EXPENSE_CATEGORY_LABEL[d.categorie as ExpenseCategory]}</span>
             <span className="w-1 h-1 rounded-full bg-border" />
             <span>{formatDateLong(d.dateISO)}</span>

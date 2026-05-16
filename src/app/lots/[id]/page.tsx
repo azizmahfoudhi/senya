@@ -165,7 +165,7 @@ export default function LotDetailPage() {
               <label className="grid gap-1.5">
                 <div className="text-xs font-medium text-foreground/80 flex items-center justify-between">
                   <span>État de production</span>
-                  <span className="text-[10px] text-muted">
+                  <span className="text-xs text-muted">
                     {editCroissance === 1 && "Critique (0.4x)"}
                     {editCroissance === 2 && "Faible (0.7x)"}
                     {editCroissance === 3 && "Normal (1.0x)"}
@@ -236,7 +236,7 @@ export default function LotDetailPage() {
                   <h3 className="font-bold text-lg">Évaluation</h3>
                   <p className="text-sm text-muted">Basé sur 4 piliers analytiques</p>
                 </div>
-                <div className={`text-3xl font-black ${health.colorClass}`}>
+                <div className={`text-3xl font-bold ${health.colorClass}`}>
                   {health.total}<span className="text-lg opacity-50">/100</span>
                 </div>
               </div>
@@ -249,8 +249,8 @@ export default function LotDetailPage() {
                 ].map((p, idx) => (
                   <div key={idx} className="space-y-2">
                     <div className="flex justify-between items-center px-0.5">
-                      <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-black">{p.label}</span>
-                      <span className="text-xs font-black tabular-nums">{p.val}%</span>
+                      <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">{p.label}</span>
+                      <span className="text-xs font-bold tabular-nums">{p.val}%</span>
                     </div>
                     <div className="h-2 w-full bg-background/50 rounded-full overflow-hidden border border-border/10 shadow-inner">
                       <div 
@@ -282,13 +282,13 @@ export default function LotDetailPage() {
             <div className="grid grid-cols-2 gap-4 mb-4 relative z-10">
               <div>
                 <div className="text-sm font-medium text-foreground/70 mb-1">Rendement Prévu</div>
-                <div className="text-2xl font-black text-foreground">
+                <div className="text-2xl font-bold text-foreground">
                   {formatKg(forecast.yieldKg)}
                 </div>
               </div>
               <div>
                 <div className="text-sm font-medium text-foreground/70 mb-1">Bénéfice Net Prévu</div>
-                <div className={`text-2xl font-black ${forecast.profitDt >= 0 ? "text-success" : "text-danger"}`}>
+                <div className={`text-2xl font-bold ${forecast.profitDt >= 0 ? "text-success" : "text-danger"}`}>
                   {formatMoneyDT(forecast.profitDt)}
                 </div>
               </div>
@@ -475,7 +475,7 @@ function Kpi({ label, value, sub, className = "" }: { label: string; value: stri
     <div className="rounded-xl border border-border/40 bg-background/50 p-3">
       <div className="text-xs text-muted font-medium mb-1">{label}</div>
       <div className={`text-base font-bold ${className}`}>{value}</div>
-      {sub && <div className="text-[10px] text-muted-foreground mt-1 opacity-70 leading-tight">{sub}</div>}
+      {sub && <div className="text-xs text-muted-foreground mt-1 opacity-70 leading-tight">{sub}</div>}
     </div>
   );
 }

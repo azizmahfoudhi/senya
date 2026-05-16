@@ -58,7 +58,7 @@ export default function ProjectionsPage() {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
           <div>
-            <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
               Moteur de Projections
             </h1>
             <p className="text-muted-foreground font-medium max-w-md pt-1">Analyse prédictive basée sur l'âge des arbres, les cycles climatiques et vos données historiques.</p>
@@ -73,34 +73,34 @@ export default function ProjectionsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5 hover:scale-[1.02] transition-transform duration-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Sprout className="w-3.5 h-3.5 text-primary" /> Rendement Prévu</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Sprout className="w-3.5 h-3.5 text-primary" /> Rendement Prévu</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black tracking-tighter">{formatKg(totalYield)}</div>
+              <div className="text-3xl font-bold tracking-tighter">{formatKg(totalYield)}</div>
             </CardContent>
           </Card>
           <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5 hover:scale-[1.02] transition-transform duration-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Coins className="w-3.5 h-3.5 text-warning" /> Coût Estimé</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Coins className="w-3.5 h-3.5 text-warning" /> Coût Estimé</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black tracking-tighter">{formatMoneyDT(totalCost)}</div>
+              <div className="text-3xl font-bold tracking-tighter">{formatMoneyDT(totalCost)}</div>
             </CardContent>
           </Card>
           <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5 hover:scale-[1.02] transition-transform duration-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Coins className="w-3.5 h-3.5 text-success" /> Recettes IA</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Coins className="w-3.5 h-3.5 text-success" /> Recettes IA</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black tracking-tighter text-success">{formatMoneyDT(revenue)}</div>
+              <div className="text-3xl font-bold tracking-tighter text-success">{formatMoneyDT(revenue)}</div>
             </CardContent>
           </Card>
           <Card className="glass-card rounded-[2rem] border-primary/30 bg-primary/5 shadow-xl shadow-primary/5 hover:scale-[1.02] transition-transform duration-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Bénéfice Net</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Bénéfice Net</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`text-3xl font-black tracking-tighter ${totalProfit >= 0 ? "text-primary" : "text-danger"}`}>
+              <div className={`text-3xl font-bold tracking-tighter ${totalProfit >= 0 ? "text-primary" : "text-danger"}`}>
                 {formatMoneyDT(totalProfit)}
               </div>
             </CardContent>
@@ -114,7 +114,7 @@ export default function ProjectionsPage() {
               <AlertTriangle className="w-24 h-24 text-danger" />
             </div>
             <CardHeader className="pb-2">
-              <CardTitle className="text-danger flex items-center gap-2 font-black">
+              <CardTitle className="text-danger flex items-center gap-2 font-bold">
                 <AlertTriangle className="w-5 h-5 animate-pulse" /> Risques Systémiques Détectés
               </CardTitle>
             </CardHeader>
@@ -135,7 +135,7 @@ export default function ProjectionsPage() {
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
           
           <div className="text-center space-y-1">
-            <h2 className="text-3xl font-black tracking-tighter">Trajectoire sur 15 Ans</h2>
+            <h2 className="text-3xl font-bold tracking-tighter">Trajectoire sur 15 Ans</h2>
             <p className="text-muted-foreground font-medium">Simulation de la maturité biologique de l'oliveraie.</p>
           </div>
           
@@ -145,7 +145,7 @@ export default function ProjectionsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg font-black tracking-tight">Potentiel de Production</CardTitle>
+                    <CardTitle className="text-lg font-bold tracking-tight">Potentiel de Production</CardTitle>
                     <CardDescription className="font-medium">Rendement cumulé en Kg</CardDescription>
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
@@ -185,7 +185,7 @@ export default function ProjectionsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg font-black tracking-tight">Rentabilité Future</CardTitle>
+                    <CardTitle className="text-lg font-bold tracking-tight">Rentabilité Future</CardTitle>
                     <CardDescription className="font-medium">Chiffre d'Affaires vs Profit Net</CardDescription>
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center text-success border border-success/20">

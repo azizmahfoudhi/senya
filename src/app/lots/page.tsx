@@ -28,7 +28,7 @@ export default function LotsPage() {
       title="Patrimoine Végétal" 
       actions={
         <Link href="/structure">
-          <Button size="sm" variant="primary" className="gap-2 rounded-xl shadow-lg shadow-primary/20 font-bold uppercase tracking-widest text-[10px]">
+          <Button size="sm" variant="primary" className="gap-2 rounded-xl shadow-lg shadow-primary/20 font-bold uppercase tracking-widest text-xs">
             <Plus className="w-4 h-4" />
             Nouveau lot
           </Button>
@@ -38,7 +38,7 @@ export default function LotsPage() {
       <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
         {/* HEADER */}
         <div className="px-2">
-          <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
             Vos Parcelles
           </h1>
           <p className="text-muted-foreground font-medium pt-1 max-w-md text-lg">Inventaire vivant et diagnostic de santé de vos oliveraies en temps réel.</p>
@@ -48,21 +48,21 @@ export default function LotsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5">
             <CardHeader className="p-5 pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Trees className="w-3.5 h-3.5 text-primary" /> Patrimoine</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Trees className="w-3.5 h-3.5 text-primary" /> Patrimoine</CardTitle>
             </CardHeader>
             <CardContent className="p-5 pt-0 flex items-baseline gap-2">
-              <div className="text-3xl font-black tracking-tighter">{formatNumber(totalTrees)}</div>
-              <span className="text-[10px] font-bold text-muted uppercase">arbres</span>
+              <div className="text-3xl font-bold tracking-tighter">{formatNumber(totalTrees)}</div>
+              <span className="text-xs font-bold text-muted uppercase">arbres</span>
             </CardContent>
           </Card>
           
           <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5">
             <CardHeader className="p-5 pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><MapIcon className="w-3.5 h-3.5 text-success" /> Sectorisation</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><MapIcon className="w-3.5 h-3.5 text-success" /> Sectorisation</CardTitle>
             </CardHeader>
             <CardContent className="p-5 pt-0 flex items-baseline gap-2">
-              <div className="text-3xl font-black tracking-tighter">{farm.lots.length}</div>
-              <span className="text-[10px] font-bold text-muted uppercase">lots</span>
+              <div className="text-3xl font-bold tracking-tighter">{farm.lots.length}</div>
+              <span className="text-xs font-bold text-muted uppercase">lots</span>
             </CardContent>
           </Card>
         </div>
@@ -192,7 +192,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
           <label className="grid gap-1.5">
             <div className="text-xs font-medium text-foreground/80 flex items-center justify-between">
               <span>État de production</span>
-              <span className="text-[10px] text-muted">
+              <span className="text-xs text-muted">
                 {croissance === 1 && "Critique (0.4x)"}
                 {croissance === 2 && "Faible (0.7x)"}
                 {croissance === 3 && "Normal (1.0x)"}
@@ -216,7 +216,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
             </div>
           </label>
           <div className="grid gap-1.5">
-            <div className="text-[11px] font-bold text-foreground/70 uppercase tracking-wider px-0.5">État de Santé (Vigueur, Sécheresse)</div>
+            <div className="text-xs font-bold text-foreground/70 uppercase tracking-wider px-0.5">État de Santé (Vigueur, Sécheresse)</div>
             <div className="flex gap-1.5">
               {[
                 { id: "bas", label: "Excellente", desc: "Sain" },
@@ -234,7 +234,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
                   )}
                 >
                   <span className="text-xs font-bold">{s.label}</span>
-                  <span className="text-[9px] opacity-80 uppercase font-medium">{s.desc}</span>
+                  <span className="text-[10px] opacity-80 uppercase font-medium">{s.desc}</span>
                 </button>
               ))}
             </div>
@@ -256,20 +256,20 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
         <div className="flex items-start justify-between min-w-0 gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className={cn("px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border", maturityColor)}>
+              <span className={cn("px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border", maturityColor)}>
                 {maturity}
               </span>
               {lot.irrigation === "non_irrigue" ? (
-                <span className="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-muted/10 text-muted border border-border/20 flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-muted/10 text-muted border border-border/20 flex items-center gap-1">
                   <DropletOff className="w-2.5 h-2.5" /> Bour
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 flex items-center gap-1">
                   <Droplets className="w-2.5 h-2.5" /> Irrigué
                 </span>
               )}
             </div>
-            <CardTitle className="truncate text-3xl mb-1 bg-gradient-to-br from-foreground via-foreground to-foreground/50 bg-clip-text text-transparent font-black tracking-tighter leading-none">
+            <CardTitle className="truncate text-3xl mb-1 bg-gradient-to-br from-foreground via-foreground to-foreground/50 bg-clip-text text-transparent font-bold tracking-tighter leading-none">
               {lot.nom}
             </CardTitle>
             <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1 font-bold text-xs">
@@ -302,17 +302,17 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
       <CardContent className="px-6 pb-6 pt-0 grid gap-5 flex-1 flex flex-col relative z-10">
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
-            <div className="text-[9px] uppercase tracking-widest text-muted font-black mb-1 opacity-60">Arbres</div>
-            <div className="text-lg font-black tracking-tighter">{formatNumber(lot.nbArbres)}</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted font-bold mb-1 opacity-60">Arbres</div>
+            <div className="text-lg font-bold tracking-tighter">{formatNumber(lot.nbArbres)}</div>
           </div>
           <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
-            <div className="text-[9px] uppercase tracking-widest text-muted font-black mb-1 opacity-60">Potentiel</div>
-            <div className="text-lg font-black tracking-tighter text-primary truncate">{formatProduction(prod, age)}</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted font-bold mb-1 opacity-60">Potentiel</div>
+            <div className="text-lg font-bold tracking-tighter text-primary truncate">{formatProduction(prod, age)}</div>
           </div>
           <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
-            <div className="text-[9px] uppercase tracking-widest text-muted font-black mb-1 opacity-60">Santé IA</div>
-            <div className={`text-lg font-black tracking-tighter ${health.colorClass}`}>
-              {health.total}<span className="text-[10px] opacity-40">/100</span>
+            <div className="text-[10px] uppercase tracking-widest text-muted font-bold mb-1 opacity-60">Santé IA</div>
+            <div className={`text-lg font-bold tracking-tighter ${health.colorClass}`}>
+              {health.total}<span className="text-xs opacity-40">/100</span>
             </div>
           </div>
         </div>
@@ -326,8 +326,8 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
           ].map((p, idx) => (
             <div key={idx} className="space-y-1.5">
               <div className="flex justify-between items-center px-0.5">
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{p.label}</span>
-                <span className="text-[10px] font-black tabular-nums">{p.val}%</span>
+                <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">{p.label}</span>
+                <span className="text-xs font-bold tabular-nums">{p.val}%</span>
               </div>
               <div className="h-1.5 w-full bg-background/50 rounded-full overflow-hidden border border-border/10 shadow-inner">
                 <div 

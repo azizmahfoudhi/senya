@@ -197,7 +197,7 @@ export default function MemoryPage() {
     <AppShell 
       title="Mémoire Agricole"
       actions={
-        <Button size="sm" variant="secondary" className="gap-2 print:hidden rounded-xl shadow-lg font-bold uppercase tracking-widest text-[10px]" onClick={() => window.print()}>
+        <Button size="sm" variant="secondary" className="gap-2 print:hidden rounded-xl shadow-lg font-bold uppercase tracking-widest text-xs" onClick={() => window.print()}>
           <Printer className="w-4 h-4" />
           Exporter
         </Button>
@@ -208,13 +208,13 @@ export default function MemoryPage() {
         {/* HEADER */}
         <div className="px-2 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
               Mémoire de la Ferme
             </h1>
             <p className="text-muted-foreground font-medium pt-1 max-w-md text-lg">Le grand livre d'histoire de votre exploitation. Archivez chaque action pour nourrir l'intelligence de demain.</p>
           </div>
           
-          <Button size="lg" className="gap-2 bg-primary shadow-xl shadow-primary/20 rounded-2xl font-black uppercase tracking-widest text-[10px] h-14 px-8 print:hidden" onClick={() => setIsAddYieldOpen(true)}>
+          <Button size="lg" className="gap-2 bg-primary shadow-xl shadow-primary/20 rounded-2xl font-bold uppercase tracking-widest text-xs h-14 px-8 print:hidden" onClick={() => setIsAddYieldOpen(true)}>
             <Plus className="w-5 h-5" />
             Saisir Récolte
           </Button>
@@ -224,11 +224,11 @@ export default function MemoryPage() {
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xl animate-in fade-in duration-300">
               <div className="bg-card w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl border border-border/40 relative animate-in zoom-in-95 duration-500 overflow-hidden">
                 <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary via-emerald-400 to-primary" />
-                <h2 className="text-2xl font-black tracking-tighter mb-6">{editingEvent ? "Modifier la récolte" : "Enregistrer une récolte"}</h2>
+                <h2 className="text-2xl font-bold tracking-tighter mb-6">{editingEvent ? "Modifier la récolte" : "Enregistrer une récolte"}</h2>
                 <form onSubmit={handleAddYield} className="space-y-6">
                   {!editingEvent && (
                     <div className="space-y-3">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Affectation (Répartition auto)</div>
+                      <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Affectation (Répartition auto)</div>
                       <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1">
                         {farm.lots.map(l => {
                           const isSelected = selectedLotIds.has(l.id);
@@ -242,37 +242,37 @@ export default function MemoryPage() {
                                 else next.add(l.id);
                                 setSelectedLotIds(next);
                               }}
-                              className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl border transition-all ${isSelected ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20' : 'bg-background hover:bg-muted border-border/40 text-muted-foreground'}`}
+                              className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-xl border transition-all ${isSelected ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20' : 'bg-background hover:bg-muted border-border/40 text-muted-foreground'}`}
                             >
                               {l.nom}
                             </button>
                           );
                         })}
                       </div>
-                      {selectedLotIds.size === 0 && <div className="text-[10px] font-bold text-danger animate-pulse">SÉLECTIONNEZ UN LOT</div>}
+                      {selectedLotIds.size === 0 && <div className="text-xs font-bold text-danger animate-pulse">SÉLECTIONNEZ UN LOT</div>}
                     </div>
                   )}
                   <div className="space-y-2">
-                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Date de récolte</div>
+                    <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Date de récolte</div>
                     <Input type="date" value={yDate} onChange={e => setYDate(e.target.value)} required className="h-12 rounded-xl bg-muted/5 font-bold" />
                   </div>
                   <div className="space-y-2">
-                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Quantité Totale (kg)</div>
+                    <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Quantité Totale (kg)</div>
                     <Input type="number" min="0" value={yQuantite} onChange={e => setYQuantite(e.target.value)} required placeholder="Ex: 1200" className="h-12 rounded-xl bg-muted/5 font-bold" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Qté Vendue (kg)</div>
+                      <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Qté Vendue (kg)</div>
                       <Input type="number" min="0" value={yQuantiteVendue} onChange={e => setYQuantiteVendue(e.target.value)} placeholder="Optionnel" className="h-12 rounded-xl bg-muted/5 font-bold" />
                     </div>
                     <div className="space-y-2">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Prix (DT/kg)</div>
+                      <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Prix (DT/kg)</div>
                       <Input type="number" step="0.001" min="0" value={yPrixVente} onChange={e => setYPrixVente(e.target.value)} placeholder="Optionnel" className="h-12 rounded-xl bg-muted/5 font-bold" />
                     </div>
                   </div>
                   <div className="flex gap-3 pt-4">
-                    <Button type="button" variant="ghost" className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px]" onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }} disabled={isSubmitting}>Annuler</Button>
-                    <Button type="submit" className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20" disabled={isSubmitting || (!editingEvent && selectedLotIds.size === 0)}>
+                    <Button type="button" variant="ghost" className="flex-1 h-14 rounded-2xl font-bold uppercase tracking-widest text-xs" onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }} disabled={isSubmitting}>Annuler</Button>
+                    <Button type="submit" className="flex-1 h-14 rounded-2xl font-bold uppercase tracking-widest text-xs shadow-xl shadow-primary/20" disabled={isSubmitting || (!editingEvent && selectedLotIds.size === 0)}>
                       {isSubmitting ? "Enregistrement..." : "Enregistrer"}
                     </Button>
                   </div>
@@ -296,7 +296,7 @@ export default function MemoryPage() {
           <select 
             value={filterType} 
             onChange={e => setFilterType(e.target.value)} 
-            className="h-14 w-full sm:w-[220px] rounded-2xl border border-border/40 bg-muted/5 px-4 py-2 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
+            className="h-14 w-full sm:w-[220px] rounded-2xl border border-border/40 bg-muted/5 px-4 py-2 text-xs font-bold uppercase tracking-widest focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
           >
             <option value="all">Tout l'Historique</option>
             <option value="yield">Récoltes</option>
@@ -310,7 +310,7 @@ export default function MemoryPage() {
           {filteredEvents.length === 0 ? (
             <div className="text-center py-20 bg-muted/5 rounded-[3rem] border-2 border-dashed border-border/40">
               <div className="text-4xl mb-4 opacity-20">📂</div>
-              <div className="text-sm font-black uppercase tracking-widest text-muted">Aucune archive trouvée</div>
+              <div className="text-sm font-bold uppercase tracking-widest text-muted">Aucune archive trouvée</div>
             </div>
           ) : (
             filteredEvents.map((event, index) => (
@@ -327,22 +327,22 @@ export default function MemoryPage() {
                   <div className="p-8 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/10 px-3 py-1 rounded-full border border-border/20">
+                        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground bg-muted/10 px-3 py-1 rounded-full border border-border/20">
                           {formatDateLong(event.dateISO)}
                         </span>
                         {event.lotName && (
-                          <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                          <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                             {event.lotName}
                           </span>
                         )}
                       </div>
-                      <h3 className="text-2xl font-black tracking-tighter leading-tight">{event.title}</h3>
+                      <h3 className="text-2xl font-bold tracking-tighter leading-tight">{event.title}</h3>
                       {event.subtitle && <p className="text-sm font-medium text-muted-foreground italic">{event.subtitle}</p>}
                     </div>
                     
                     <div className="flex items-center gap-6 shrink-0 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
                       {event.amount !== undefined && (
-                        <div className={`text-3xl font-black tracking-tighter tabular-nums ${event.type === 'expense' ? 'text-danger' : 'text-success'}`}>
+                        <div className={`text-3xl font-bold tracking-tighter tabular-nums ${event.type === 'expense' ? 'text-danger' : 'text-success'}`}>
                           {event.type === 'expense' ? `-${formatMoneyDT(event.amount)}` : `+${formatKg(event.amount)}`}
                         </div>
                       )}

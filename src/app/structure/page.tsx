@@ -64,7 +64,7 @@ export default function StructurePage() {
         
         <div className="px-2 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
               Architecture de la Ferme
             </h1>
             <p className="text-muted-foreground font-medium pt-1 max-w-xl text-lg">Définissez vos modèles biologiques et gérez l'infrastructure de vos parcelles.</p>
@@ -76,7 +76,7 @@ export default function StructurePage() {
           <CardHeader className="bg-muted/5 border-b border-border/40 p-8">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-2xl font-black tracking-tighter">Pivot de Rendement Variétal</CardTitle>
+                <CardTitle className="text-2xl font-bold tracking-tighter">Pivot de Rendement Variétal</CardTitle>
                 <CardDescription className="font-medium italic">Automatisation basée sur les piliers de conditions (Eau, Botanique, Climat).</CardDescription>
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -84,12 +84,12 @@ export default function StructurePage() {
                   variant="ghost" 
                   size="sm" 
                   onClick={calibrateIA}
-                  className="rounded-xl font-black uppercase tracking-widest text-[9px] gap-2 border border-primary/20 hover:bg-primary/10 text-primary h-8 px-3 transition-all"
+                  className="rounded-xl font-bold uppercase tracking-widest text-[10px] gap-2 border border-primary/20 hover:bg-primary/10 text-primary h-8 px-3 transition-all"
                 >
                   <BrainCircuit className="w-3.5 h-3.5" />
                   Calibrer Standards
                 </Button>
-                <div className="px-4 py-2 bg-primary/10 rounded-xl border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-2 h-8">
+                <div className="px-4 py-2 bg-primary/10 rounded-xl border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2 h-8">
                   <BrainCircuit className="w-3.5 h-3.5 animate-pulse" />
                   IA Active
                 </div>
@@ -101,20 +101,20 @@ export default function StructurePage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-muted/10">
-                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Modèle</th>
-                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40 text-center">Arbres</th>
-                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Plafond (Max)</th>
-                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Indice Pilier</th>
-                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Potentiel Réel</th>
-                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Statut</th>
+                    <th className="p-4 sm:p-6 text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/40">Modèle</th>
+                    <th className="p-4 sm:p-6 text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/40 text-center">Arbres</th>
+                    <th className="p-4 sm:p-6 text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/40">Plafond (Max)</th>
+                    <th className="p-4 sm:p-6 text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/40">Indice Pilier</th>
+                    <th className="p-4 sm:p-6 text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/40">Potentiel Réel</th>
+                    <th className="p-4 sm:p-6 text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/40">Statut</th>
                   </tr>
                 </thead>
                 <tbody>
                   {varietiesAnalysis.map((v) => (
                     <tr key={v.id} className="hover:bg-muted/5 transition-colors group">
                       <td className="p-4 sm:p-6 border-b border-border/40">
-                        <div className="font-black text-lg">{v.nom}</div>
-                        <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{v.isIntensive ? "Système Intensif" : "Traditionnel"}</div>
+                        <div className="font-bold text-lg">{v.nom}</div>
+                        <div className="text-xs text-muted-foreground font-bold uppercase tracking-widest">{v.isIntensive ? "Système Intensif" : "Traditionnel"}</div>
                       </td>
                       <td className="p-4 sm:p-6 border-b border-border/40 text-center font-bold">
                         {v.totalTrees}
@@ -133,27 +133,27 @@ export default function StructurePage() {
                                 style={{ width: `${v.avgHealth}%` }} 
                               />
                            </div>
-                           <span className="text-sm font-black tabular-nums tracking-tighter">{Math.round(v.avgHealth)}%</span>
+                           <span className="text-sm font-bold tabular-nums tracking-tighter">{Math.round(v.avgHealth)}%</span>
                         </div>
                       </td>
                       <td className="p-4 sm:p-6 border-b border-border/40">
                         <div className="flex flex-col">
-                          <div className="text-xl font-black text-primary tabular-nums tracking-tighter">
-                            {v.totalTrees > 0 ? (Math.round(v.actualYieldPerTree * 10) / 10).toFixed(1) : "—"} <span className="text-[10px] uppercase ml-0.5">{v.totalTrees > 0 ? "kg/arbre" : ""}</span>
+                          <div className="text-xl font-bold text-primary tabular-nums tracking-tighter">
+                            {v.totalTrees > 0 ? (Math.round(v.actualYieldPerTree * 10) / 10).toFixed(1) : "—"} <span className="text-xs uppercase ml-0.5">{v.totalTrees > 0 ? "kg/arbre" : ""}</span>
                           </div>
-                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none mt-1">Projection IA Actuelle</div>
+                          <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest leading-none mt-1">Projection IA Actuelle</div>
                         </div>
                       </td>
                       <td className="p-4 sm:p-6 border-b border-border/40">
                         <div className="flex flex-wrap gap-2">
                            {v.totalTrees === 0 ? (
-                              <span className="bg-muted/10 text-muted-foreground text-[9px] font-black px-3 py-1.5 rounded-xl border border-border/20 uppercase tracking-widest">Inactif</span>
+                              <span className="bg-muted/10 text-muted-foreground text-[10px] font-bold px-3 py-1.5 rounded-xl border border-border/20 uppercase tracking-widest">Inactif</span>
                            ) : v.avgHealth > 75 ? (
-                             <span className="bg-success/10 text-success text-[9px] font-black px-3 py-1.5 rounded-xl border border-success/20 uppercase tracking-widest shadow-sm shadow-success/5">Optimisé</span>
+                             <span className="bg-success/10 text-success text-[10px] font-bold px-3 py-1.5 rounded-xl border border-success/20 uppercase tracking-widest shadow-sm shadow-success/5">Optimisé</span>
                            ) : v.avgHealth > 50 ? (
-                             <span className="bg-warning/10 text-warning text-[9px] font-black px-3 py-1.5 rounded-xl border border-warning/20 uppercase tracking-widest shadow-sm shadow-warning/5">A surveiller</span>
+                             <span className="bg-warning/10 text-warning text-[10px] font-bold px-3 py-1.5 rounded-xl border border-warning/20 uppercase tracking-widest shadow-sm shadow-warning/5">A surveiller</span>
                            ) : (
-                             <span className="bg-danger/10 text-danger text-[9px] font-black px-3 py-1.5 rounded-xl border border-danger/20 uppercase tracking-widest shadow-sm shadow-danger/5 whitespace-nowrap">Stress Critique</span>
+                             <span className="bg-danger/10 text-danger text-[10px] font-bold px-3 py-1.5 rounded-xl border border-danger/20 uppercase tracking-widest shadow-sm shadow-danger/5 whitespace-nowrap">Stress Critique</span>
                            )}
                         </div>
                       </td>
@@ -174,7 +174,7 @@ export default function StructurePage() {
               <CardHeader className="bg-muted/5 border-b border-border/40 p-8">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl font-black tracking-tighter">Modèles Botaniques</CardTitle>
+                    <CardTitle className="text-2xl font-bold tracking-tighter">Modèles Botaniques</CardTitle>
                     <CardDescription className="font-medium">Profils de production théoriques.</CardDescription>
                   </div>
                   <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:rotate-12 transition-transform duration-500">
@@ -188,15 +188,15 @@ export default function StructurePage() {
                     <div key={type.id} className="p-4 rounded-2xl border border-border/40 bg-muted/5 hover:bg-background transition-all group/item">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-lg font-black tracking-tight">{type.nom}</div>
+                          <div className="text-lg font-bold tracking-tight">{type.nom}</div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                               {type.isIntensive ? "Système Intensif" : "Système Traditionnel"} •
                             </span>
                             {editingTypeId === type.id ? (
                               <div className="flex items-center gap-1 animate-in zoom-in-95">
                                 <Input 
-                                  className="h-7 w-16 text-[10px] font-black px-2 rounded-lg" 
+                                  className="h-7 w-16 text-xs font-bold px-2 rounded-lg" 
                                   value={editMaxYield} 
                                   onChange={e => setEditMaxYield(e.target.value)}
                                   autoFocus
@@ -217,7 +217,7 @@ export default function StructurePage() {
                                   setEditingTypeId(type.id);
                                   setEditMaxYield(String(type.rendementMaxKgParArbre));
                                 }}
-                                className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1 group/edit"
+                                className="text-xs font-bold uppercase tracking-widest text-primary hover:underline flex items-center gap-1 group/edit"
                               >
                                 Max {type.rendementMaxKgParArbre}kg/arbre
                                 <Edit2 className="w-3 h-3 opacity-0 group-hover/edit:opacity-100 transition-opacity" />
@@ -226,10 +226,10 @@ export default function StructurePage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-xl font-black text-primary">
+                          <div className="text-xl font-bold text-primary">
                             {Math.round(varietiesAnalysis.find(v => v.id === type.id)?.avgHealth || 0)}%
                           </div>
-                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Santé Moy.</div>
+                          <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Santé Moy.</div>
                         </div>
                       </div>
                     </div>
@@ -270,12 +270,12 @@ function SettingsCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
               <Settings className="w-6 h-6" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-black tracking-tighter">Configuration Globale</CardTitle>
+              <CardTitle className="text-2xl font-bold tracking-tighter">Configuration Globale</CardTitle>
               <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Dimensions et économie de l'exploitation</CardDescription>
             </div>
           </div>
           {saving === "saved" && (
-            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary animate-in fade-in slide-in-from-right-2 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-primary animate-in fade-in slide-in-from-right-2 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
               <CheckCircle2 className="w-3.5 h-3.5" /> Enregistré
             </div>
           )}
@@ -283,7 +283,7 @@ function SettingsCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
       </CardHeader>
       <CardContent className="p-8 pt-4 grid sm:grid-cols-2 gap-6 relative z-10">
         <div className="space-y-2">
-          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
+          <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
             <Map className="w-3 h-3" /> Surface Totale
           </div>
           <div className="relative">
@@ -293,12 +293,12 @@ function SettingsCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
               defaultValue={String(farm.settings.surfaceHa ?? 0)}
               onBlur={(e) => handleSave({ surfaceHa: Number(e.target.value || 0) })}
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted uppercase tracking-tighter">ha</div>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-muted uppercase tracking-tighter">ha</div>
           </div>
         </div>
 
         <div className="space-y-2">
-          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
+          <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
             <DollarSign className="w-3 h-3" /> Prix de Vente (Moy.)
           </div>
           <div className="relative">
@@ -308,7 +308,7 @@ function SettingsCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
               defaultValue={String(farm.settings.prixKgOlives ?? 0)}
               onBlur={(e) => handleSave({ prixKgOlives: Number(e.target.value || 0) })}
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted uppercase tracking-tighter">DT/kg</div>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-muted uppercase tracking-tighter">DT/kg</div>
           </div>
         </div>
       </CardContent>
@@ -350,31 +350,31 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
             <Plus className="w-6 h-6" />
           </div>
           <div>
-            <CardTitle className="text-xl font-black tracking-tighter">Nouveau Lot</CardTitle>
-            <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Extension du patrimoine</CardDescription>
+            <CardTitle className="text-xl font-bold tracking-tighter">Nouveau Lot</CardTitle>
+            <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Extension du patrimoine</CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent className="p-8 pt-4 grid gap-6">
         <div className="space-y-2">
-          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Identifiant</div>
+          <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Identifiant</div>
           <Input value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Nom du lot" className="h-12 rounded-xl bg-background/50 border-border/40 font-bold" />
         </div>
         
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Plantation</div>
+            <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Plantation</div>
             <Input type="date" value={datePlantation} onChange={(e) => setDatePlantation(e.target.value)} className="h-12 rounded-xl bg-background/50 border-border/40 font-bold" />
           </div>
           <div className="space-y-2">
-            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Population</div>
+            <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Population</div>
             <Input inputMode="numeric" min="1" value={nb} onChange={(e) => setNb(e.target.value)} className="h-12 rounded-xl bg-background/50 border-border/40 font-bold" />
           </div>
         </div>
         
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Variété</div>
+            <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Variété</div>
             <select
               className="h-12 w-full rounded-xl border border-border/40 bg-background/50 px-3 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
               value={typeId}
@@ -387,7 +387,7 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
             </select>
           </div>
           <div className="space-y-2">
-            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Régime</div>
+            <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Régime</div>
             <select
               className="h-12 w-full rounded-xl border border-border/40 bg-background/50 px-3 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
               value={irrig}
@@ -402,9 +402,9 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
         </div>
 
         <div className="space-y-3">
-          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center justify-between">
+          <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1 flex items-center justify-between">
             <span>Évaluation Vigueur</span>
-            <span className="text-primary font-black">{(croissance * 20)}%</span>
+            <span className="text-primary font-bold">{(croissance * 20)}%</span>
           </div>
           <div className="flex items-center justify-center gap-2 bg-background/30 p-4 rounded-2xl border border-border/20">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -420,7 +420,7 @@ function CreateBatchCard({ farm }: { farm: ReturnType<typeof useFarmData> }) {
           </div>
         </div>
         
-        <Button onClick={submit} disabled={farm.types.length === 0} className="w-full h-14 rounded-2xl shadow-xl shadow-success/20 font-black uppercase tracking-widest text-xs mt-2">
+        <Button onClick={submit} disabled={farm.types.length === 0} className="w-full h-14 rounded-2xl shadow-xl shadow-success/20 font-bold uppercase tracking-widest text-xs mt-2">
           Créer le lot
         </Button>
       </CardContent>

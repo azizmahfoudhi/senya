@@ -34,7 +34,7 @@ export default function PluviometriePage() {
   return (
     <AppShell title="Pluviométrie & Météo">
       <div className="mb-6 animate-in fade-in slide-in-from-top-4">
-        <h1 className="text-2xl font-black flex items-center gap-2">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
           <CloudRain className="w-6 h-6 text-primary" />
           Dashboard Pluviométrique
         </h1>
@@ -58,7 +58,7 @@ export default function PluviometriePage() {
                   <CardDescription>Données pour Nasrallah, Kairouan</CardDescription>
                 </div>
                 {weather && (
-                  <div className="text-3xl font-black">
+                  <div className="text-3xl font-bold">
                     {weather.current.temp}°C
                   </div>
                 )}
@@ -108,7 +108,7 @@ export default function PluviometriePage() {
                               <span className="text-xs text-muted">{Math.round(weather.daily.minTemps[i])}°</span>
                             </div>
                             {weather.daily.precipitation[i] > 0 && (
-                              <span className="text-[10px] font-bold text-primary flex items-center gap-0.5 whitespace-nowrap">
+                              <span className="text-xs font-bold text-primary flex items-center gap-0.5 whitespace-nowrap">
                                 <Droplets className="w-2.5 h-2.5 shrink-0" />
                                 {weather.daily.precipitation[i]} mm
                               </span>
@@ -142,7 +142,7 @@ export default function PluviometriePage() {
               <div className="flex justify-between items-end">
                 <div>
                   <div className="text-sm font-medium text-foreground/80 mb-1">Pluie Actuelle (Cette année)</div>
-                  <div className="text-3xl font-black text-foreground">{historyLoading ? "..." : formatNumber(ytdRainMm)} <span className="text-base font-normal text-muted">mm</span></div>
+                  <div className="text-3xl font-bold text-foreground">{historyLoading ? "..." : formatNumber(ytdRainMm)} <span className="text-base font-normal text-muted">mm</span></div>
                 </div>
                 <div className="text-right flex flex-col items-end gap-1">
                   <div className="text-xs text-muted" title="Estimation basée sur la vitesse actuelle des précipitations rapportée sur 365 jours.">
@@ -152,7 +152,7 @@ export default function PluviometriePage() {
                   {projectedRainMm > 0 && Math.abs(projectedRainMm - (farm.settings.pluviometrieAnnuelleMm || 0)) > 10 && (
                     <button 
                       onClick={() => farm.actions.setSettings({ pluviometrieAnnuelleMm: projectedRainMm })}
-                      className="text-[10px] uppercase font-bold tracking-wider bg-primary/10 text-primary px-2 py-1 rounded-md mt-1 hover:bg-primary/20 transition-colors"
+                      className="text-xs uppercase font-bold tracking-wider bg-primary/10 text-primary px-2 py-1 rounded-md mt-1 hover:bg-primary/20 transition-colors"
                     >
                       Utiliser pour calculs
                     </button>

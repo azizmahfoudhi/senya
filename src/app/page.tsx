@@ -155,7 +155,7 @@ export default function HomePage() {
               <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
               
-              <h2 className="text-4xl sm:text-6xl font-black tracking-tighter flex items-center gap-4">
+              <h2 className="text-4xl sm:text-6xl font-bold tracking-tighter flex items-center gap-4">
                 <span className="animate-float inline-block drop-shadow-sm">👋</span> 
                 Bonjour.
               </h2>
@@ -165,17 +165,17 @@ export default function HomePage() {
               
               <div className="mt-10 flex flex-wrap gap-4 relative z-10">
                 <div className="inline-flex items-center gap-4 bg-background/60 backdrop-blur-xl px-6 py-3.5 rounded-2xl border border-border/40 shadow-xl shadow-black/5 animate-pulse-glow">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Indice Santé</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Indice Santé</span>
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       "h-3.5 w-3.5 rounded-full animate-pulse",
                       globalHealth >= 80 ? 'bg-success shadow-[0_0_12px_rgba(16,185,129,0.6)]' : globalHealth >= 50 ? 'bg-warning shadow-[0_0_12px_rgba(245,158,11,0.6)]' : 'bg-danger shadow-[0_0_12px_rgba(239,68,68,0.6)]'
                     )} />
-                    <span className="font-black text-3xl tracking-tighter tabular-nums">{historyLoading ? "..." : globalHealth}<span className="text-xs opacity-40 font-bold ml-0.5">/100</span></span>
+                    <span className="font-bold text-3xl tracking-tighter tabular-nums">{historyLoading ? "..." : globalHealth}<span className="text-xs opacity-40 font-bold ml-0.5">/100</span></span>
                   </div>
                 </div>
                 
-                <Link href="/lots" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/30 group/btn">
+                <Link href="/lots" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 rounded-2xl font-bold uppercase tracking-widest text-xs hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/30 group/btn">
                   Gérer les lots <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
@@ -328,10 +328,10 @@ export default function HomePage() {
                       <span className="text-3xl animate-float">🤖</span>
                     </div>
                     <div>
-                      <CardTitle className="text-xl bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent font-black tracking-tight">Intelligence Artificielle</CardTitle>
+                      <CardTitle className="text-xl bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent font-bold tracking-tight">Intelligence Artificielle</CardTitle>
                       <CardDescription className="font-medium">
                         {weather ? `${weather.current.temp}°C · ${weather.current.isDay ? 'Ensoleillé' : 'Nuit'}` : "Calcul des variables..."}
-                        {lastFetched && <span className="ml-2 text-[10px] opacity-70">Màj: {lastFetched}</span>}
+                        {lastFetched && <span className="ml-2 text-xs opacity-70">Màj: {lastFetched}</span>}
                       </CardDescription>
                     </div>
                   </div>
@@ -419,13 +419,13 @@ export default function HomePage() {
               <CardHeader className="p-8 pb-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl font-black tracking-tighter">Météo Agricole</CardTitle>
-                    <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Conditions actuelles et prévisions à 5 jours</CardDescription>
+                    <CardTitle className="text-2xl font-bold tracking-tighter">Météo Agricole</CardTitle>
+                    <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Conditions actuelles et prévisions à 5 jours</CardDescription>
                   </div>
                   {weather && (
                     <div className="text-right">
-                      <div className="text-3xl font-black tracking-tighter text-primary">{weather.current.temp}°C</div>
-                      <div className="text-[10px] font-bold text-muted uppercase tracking-widest">Nasrallah, Kairouan</div>
+                      <div className="text-3xl font-bold tracking-tighter text-primary">{weather.current.temp}°C</div>
+                      <div className="text-xs font-bold text-muted uppercase tracking-widest">Nasrallah, Kairouan</div>
                     </div>
                   )}
                 </div>
@@ -438,12 +438,12 @@ export default function HomePage() {
                     {/* CURRENT DETAILS */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
-                        <div className="text-[10px] font-black uppercase text-muted mb-1">Vent</div>
-                        <div className="text-lg font-black">{weather.current.windSpeed} km/h</div>
+                        <div className="text-xs font-bold uppercase text-muted mb-1">Vent</div>
+                        <div className="text-lg font-bold">{weather.current.windSpeed} km/h</div>
                       </div>
                       <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
-                        <div className="text-[10px] font-black uppercase text-muted mb-1">UV</div>
-                        <div className="text-lg font-black">{weather.daily.uvIndex[0] || 6}</div>
+                        <div className="text-xs font-bold uppercase text-muted mb-1">UV</div>
+                        <div className="text-lg font-bold">{weather.daily.uvIndex[0] || 6}</div>
                       </div>
                     </div>
 
@@ -451,7 +451,7 @@ export default function HomePage() {
                     <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 no-scrollbar snap-x">
                       {weather.daily.dates.slice(0, 5).map((date, i) => (
                         <div key={date} className="shrink-0 w-[110px] sm:w-auto sm:flex-1 bg-background/30 border border-border/20 rounded-3xl p-5 flex flex-col items-center justify-center gap-3 group/day hover:bg-primary/5 transition-all snap-center">
-                          <div className="text-[10px] font-black text-muted uppercase tracking-widest">
+                          <div className="text-xs font-bold text-muted uppercase tracking-widest">
                             {new Date(date).toLocaleDateString("fr-FR", { weekday: "short" })}
                           </div>
                           <div className="py-2 transform group-hover/day:scale-110 transition-transform">
@@ -466,8 +466,8 @@ export default function HomePage() {
                             )}
                           </div>
                           <div className="text-center">
-                            <div className="text-lg font-black tracking-tight">{Math.round(weather.daily.maxTemps[i])}°</div>
-                            <div className="text-[10px] font-bold text-muted">{Math.round(weather.daily.minTemps[i])}°</div>
+                            <div className="text-lg font-bold tracking-tight">{Math.round(weather.daily.maxTemps[i])}°</div>
+                            <div className="text-xs font-bold text-muted">{Math.round(weather.daily.minTemps[i])}°</div>
                           </div>
                         </div>
                       ))}
@@ -484,11 +484,11 @@ export default function HomePage() {
               <CardHeader className="p-8 pb-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl font-black tracking-tighter">Opérations Récentes</CardTitle>
-                    <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Historique direct des derniers flux</CardDescription>
+                    <CardTitle className="text-2xl font-bold tracking-tighter">Opérations Récentes</CardTitle>
+                    <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Historique direct des derniers flux</CardDescription>
                   </div>
                   <Link href="/depenses">
-                    <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest">
+                    <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-xl text-xs font-bold uppercase tracking-widest">
                       Voir tout <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
                   </Link>
@@ -503,14 +503,14 @@ export default function HomePage() {
                           <Wallet className="w-6 h-6 text-muted group-hover/row:text-primary transition-colors" />
                         </div>
                         <div>
-                          <div className="text-sm font-black tracking-tight">{formatMoneyDT(d.montant)}</div>
-                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                          <div className="text-sm font-bold tracking-tight">{formatMoneyDT(d.montant)}</div>
+                          <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                             {d.categorie} • {new Date(d.dateISO).toLocaleDateString("fr-FR")}
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] font-black uppercase text-muted">Statut</div>
+                        <div className="text-xs font-bold uppercase text-muted">Statut</div>
                         <div className="text-xs font-bold text-success">Validé</div>
                       </div>
                     </div>
@@ -546,16 +546,16 @@ function MetricCard({
       delay
     )}>
       <CardHeader className="p-6 pb-2">
-        <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+        <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
           {icon}
           {title}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6 pt-0">
-        <div className="text-2xl sm:text-3xl font-black tracking-tighter bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent group-hover:scale-[1.02] transition-transform origin-left">
+        <div className="text-2xl sm:text-3xl font-bold tracking-tighter bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent group-hover:scale-[1.02] transition-transform origin-left">
           {value}
         </div>
-        <CardDescription className="text-[10px] font-bold text-muted uppercase tracking-widest mt-1 line-clamp-1">{sub}</CardDescription>
+        <CardDescription className="text-xs font-bold text-muted uppercase tracking-widest mt-1 line-clamp-1">{sub}</CardDescription>
       </CardContent>
     </Card>
   );

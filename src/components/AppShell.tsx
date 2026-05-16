@@ -59,7 +59,7 @@ export function AppShell({
           <div className="flex items-center gap-3 min-w-0">
             <Image src="/logo.png" alt="Senya Logo" width={36} height={36} className="bg-white rounded-xl shadow-sm border border-border/50" />
             <div className="flex flex-col">
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent leading-none pb-0.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent leading-none pb-0.5">
                 Senya
               </h1>
               {title && (
@@ -76,8 +76,8 @@ export function AppShell({
               title="Rechercher (Ctrl+K)"
             >
               <Search className="w-4 h-4 group-hover:text-primary transition-colors" />
-              <span className="text-[10px] font-bold uppercase tracking-wider">Rechercher</span>
-              <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-background border border-border/40 text-[9px]">
+              <span className="text-xs font-bold uppercase tracking-wider">Rechercher</span>
+              <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-background border border-border/40 text-[10px]">
                 <CommandIcon className="w-2.5 h-2.5" /> K
               </div>
             </button>

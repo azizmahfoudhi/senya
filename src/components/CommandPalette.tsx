@@ -89,7 +89,7 @@ export function CommandPalette() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted/10 border border-border/20 text-[10px] font-bold text-muted">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted/10 border border-border/20 text-xs font-bold text-muted">
             <Command className="w-3 h-3" /> K
           </div>
           <button onClick={() => setOpen(false)} className="p-1 hover:bg-muted/20 rounded-full transition-colors">
@@ -125,7 +125,7 @@ export function CommandPalette() {
                     <div>
                       <div className="font-bold">{item.name}</div>
                       <div className={cn(
-                        "text-[10px] uppercase tracking-widest font-bold opacity-60",
+                        "text-xs uppercase tracking-widest font-bold opacity-60",
                         index === selectedIndex ? "text-white" : "text-muted"
                       )}>
                         {item.category}
@@ -133,7 +133,7 @@ export function CommandPalette() {
                     </div>
                   </div>
                   {index === selectedIndex && (
-                    <div className="text-[10px] font-black bg-white/20 px-2 py-1 rounded-md">ENTRÉE</div>
+                    <div className="text-xs font-bold bg-white/20 px-2 py-1 rounded-md">ENTRÉE</div>
                   )}
                 </button>
               ))}
@@ -141,7 +141,7 @@ export function CommandPalette() {
           )}
         </div>
         
-        <div className="px-6 py-3 border-t border-border/40 bg-muted/5 flex items-center justify-between text-[10px] font-bold text-muted uppercase tracking-widest">
+        <div className="px-6 py-3 border-t border-border/40 bg-muted/5 flex items-center justify-between text-xs font-bold text-muted uppercase tracking-widest">
           <div className="flex gap-4">
             <span className="flex items-center gap-1"><span className="p-0.5 rounded border border-border/40 bg-background">↑↓</span> Naviguer</span>
             <span className="flex items-center gap-1"><span className="p-0.5 rounded border border-border/40 bg-background">↩</span> Sélectionner</span>

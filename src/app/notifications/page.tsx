@@ -34,7 +34,7 @@ export default function NotificationsPage() {
             <Bell className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight">Notifications</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Chargement des alertes...
             </p>
@@ -56,7 +56,7 @@ export default function NotificationsPage() {
           <Bell className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-black tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
             Notifications
           </h1>
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
@@ -100,18 +100,18 @@ export default function NotificationsPage() {
                 <div className="flex items-center justify-between border-b border-border/40 pb-3">
                   <div className="flex items-center gap-2">
                     <div className={cn(
-                      "text-xl font-black tracking-tight",
+                      "text-xl font-bold tracking-tight",
                       i.level === "danger" ? "text-danger" : i.level === "warning" ? "text-warning-foreground" : "text-primary"
                     )}>
                       {i.titre}
                     </div>
                     {i.level === "danger" && (
-                      <span className="px-2 py-0.5 rounded-full bg-danger/10 text-danger text-[10px] font-bold uppercase tracking-wider border border-danger/20">
+                      <span className="px-2 py-0.5 rounded-full bg-danger/10 text-danger text-xs font-bold uppercase tracking-wider border border-danger/20">
                         Critique
                       </span>
                     )}
                     {i.level === "warning" && (
-                      <span className="px-2 py-0.5 rounded-full bg-warning/10 text-warning-foreground text-[10px] font-bold uppercase tracking-wider border border-warning/20">
+                      <span className="px-2 py-0.5 rounded-full bg-warning/10 text-warning-foreground text-xs font-bold uppercase tracking-wider border border-warning/20">
                         Attention
                       </span>
                     )}
@@ -127,17 +127,17 @@ export default function NotificationsPage() {
 
                 <div className="space-y-3 text-sm">
                   <div>
-                    <span className="font-bold text-foreground/80 uppercase text-[10px] tracking-widest">Le Constat</span>
+                    <span className="font-bold text-foreground/80 uppercase text-xs tracking-widest">Le Constat</span>
                     <div className="text-foreground/90 mt-1 font-medium leading-relaxed">{i.whatIsHappening}</div>
                   </div>
                   <div className="bg-background/50 p-3 rounded-xl border border-border/40 shadow-inner">
-                    <span className="font-bold text-foreground/80 uppercase text-[10px] tracking-widest flex items-center gap-1.5 mb-1.5">
+                    <span className="font-bold text-foreground/80 uppercase text-xs tracking-widest flex items-center gap-1.5 mb-1.5">
                       🎯 Action Recommandée
                     </span>
                     <div className="text-foreground font-semibold leading-relaxed">{i.whatToDo}</div>
                   </div>
                   <div>
-                    <span className="font-bold text-foreground/80 uppercase text-[10px] tracking-widest">L'Impact</span>
+                    <span className="font-bold text-foreground/80 uppercase text-xs tracking-widest">L'Impact</span>
                     <div className="text-muted-foreground mt-1 italic text-xs leading-relaxed">{i.whyItMatters}</div>
                   </div>
                 </div>
