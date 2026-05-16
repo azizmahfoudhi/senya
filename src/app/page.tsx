@@ -19,7 +19,7 @@ import { computeGlobalHealth, computeLotHealth } from "@/lib/intelligence";
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useFarmData } from "@/lib/useFarmData";
-import { Trees, Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit, Sun, Cloud, Snowflake, CloudRain, Moon } from "lucide-react";
+import { Trees, Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit, Sun, Cloud, Snowflake, CloudRain, Moon, Bell } from "lucide-react";
 import { useHistoricalRain } from "@/lib/useHistoricalRain";
 
 export default function HomePage() {
@@ -328,6 +328,12 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
+                    <Link href="/notifications">
+                      <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl border-border/50 bg-background/40 hover:bg-primary/5 hover:text-primary transition-all">
+                        <Bell className="w-4 h-4" />
+                        <span className="hidden sm:inline font-bold">Alertes</span>
+                      </Button>
+                    </Link>
                     <Link href="/memory">
                       <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl border-border/50 bg-background/40 hover:bg-primary/5 hover:text-primary transition-all">
                         <BrainCircuit className="w-4 h-4" />

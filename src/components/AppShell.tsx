@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { CommandPalette } from "./CommandPalette";
-import { Search, Command as CommandIcon } from "lucide-react";
+import { Search, Command as CommandIcon, Bell } from "lucide-react";
 
 const nav = [
   { href: "/", label: "Résumé", icon: BarChart3 },
@@ -26,6 +26,7 @@ const nav = [
   { href: "/lots", label: "Lots", icon: Layers },
   { href: "/depenses", label: "Dépenses", icon: Wallet },
   { href: "/projections", label: "Prévisions", icon: TrendingUp },
+  { href: "/notifications", label: "Notifs", icon: Bell },
 ];
 
 import Image from "next/image";
