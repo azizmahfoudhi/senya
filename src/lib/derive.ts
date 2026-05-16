@@ -143,6 +143,22 @@ export function buildInsights(state: FarmState, weather: WeatherData | null = nu
         whatToDo: "Mettez vos systèmes d'irrigation en pause pour les 48 à 72 prochaines heures.",
         whyItMatters: "L'excès d'eau fatigue les racines et représente un coût inutile en énergie et en ressources."
       });
+    } else {
+      // Forecasted Rain Insight
+      const upcomingRainDays = weather.daily.precipitation.slice(0, 3);
+      const upcomingRainTotal = upcomingRainDays.reduce((a, b) => a + b, 0);
+      
+      if (upcomingRainTotal > 3) {
+        addInsight({
+          level: "info",
+          titre: "Pluie prévue sous peu",
+          icon: "☔",
+          priorityScore: 85,
+          whatIsHappening: `Un cumul de ${Math.round(upcomingRainTotal * 10) / 10} mm de pluie est annoncé d'ici 3 jours.`,
+          whatToDo: "Suspendez les irrigations prévues et décalez l'application de traitements foliaires.",
+          whyItMatters: "Anticiper la pluie vous évite de gaspiller de l'eau par sur-irrigation et d'avoir vos traitements chimiques lessivés (argent perdu)."
+        });
+      }
     }
   }
 
