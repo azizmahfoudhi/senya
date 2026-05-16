@@ -155,11 +155,11 @@ export default function HomePage() {
               <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
               
-              <h2 className="text-5xl sm:text-6xl font-black tracking-tighter flex items-center gap-4">
+              <h2 className="text-4xl sm:text-6xl font-black tracking-tighter flex items-center gap-4">
                 <span className="animate-float inline-block drop-shadow-sm">👋</span> 
                 Bonjour.
               </h2>
-              <p className="text-muted-foreground font-medium text-2xl pt-2 tracking-tight">
+              <p className="text-muted-foreground font-medium text-xl sm:text-2xl pt-2 tracking-tight">
                 Oliveraie de {farm.settings.surfaceHa} ha <span className="text-sm opacity-40 font-bold uppercase tracking-widest ml-2">({farm.lots.length} parcelles actives)</span>
               </p>
               
@@ -448,9 +448,9 @@ export default function HomePage() {
                     </div>
 
                     {/* 5-DAY STRIP */}
-                    <div className="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
+                    <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 no-scrollbar snap-x">
                       {weather.daily.dates.slice(0, 5).map((date, i) => (
-                        <div key={date} className="flex-1 min-w-[100px] bg-background/30 border border-border/20 rounded-3xl p-5 flex flex-col items-center justify-center gap-3 group/day hover:bg-primary/5 transition-all">
+                        <div key={date} className="shrink-0 w-[110px] sm:w-auto sm:flex-1 bg-background/30 border border-border/20 rounded-3xl p-5 flex flex-col items-center justify-center gap-3 group/day hover:bg-primary/5 transition-all snap-center">
                           <div className="text-[10px] font-black text-muted uppercase tracking-widest">
                             {new Date(date).toLocaleDateString("fr-FR", { weekday: "short" })}
                           </div>
@@ -497,7 +497,7 @@ export default function HomePage() {
               <CardContent className="p-0">
                 <div className="divide-y divide-border/40">
                   {farm.depenses.slice(0, 4).map((d) => (
-                    <div key={d.id} className="p-6 flex items-center justify-between hover:bg-primary/[0.02] transition-colors group/row">
+                    <div key={d.id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-primary/[0.02] transition-colors group/row">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-muted/5 flex items-center justify-center border border-border/30 group-hover/row:bg-primary/10 group-hover/row:border-primary/20 transition-all">
                           <Wallet className="w-6 h-6 text-muted group-hover/row:text-primary transition-colors" />

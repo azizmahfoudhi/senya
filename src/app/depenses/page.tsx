@@ -201,7 +201,7 @@ function OneOffExpenses() {
               <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">DT</div>
             </div>
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="grid gap-1.5">
               <div className="text-sm font-medium text-foreground/80">Date</div>
               <Input type="date" value={dateISO} onChange={(e) => setDateISO(e.target.value)} className="bg-background/50" />
@@ -399,7 +399,7 @@ function ExpenseRow({ d, farm }: { d: any; farm: ReturnType<typeof useFarmData> 
           {d.note ? <div className="mt-2 text-xs text-muted/60 italic font-medium bg-muted/5 px-2 py-1 rounded-lg inline-block">{d.note}</div> : null}
         </div>
       </div>
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity print:hidden">
+      <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity print:hidden">
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted" onClick={() => setIsEditing(true)} title="Modifier la dépense">
           <Edit2 className="w-4 h-4" />
         </Button>

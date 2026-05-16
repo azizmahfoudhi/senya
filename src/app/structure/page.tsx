@@ -101,28 +101,28 @@ export default function StructurePage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-muted/10">
-                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Modèle</th>
-                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40 text-center">Arbres</th>
-                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Plafond (Max)</th>
-                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Indice Pilier</th>
-                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Potentiel Réel</th>
-                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Statut</th>
+                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Modèle</th>
+                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40 text-center">Arbres</th>
+                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Plafond (Max)</th>
+                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Indice Pilier</th>
+                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Potentiel Réel</th>
+                    <th className="p-4 sm:p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/40">Statut</th>
                   </tr>
                 </thead>
                 <tbody>
                   {varietiesAnalysis.map((v) => (
                     <tr key={v.id} className="hover:bg-muted/5 transition-colors group">
-                      <td className="p-6 border-b border-border/40">
+                      <td className="p-4 sm:p-6 border-b border-border/40">
                         <div className="font-black text-lg">{v.nom}</div>
                         <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{v.isIntensive ? "Système Intensif" : "Traditionnel"}</div>
                       </td>
-                      <td className="p-6 border-b border-border/40 text-center font-bold">
+                      <td className="p-4 sm:p-6 border-b border-border/40 text-center font-bold">
                         {v.totalTrees}
                       </td>
-                      <td className="p-6 border-b border-border/40 font-bold text-muted-foreground italic">
+                      <td className="p-4 sm:p-6 border-b border-border/40 font-bold text-muted-foreground italic">
                         {v.rendementMaxKgParArbre} kg/arbre
                       </td>
-                      <td className="p-6 border-b border-border/40">
+                      <td className="p-4 sm:p-6 border-b border-border/40">
                         <div className="flex items-center gap-4 w-48">
                            <div className="flex-1 h-2.5 bg-muted/20 rounded-full overflow-hidden p-[1px]">
                               <div 
@@ -136,7 +136,7 @@ export default function StructurePage() {
                            <span className="text-sm font-black tabular-nums tracking-tighter">{Math.round(v.avgHealth)}%</span>
                         </div>
                       </td>
-                      <td className="p-6 border-b border-border/40">
+                      <td className="p-4 sm:p-6 border-b border-border/40">
                         <div className="flex flex-col">
                           <div className="text-xl font-black text-primary tabular-nums tracking-tighter">
                             {v.totalTrees > 0 ? (Math.round(v.actualYieldPerTree * 10) / 10).toFixed(1) : "—"} <span className="text-[10px] uppercase ml-0.5">{v.totalTrees > 0 ? "kg/arbre" : ""}</span>
@@ -144,7 +144,7 @@ export default function StructurePage() {
                           <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none mt-1">Projection IA Actuelle</div>
                         </div>
                       </td>
-                      <td className="p-6 border-b border-border/40">
+                      <td className="p-4 sm:p-6 border-b border-border/40">
                         <div className="flex flex-wrap gap-2">
                            {v.totalTrees === 0 ? (
                               <span className="bg-muted/10 text-muted-foreground text-[9px] font-black px-3 py-1.5 rounded-xl border border-border/20 uppercase tracking-widest">Inactif</span>

@@ -300,7 +300,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
         </div>
       </CardHeader>
       <CardContent className="px-6 pb-6 pt-0 grid gap-5 flex-1 flex flex-col relative z-10">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
             <div className="text-[9px] uppercase tracking-widest text-muted font-black mb-1 opacity-60">Arbres</div>
             <div className="text-lg font-black tracking-tighter">{formatNumber(lot.nbArbres)}</div>
@@ -347,7 +347,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-muted opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
+              className="text-muted opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
               onClick={() => setIsEditing(true)}
               title="Modifier le lot"
             >
@@ -356,7 +356,7 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-danger opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
+              className="text-danger opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
               onClick={() => {
                 if (confirm(`Voulez-vous vraiment supprimer le lot "${lot.nom}" ? Cette action est irréversible.`)) {
                   farm.actions.removeBatch(lot.id);
