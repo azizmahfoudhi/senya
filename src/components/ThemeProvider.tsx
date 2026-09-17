@@ -7,6 +7,7 @@ type Theme = "day" | "dark" | "sunrise" | "sunset" | "rain" | "hot";
 
 const ThemeContext = React.createContext<{
   theme: Theme;
+  setTheme: (t: Theme) => void;
 } | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -53,7 +54,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme, mounted]);
 
   return (
-    <ThemeContext.Provider value={{ theme }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

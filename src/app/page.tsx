@@ -2,29 +2,61 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, CartesianGrid } from "recharts";
-import { AppShell } from "@/components/AppShell";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
+import { AppShell } from "@/components/AppShell";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Button } from "@/components/ui/Button";
-import { buildInsights, farmTotals, expensesSeriesLast12Months } from "@/lib/derive";
+import { Stat } from "@/components/ui/Stat";
+import { Badge } from "@/components/ui/Badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
+import {
+  buildInsights,
+  farmTotals,
+  expensesSeriesLast12Months,
+} from "@/lib/derive";
 import { useWeather } from "@/lib/useWeather";
-import { computeGlobalHealth, computeLotHealth } from "@/lib/intelligence";
+import { computeGlobalHealth } from "@/lib/intelligence";
 import { formatKg, formatMoneyDT, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useFarmData } from "@/lib/useFarmData";
-import { Trees, Sprout, Layers, Wallet, ArrowRight, TrendingUp, Settings, BrainCircuit, Sun, Cloud, Snowflake, CloudRain, Moon, Bell, X } from "lucide-react";
 import { useHistoricalRain } from "@/lib/useHistoricalRain";
+import {
+  Trees,
+  Wallet,
+  TrendingUp,
+  Sprout,
+  Bell,
+  Settings,
+  ArrowRight,
+  CheckCircle2,
+  X,
+  Wind,
+  Thermometer,
+  Sun,
+  Cloud,
+  CloudRain,
+  Snowflake,
+} from "lucide-react";
+import { EXPENSE_CATEGORY_LABEL } from "@/lib/domain";
 
 export default function HomePage() {
   const farm = useFarmData();
-  const { data: weather, loading: weatherLoading, lastFetched } = useWeather();
+  const { data: weather, loading: weatherLoading } = useWeather();
+  const { projectedRainMm, loading: historyLoading } = useHistoricalRain();
 
   const state = {
     settings: farm.settings,
@@ -42,521 +74,474 @@ export default function HomePage() {
     ...p,
     month: p.monthISO.slice(5, 7),
   }));
-  
-  const { projectedRainMm, loading: historyLoading } = useHistoricalRain();
   const globalHealth = computeGlobalHealth(state, projectedRainMm);
+
+  const healthLabel =
+    globalHealth >= 80
+      ? "Excellent"
+      : globalHealth >= 60
+      ? "Stable"
+      : globalHealth >= 40
+      ? "Moyen"
+      : "Critique";
+  const healthVariant =
+    globalHealth >= 80
+      ? "success"
+      : globalHealth >= 60
+      ? "primary"
+      : globalHealth >= 40
+      ? "warning"
+      : "danger";
+
+  const actions = (
+    <div className="flex items-center gap-1">
+      <Link
+        href="/notifications"
+        className="relative p-2 rounded-md hover:bg-secondary transition-colors"
+      >
+        <Bell className="w-4 h-4 text-muted" />
+        {insights.length > 0 && (
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-danger" />
+        )}
+      </Link>
+      <Link
+        href="/structure"
+        className="p-2 rounded-md hover:bg-secondary transition-colors"
+      >
+        <Settings className="w-4 h-4 text-muted" />
+      </Link>
+    </div>
+  );
 
   if (farm.loading) {
     return (
-      <AppShell title="Résumé">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-28 w-full" />
+      <AppShell title="Tableau de Bord" actions={actions}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-20" />
+          ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="md:col-span-2 h-40 w-full" />
+          <Skeleton className="h-56" />
+          <Skeleton className="h-56" />
+          <Skeleton className="md:col-span-2 h-40" />
         </div>
       </AppShell>
     );
   }
 
   return (
-    <AppShell
-      title="Résumé"
-      actions={
-        <div className="flex items-center gap-1">
-          <Link href="/notifications" className="p-2 rounded-full hover:bg-muted transition-colors relative flex items-center justify-center" title="Alertes et Notifications">
-            <Bell className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
-            {insights.length > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-danger animate-pulse border border-background"></span>
-            )}
-          </Link>
-          <Link href="/structure" className="p-2 rounded-full hover:bg-muted transition-colors flex items-center justify-center" title="Configuration de la Structure">
-            <Settings className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
-          </Link>
+    <AppShell title="Tableau de Bord" actions={actions}>
+      {/* Error banner */}
+      {farm.error && (
+        <div className="mb-4 flex items-center gap-3 rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">
+          <span className="font-semibold">Erreur Supabase:</span>
+          <span className="flex-1">{farm.error}</span>
+          <button
+            className="text-xs font-bold underline"
+            onClick={() => farm.refresh()}
+          >
+            Réessayer
+          </button>
         </div>
-      }
-    >
-      {farm.error ? (
-        <Card className="mb-4 border-danger/20 bg-danger/5 backdrop-blur-xl animate-in fade-in slide-in-from-top-2">
-          <CardHeader>
-            <div>
-              <CardTitle className="text-danger">Connexion Supabase</CardTitle>
-              <CardDescription className="text-danger/80">
-                {farm.error}. Vérifiez `.env.local` + le schéma SQL.
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <button
-              className="text-sm font-medium text-danger hover:underline transition-all"
-              onClick={() => farm.refresh()}
-            >
-              Réessayer
-            </button>
-          </CardContent>
-        </Card>
-      ) : null}
+      )}
 
+      {/* Empty / onboarding state */}
       {farm.lots.length === 0 ? (
-        <div className="flex flex-col items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 mt-4 sm:mt-12">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-            <Sprout className="w-8 h-8 text-primary" />
+        <div className="flex flex-col items-center justify-center gap-6 py-16 text-center">
+          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Sprout className="w-7 h-7 text-primary" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3 text-center">Bienvenue sur Senya</h2>
-          <p className="text-muted text-center max-w-md mb-8">
-            Votre exploitation est vide. Suivez ces trois étapes simples pour commencer à générer vos projections de rentabilité.
-          </p>
-
-          <div className="grid grid-cols-1 gap-4 w-full max-w-md">
-            <Link href="/structure" className="group flex items-center gap-4 p-4 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-xl hover:bg-primary/5 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                1
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold">Paramétrer la ferme</div>
-                <div className="text-xs text-muted">Surface, prix de vente et types d'arbres.</div>
-              </div>
-              <ArrowRight className="w-5 h-5 text-muted group-hover:text-primary transition-colors transform group-hover:translate-x-1" />
-            </Link>
-
-            <Link href="/lots" className="group flex items-center gap-4 p-4 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-xl hover:bg-primary/5 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300">
-              <div className="w-10 h-10 rounded-full bg-muted/10 flex items-center justify-center text-muted shrink-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                2
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold text-foreground/80 group-hover:text-foreground transition-colors">Ajouter vos lots</div>
-                <div className="text-xs text-muted">Combien d'arbres avez-vous plantés et quand ?</div>
-              </div>
-              <Layers className="w-5 h-5 text-muted/50 group-hover:text-primary transition-colors" />
-            </Link>
-
-            <Link href="/depenses" className="group flex items-center gap-4 p-4 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-xl hover:bg-primary/5 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300">
-              <div className="w-10 h-10 rounded-full bg-muted/10 flex items-center justify-center text-muted shrink-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                3
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold text-foreground/80 group-hover:text-foreground transition-colors">Saisir les dépenses</div>
-                <div className="text-xs text-muted">Frais et investissements de la ferme.</div>
-              </div>
-              <Wallet className="w-5 h-5 text-muted/50 group-hover:text-primary transition-colors" />
-            </Link>
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-1">
+              Bienvenue sur Senya
+            </h2>
+            <p className="text-muted text-sm max-w-sm">
+              Suivez ces étapes pour démarrer vos projections de rentabilité.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 w-full max-w-sm text-left">
+            {[
+              { step: "1", label: "Paramétrer la ferme", href: "/structure", sub: "Surface, prix, types d'arbres" },
+              { step: "2", label: "Ajouter vos lots", href: "/lots", sub: "Parcelles et plantations" },
+              { step: "3", label: "Saisir les dépenses", href: "/depenses", sub: "Frais et investissements" },
+            ].map((s) => (
+              <Link
+                key={s.step}
+                href={s.href}
+                className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 hover:border-primary/40 hover:bg-secondary transition-colors group"
+              >
+                <span className="w-7 h-7 rounded-md bg-primary/10 text-primary text-sm font-bold flex items-center justify-center shrink-0">
+                  {s.step}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm">{s.label}</div>
+                  <div className="text-xs text-muted">{s.sub}</div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted group-hover:text-primary transition-colors shrink-0" />
+              </Link>
+            ))}
           </div>
         </div>
       ) : (
-        <>
-          {/* HERO SECTION */}
-          <div className="flex flex-col sm:flex-row gap-6 items-stretch mb-10 mt-4 px-2">
-            <div className="flex-1 space-y-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-10 rounded-[3rem] border border-primary/20 shadow-xl shadow-primary/5 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
-              
-              <h2 className="text-4xl sm:text-6xl font-bold tracking-tighter flex items-center gap-4">
-                <span className="animate-float inline-block drop-shadow-sm">👋</span> 
-                Bonjour.
-              </h2>
-              <p className="text-muted-foreground font-medium text-xl sm:text-2xl pt-2 tracking-tight">
-                Oliveraie de {farm.settings.surfaceHa} ha <span className="text-sm opacity-40 font-bold uppercase tracking-widest ml-2">({farm.lots.length} parcelles actives)</span>
-              </p>
-              
-              <div className="mt-10 flex flex-wrap gap-4 relative z-10">
-                <div className="inline-flex items-center gap-4 bg-background/60 backdrop-blur-xl px-6 py-3.5 rounded-2xl border border-border/40 shadow-xl shadow-black/5 animate-pulse-glow">
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Indice Santé</span>
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "h-3.5 w-3.5 rounded-full animate-pulse",
-                      globalHealth >= 80 ? 'bg-success shadow-[0_0_12px_rgba(16,185,129,0.6)]' : globalHealth >= 50 ? 'bg-warning shadow-[0_0_12px_rgba(245,158,11,0.6)]' : 'bg-danger shadow-[0_0_12px_rgba(239,68,68,0.6)]'
-                    )} />
-                    <span className="font-bold text-3xl tracking-tighter tabular-nums">{historyLoading ? "..." : globalHealth}<span className="text-xs opacity-40 font-bold ml-0.5">/100</span></span>
-                  </div>
-                </div>
-                
-                <Link href="/lots" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 rounded-2xl font-bold uppercase tracking-widest text-xs hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/30 group/btn">
-                  Gérer les lots <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-            <MetricCard
-              title="Population"
+        <div className="space-y-4">
+          {/* Stats row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Stat
+              label="Arbres"
               value={formatNumber(totals.totalTrees)}
-              sub={`${state.lots.length} parcelles`}
-              delay="delay-[100ms]"
-              icon={<Trees className="w-3 h-3" />}
+              sub={`${state.lots.length} lots`}
+              icon={<Trees className="w-4 h-4" />}
             />
-            <MetricCard
-              title="Investi"
+            <Stat
+              label="Investi"
               value={formatMoneyDT(totals.totalInvestment)}
-              sub="Capex total"
-              delay="delay-[200ms]"
-              icon={<Wallet className="w-3 h-3" />}
+              sub="Total CAPEX"
+              icon={<Wallet className="w-4 h-4" />}
             />
-            <MetricCard
-              title="OPEX / 12 mois"
+            <Stat
+              label="OPEX 12 mois"
               value={formatMoneyDT(totals.estimatedYearlyCosts)}
-              sub="Coûts tournants"
-              delay="delay-[300ms]"
-              icon={<TrendingUp className="w-3 h-3" />}
+              sub="Charges récentes"
+              icon={<TrendingUp className="w-4 h-4" />}
             />
-            <MetricCard
-              title="Rendement"
+            <Stat
+              label="Production"
               value={formatKg(totals.estimatedYearlyProductionKg)}
-              sub="Production estimée"
-              delay="delay-[400ms]"
-              icon={<Sprout className="w-3 h-3" />}
+              sub="Estimation annuelle"
+              icon={<Sprout className="w-4 h-4" />}
             />
           </div>
 
+          {/* Main 2-col grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="group animate-in fade-in slide-in-from-bottom-4 duration-700 delay-[500ms] fill-mode-both border-border/50 bg-card/50 backdrop-blur-xl shadow-sm hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all">
+            {/* Health card */}
+            <Card>
               <CardHeader>
-                <div>
-                  <CardTitle className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    Rentabilité (estimation)
-                  </CardTitle>
-                  <CardDescription>
-                    Recettes − dépenses 12 derniers mois
-                  </CardDescription>
-                </div>
+                <CardTitle>Santé Globale</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-3 relative z-10">
-                  <div className="group/item rounded-2xl border border-border/40 bg-background/40 p-4 transition-all hover:bg-background/60 hover:border-primary/30">
-                    <div className="text-xs text-muted font-medium uppercase tracking-wider">Recettes</div>
-                    <div className="mt-2 text-2xl font-bold tracking-tight">
-                      {formatMoneyDT(totals.estimatedRevenue)}
-                    </div>
-                    <div className="mt-1 text-xs text-muted flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-primary/40 inline-block"></span>
-                      Prix: {formatNumber(state.settings.prixKgOlives || 0, 2)} / kg
-                    </div>
-                  </div>
-                  <div className="group/item rounded-2xl border border-border/40 bg-background/40 p-4 transition-all hover:bg-background/60 hover:border-primary/30">
-                    <div className="text-xs text-muted font-medium uppercase tracking-wider">Résultat</div>
-                    <div
-                      className={cn(
-                        "mt-2 text-2xl font-bold tracking-tight",
-                        totals.profit >= 0 ? "text-primary" : "text-danger drop-shadow-sm",
-                      )}
-                    >
-                      {formatMoneyDT(totals.profit)}
-                    </div>
-                    <div className="mt-1 text-xs text-muted flex items-center gap-1">
-                      <span className={cn("w-2 h-2 rounded-full inline-block", totals.profit >= 0 ? "bg-primary/40" : "bg-danger/40")}></span>
-                      Coût/kg: {formatNumber(totals.costPerKg || 0, 2)}
-                    </div>
+                <div className="flex items-end gap-3 mb-4">
+                  {historyLoading ? (
+                    <Skeleton className="h-12 w-24" />
+                  ) : (
+                    <>
+                      <span className="text-5xl font-bold tabular-nums leading-none">
+                        {globalHealth}
+                      </span>
+                      <span className="text-muted mb-1">/100</span>
+                      <Badge variant={healthVariant} className="mb-1">
+                        {healthLabel}
+                      </Badge>
+                    </>
+                  )}
+                </div>
+
+                {/* Health bar */}
+                <div className="w-full h-2 rounded-full bg-secondary overflow-hidden mb-4">
+                  <div
+                    className={cn(
+                      "h-full rounded-full transition-all",
+                      globalHealth >= 80
+                        ? "bg-success"
+                        : globalHealth >= 60
+                        ? "bg-primary"
+                        : globalHealth >= 40
+                        ? "bg-warning"
+                        : "bg-danger"
+                    )}
+                    style={{ width: `${globalHealth}%` }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs">
+                    {[
+                      { label: "Résultat net", value: formatMoneyDT(totals.profit), positive: totals.profit >= 0 },
+                      { label: "Recettes est.", value: formatMoneyDT(totals.estimatedRevenue), positive: true },
+                      { label: "Coût/kg", value: formatNumber(totals.costPerKg, 2) + " DT", positive: true },
+                    ].map((r) => (
+                      <div key={r.label} className="flex justify-between items-center">
+                        <span className="text-muted">{r.label}</span>
+                        <span className={cn("font-semibold", !r.positive && "text-danger")}>
+                          {r.value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-border/50 relative z-10">
-                  <Link href="/projections" className="flex items-center justify-between group/link hover:bg-background/40 p-2 -mx-2 rounded-xl transition-all">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-semibold">Voir les projections à long terme</span>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-muted group-hover/link:text-primary transition-colors transform group-hover/link:translate-x-1" />
+
+                <div className="mt-4 pt-3 border-t border-border">
+                  <Link
+                    href="/projections"
+                    className="flex items-center justify-between text-sm text-primary hover:underline"
+                  >
+                    <span className="font-medium">Voir les projections</span>
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-[600ms] fill-mode-both border-border/50 bg-card/50 backdrop-blur-xl shadow-sm hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all">
+            {/* Expense chart */}
+            <Card>
               <CardHeader>
-                <div>
-                  <CardTitle>Dépenses</CardTitle>
-                  <CardDescription>Dépenses des 12 derniers mois</CardDescription>
-                </div>
+                <CardTitle>Dépenses (12 mois)</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-44 -ml-4">
+                <div className="h-44 -ml-3">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={expensesSeries} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <AreaChart
+                      data={expensesSeries}
+                      margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                    >
                       <defs>
-                        <linearGradient id="colorMontant" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                        <linearGradient
+                          id="colorMontant"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="var(--primary)"
+                            stopOpacity={0.2}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="var(--primary)"
+                            stopOpacity={0}
+                          />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
-                      <XAxis 
-                        dataKey="month" 
-                        tickLine={false} 
-                        axisLine={false} 
-                        tick={{ fill: 'var(--muted)', fontSize: 12 }}
-                        dy={10}
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="var(--border)"
+                      />
+                      <XAxis
+                        dataKey="month"
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fill: "var(--muted)", fontSize: 11 }}
+                        dy={8}
                       />
                       <Tooltip
-                        cursor={{ stroke: 'var(--muted)', strokeWidth: 1, strokeDasharray: '3 3' }}
                         contentStyle={{
-                          borderRadius: '16px',
+                          borderRadius: "8px",
                           border: "1px solid var(--border)",
-                          background: "rgba(var(--card-rgb), 0.8)",
-                          backdropFilter: "blur(12px)",
+                          background: "var(--card)",
                           color: "var(--foreground)",
-                          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                          padding: '8px 12px'
+                          fontSize: "12px",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                         }}
-                        itemStyle={{ color: 'var(--foreground)', fontWeight: 600 }}
-                        formatter={(v: unknown) => [formatMoneyDT(Number(v)), "Montant"]}
-                        labelStyle={{ color: 'var(--muted)', marginBottom: '4px' }}
+                        formatter={(v: unknown) => [
+                          formatMoneyDT(Number(v)),
+                          "Montant",
+                        ]}
                       />
                       <Area
                         type="monotone"
                         dataKey="montant"
                         stroke="var(--primary)"
                         fill="url(#colorMontant)"
-                        strokeWidth={3}
-                        activeDot={{ r: 6, fill: "var(--primary)", stroke: "var(--background)", strokeWidth: 2 }}
+                        strokeWidth={2}
+                        activeDot={{
+                          r: 4,
+                          fill: "var(--primary)",
+                          stroke: "var(--card)",
+                          strokeWidth: 2,
+                        }}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
+          </div>
 
-            <Card className="md:col-span-2 glass-card rounded-[2.5rem] shadow-xl hover:shadow-primary/5 transition-all relative overflow-hidden group">
-              <div className="absolute inset-x-0 top-0 h-1 bg-primary/20 animate-scanning z-20 pointer-events-none" />
-              
-              <CardHeader className="pb-3 border-b border-border/40 relative z-10">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform duration-500">
-                      <span className="text-3xl animate-float">🤖</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg sm:text-xl bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent font-semibold tracking-normal">Intelligence Artificielle</CardTitle>
-                      <CardDescription className="font-medium">
-                        {weather ? `${weather.current.temp}°C · ${weather.current.isDay ? 'Ensoleillé' : 'Nuit'}` : "Calcul des variables..."}
-                        {lastFetched && <span className="ml-2 text-xs opacity-70">Màj: {lastFetched}</span>}
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Link href="/notifications">
-                      <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl border-border/50 bg-background/40 hover:bg-primary/5 hover:text-primary transition-all">
-                        <Bell className="w-4 h-4" />
-                        <span className="hidden sm:inline font-bold">Alertes</span>
-                      </Button>
-                    </Link>
-                    <Link href="/memory">
-                      <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl border-border/50 bg-background/40 hover:bg-primary/5 hover:text-primary transition-all">
-                        <BrainCircuit className="w-4 h-4" />
-                        <span className="hidden sm:inline font-bold">Mémoire</span>
-                      </Button>
-                    </Link>
-                  </div>
+          {/* AI Insights */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Alertes & Recommandations IA</CardTitle>
+                <span className="text-xs text-muted">{insights.length} alerte(s)</span>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              {insights.length === 0 ? (
+                <div className="flex items-center gap-3 px-4 py-5 text-sm text-muted">
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
+                  <span>Aucune alerte — votre exploitation est en bonne santé.</span>
                 </div>
-              </CardHeader>
-              <CardContent className="pt-4 space-y-4">
-                {insights.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center bg-background/30 rounded-2xl border border-dashed border-border">
-                    <div className="text-sm font-medium">L'assistant collecte des données...</div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    {insights.map((i) => (
-                      <div
-                        key={i.id}
-                        className={cn(
-                          "rounded-2xl border p-4 transition-all flex flex-col sm:flex-row gap-4 items-start",
-                          i.level === "danger" 
-                            ? "border-danger/30 bg-danger/5 shadow-[0_0_15px_rgba(239,68,68,0.1)]" 
-                            : i.level === "warning" 
-                              ? "border-warning/40 bg-warning/5"
-                              : i.level === "success"
-                                ? "border-primary/40 bg-primary/10"
-                                : "border-primary/20 bg-primary/5"
-                        )}
-                      >
-                        <div className="text-3xl mt-1 shrink-0 p-2 bg-background/50 rounded-xl border border-border/40">
-                          {i.icon}
+              ) : (
+                <div className="divide-y divide-border">
+                  {insights.map((insight) => (
+                    <div
+                      key={insight.id}
+                      className={cn(
+                        "flex items-start gap-3 px-4 py-3 border-l-[3px]",
+                        insight.level === "danger"
+                          ? "border-l-danger"
+                          : insight.level === "warning"
+                          ? "border-l-warning"
+                          : insight.level === "success"
+                          ? "border-l-success"
+                          : "border-l-primary"
+                      )}
+                    >
+                      <span className="text-xl shrink-0">{insight.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm">{insight.titre}</div>
+                        <div className="text-xs text-muted mt-0.5 line-clamp-2">
+                          {insight.whatIsHappening}
                         </div>
-                        <div className="flex-1 w-full space-y-3">
-                          <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                            <div className={cn(
-                              "text-lg font-bold tracking-tight",
-                              i.level === "danger" ? "text-danger" : i.level === "warning" ? "text-warning-foreground" : "text-primary"
-                            )}>
-                              {i.titre}
-                            </div>
-                            <button
-                              onClick={() => farm.actions.setSettings({ readInsights: [...(farm.settings.readInsights || []), i.id] })}
-                              className="p-1 -mr-1 rounded-full hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                              title="Marquer comme lu"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                          
-                          <div className="space-y-2 text-sm">
-                            <div>
-                              <span className="font-semibold text-foreground/90 uppercase text-xs tracking-wider opacity-80">Le Constat</span>
-                              <div className="text-foreground/80 mt-0.5">{i.whatIsHappening}</div>
-                            </div>
-                            <div className="bg-background/40 p-2 rounded-lg border border-border/30">
-                              <span className="font-semibold text-foreground/90 uppercase text-xs tracking-wider opacity-80 flex items-center gap-1">
-                                🎯 Action Recommandée
-                              </span>
-                              <div className="text-foreground font-medium mt-0.5">{i.whatToDo}</div>
-                            </div>
-                            <div>
-                              <span className="font-semibold text-foreground/90 uppercase text-xs tracking-wider opacity-80">L'Impact</span>
-                              <div className="text-muted-foreground mt-0.5 italic">{i.whyItMatters}</div>
-                            </div>
-                          </div>
+                        <div className="text-xs font-medium text-foreground mt-1">
+                          🎯 {insight.whatToDo}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() =>
+                          farm.actions.setSettings({
+                            readInsights: [
+                              ...(farm.settings.readInsights || []),
+                              insight.id,
+                            ],
+                          })
+                        }
+                        className="p-1 rounded hover:bg-secondary text-muted transition-colors shrink-0"
+                        title="Marquer comme lu"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Weather */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Météo Agricole</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {weatherLoading ? (
+                <Skeleton className="h-24" />
+              ) : weather ? (
+                <div className="space-y-4">
+                  {/* Current conditions */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2 flex items-center gap-2">
+                      <Thermometer className="w-4 h-4 text-warning shrink-0" />
+                      <div>
+                        <div className="text-[10px] uppercase text-muted font-semibold tracking-wide">Temp</div>
+                        <div className="font-bold text-sm">{weather.current.temp}°C</div>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2 flex items-center gap-2">
+                      <Wind className="w-4 h-4 text-primary shrink-0" />
+                      <div>
+                        <div className="text-[10px] uppercase text-muted font-semibold tracking-wide">Vent</div>
+                        <div className="font-bold text-sm">{weather.current.windSpeed} km/h</div>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2 flex items-center gap-2">
+                      <Sun className="w-4 h-4 text-warning shrink-0" />
+                      <div>
+                        <div className="text-[10px] uppercase text-muted font-semibold tracking-wide">UV</div>
+                        <div className="font-bold text-sm">{weather.daily.uvIndex[0] ?? 6}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 5-day strip */}
+                  <div className="grid grid-cols-5 gap-2">
+                    {weather.daily.dates.slice(0, 5).map((date, i) => (
+                      <div
+                        key={date}
+                        className="flex flex-col items-center gap-1 rounded-lg border border-border bg-secondary/20 px-2 py-2"
+                      >
+                        <div className="text-[10px] uppercase text-muted font-semibold tracking-wide">
+                          {new Date(date).toLocaleDateString("fr-FR", { weekday: "short" })}
+                        </div>
+                        <div className="text-lg">
+                          {weather.daily.precipitation[i] > 2
+                            ? <CloudRain className="w-5 h-5 text-primary" />
+                            : weather.daily.maxTemps[i] > 30
+                            ? <Sun className="w-5 h-5 text-warning" />
+                            : weather.daily.maxTemps[i] < 10
+                            ? <Snowflake className="w-5 h-5 text-blue-400" />
+                            : <Cloud className="w-5 h-5 text-muted" />}
+                        </div>
+                        <div className="font-bold text-xs">
+                          {Math.round(weather.daily.maxTemps[i])}°
+                        </div>
+                        <div className="text-[10px] text-muted">
+                          {Math.round(weather.daily.minTemps[i])}°
                         </div>
                       </div>
                     ))}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-            <Card className="md:col-span-2 glass-card rounded-[2.5rem] shadow-xl overflow-hidden group border-border/40">
-              <CardHeader className="p-8 pb-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-2xl font-semibold tracking-tight">Météo Agricole</CardTitle>
-                    <CardDescription className="text-xs font-medium uppercase tracking-wider text-muted-foreground mt-1">Conditions actuelles et prévisions à 5 jours</CardDescription>
-                  </div>
-                  {weather && (
-                      <div className="text-right flex flex-col items-end">
-                        <div className="text-2xl sm:text-3xl font-semibold tracking-tight text-primary">{weather.current.temp}°C</div>
-                        <div className="text-[10px] sm:text-xs font-semibold text-muted uppercase tracking-widest mt-0.5">Nasrallah, Kairouan</div>
-                      </div>
-                  )}
                 </div>
-              </CardHeader>
-              <CardContent className="p-8 pt-0">
-                {weatherLoading ? (
-                  <div className="flex justify-center py-8"><Skeleton className="h-24 w-full rounded-2xl" /></div>
-                ) : weather ? (
-                  <div className="space-y-8">
-                    {/* CURRENT DETAILS */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
-                        <div className="text-xs font-bold uppercase text-muted mb-1">Vent</div>
-                        <div className="text-lg font-bold">{weather.current.windSpeed} km/h</div>
-                      </div>
-                      <div className="bg-background/40 backdrop-blur-md p-4 rounded-2xl border border-border/40 flex flex-col items-center">
-                        <div className="text-xs font-bold uppercase text-muted mb-1">UV</div>
-                        <div className="text-lg font-bold">{weather.daily.uvIndex[0] || 6}</div>
-                      </div>
-                    </div>
+              ) : (
+                <p className="text-sm text-muted py-4 text-center">
+                  Données météo indisponibles
+                </p>
+              )}
+            </CardContent>
+          </Card>
 
-                    {/* 5-DAY STRIP */}
-                    <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 no-scrollbar snap-x">
-                      {weather.daily.dates.slice(0, 5).map((date, i) => (
-                        <div key={date} className="shrink-0 w-[110px] sm:w-auto sm:flex-1 bg-background/30 border border-border/20 rounded-3xl p-5 flex flex-col items-center justify-center gap-3 group/day hover:bg-primary/5 transition-all snap-center">
-                          <div className="text-xs font-bold text-muted uppercase tracking-widest">
-                            {new Date(date).toLocaleDateString("fr-FR", { weekday: "short" })}
-                          </div>
-                          <div className="py-2 transform group-hover/day:scale-110 transition-transform">
-                            {weather.daily.precipitation[i] > 2 ? (
-                              <CloudRain className="w-8 h-8 text-primary" />
-                            ) : weather.daily.maxTemps[i] > 30 ? (
-                              <Sun className="w-8 h-8 text-warning" />
-                            ) : weather.daily.maxTemps[i] < 10 ? (
-                              <Snowflake className="w-8 h-8 text-blue-300" />
-                            ) : (
-                              <Cloud className="w-8 h-8 text-muted" />
-                            )}
-                          </div>
-                          <div className="text-center">
-                            <div className="text-lg font-bold tracking-tight">{Math.round(weather.daily.maxTemps[i])}°</div>
-                            <div className="text-xs font-bold text-muted">{Math.round(weather.daily.minTemps[i])}°</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted text-center py-8">Données météo temporairement indisponibles</div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* RECENT ACTIVITY SECTION */}
-            <Card className="md:col-span-2 glass-card rounded-[2.5rem] shadow-xl overflow-hidden group border-border/40">
-              <CardHeader className="p-8 pb-4">
+          {/* Recent ops */}
+          {farm.depenses.length > 0 && (
+            <Card>
+              <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-2xl font-bold tracking-tighter">Opérations Récentes</CardTitle>
-                    <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Historique direct des derniers flux</CardDescription>
-                  </div>
-                  <Link href="/depenses">
-                    <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-xl text-xs font-bold uppercase tracking-widest">
-                      Voir tout <ArrowRight className="w-3.5 h-3.5" />
-                    </Button>
+                  <CardTitle>Opérations Récentes</CardTitle>
+                  <Link
+                    href="/depenses"
+                    className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
+                  >
+                    Tout voir <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="divide-y divide-border/40">
-                  {farm.depenses.slice(0, 4).map((d) => (
-                    <div key={d.id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-primary/[0.02] transition-colors group/row">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-muted/5 flex items-center justify-center border border-border/30 group-hover/row:bg-primary/10 group-hover/row:border-primary/20 transition-all">
-                          <Wallet className="w-6 h-6 text-muted group-hover/row:text-primary transition-colors" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-bold tracking-tight">{formatMoneyDT(d.montant)}</div>
-                          <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                            {d.categorie} • {new Date(d.dateISO).toLocaleDateString("fr-FR")}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs font-bold uppercase text-muted">Statut</div>
-                        <div className="text-xs font-bold text-success">Validé</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Catégorie</TableHead>
+                      <TableHead className="text-right">Montant</TableHead>
+                      <TableHead>Statut</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {farm.depenses.slice(0, 4).map((d) => (
+                      <TableRow key={d.id}>
+                        <TableCell className="text-muted">
+                          {new Date(d.dateISO).toLocaleDateString("fr-FR")}
+                        </TableCell>
+                        <TableCell>
+                          {EXPENSE_CATEGORY_LABEL[d.categorie]}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold">
+                          {formatMoneyDT(d.montant)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="success">Validé</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
-
-          </div>
-        </>
+          )}
+        </div>
       )}
     </AppShell>
-  );
-}
-
-function MetricCard({
-  title,
-  value,
-  sub,
-  delay = "delay-0",
-  icon,
-}: {
-  title: string;
-  value: string;
-  sub: string;
-  delay?: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <Card className={cn(
-      "glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5 hover:shadow-primary/10 hover:border-primary/30 transition-all duration-500 hover:-translate-y-1 group relative overflow-hidden",
-      "animate-in fade-in zoom-in-95 duration-700 fill-mode-both",
-      delay
-    )}>
-      <CardHeader className="p-6 pb-2">
-        <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-          {icon}
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-6 pt-0">
-        <div className="text-2xl sm:text-3xl font-bold tracking-tighter bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent group-hover:scale-[1.02] transition-transform origin-left">
-          {value}
-        </div>
-        <CardDescription className="text-xs font-bold text-muted uppercase tracking-widest mt-1 line-clamp-1">{sub}</CardDescription>
-      </CardContent>
-    </Card>
   );
 }

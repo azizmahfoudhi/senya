@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#10b981",
+  themeColor: "#7c5b2b",
 };
 
 import { ThemeProvider } from "@/components/ThemeProvider";

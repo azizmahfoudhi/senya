@@ -5,10 +5,11 @@ import { AppShell } from "@/components/AppShell";
 import { useFarmData } from "@/lib/useFarmData";
 import { useWeather } from "@/lib/useWeather";
 import { buildInsights } from "@/lib/derive";
-import { cn } from "@/lib/cn";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Bell, BellOff, X } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
+import { Bell, BellOff, X, ChevronDown, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/cn";
 
 export default function NotificationsPage() {
   const farm = useFarmData();
@@ -28,124 +29,142 @@ export default function NotificationsPage() {
 
   if (farm.loading || weatherLoading) {
     return (
-      <AppShell title="Notifications">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-            <Bell className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Chargement des alertes...
-            </p>
-          </div>
-        </div>
-        <div className="space-y-4">
-          <Skeleton className="h-40 w-full rounded-2xl" />
-          <Skeleton className="h-40 w-full rounded-2xl" />
-          <Skeleton className="h-40 w-full rounded-2xl" />
+      <AppShell title="Alertes & Notifications">
+        <div className="space-y-3">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
         </div>
       </AppShell>
     );
   }
 
   return (
-    <AppShell title="Notifications">
-      <div className="flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
-        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-inner">
-          <Bell className="w-6 h-6 text-primary" />
+    <AppShell title="Alertes & Notifications">
+      <div className="space-y-3">
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-2">
+          <Bell className="w-4 h-4 text-primary" />
+          <span className="text-sm text-muted">
+            {insights.length} alerte{insights.length !== 1 ? "s" : ""} active{insights.length !== 1 ? "s" : ""}
+          </span>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Notifications
-          </h1>
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            {insights.length} {insights.length > 1 ? "alertes actives" : "alerte active"}
-          </p>
+
+        {insights.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center gap-3 py-14 text-center">
+              <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
+                <BellOff className="w-6 h-6 text-success" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Aucune notification</p>
+                <p className="text-xs text-muted mt-1 max-w-xs">
+                  Votre exploitation ne présente aucune alerte critique ni recommandation d'action.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="rounded-lg border border-border bg-card overflow-hidden divide-y divide-border">
+            {insights.map((i) => (
+              <InsightRow
+                key={i.id}
+                insight={i}
+                onDismiss={() =>
+                  farm.actions.setSettings({
+                    readInsights: [...(farm.settings.readInsights || []), i.id],
+                  })
+                }
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </AppShell>
+  );
+}
+
+function InsightRow({
+  insight,
+  onDismiss,
+}: {
+  insight: ReturnType<typeof buildInsights>[number];
+  onDismiss: () => void;
+}) {
+  const [expanded, setExpanded] = React.useState(false);
+
+  const borderColor =
+    insight.level === "danger"
+      ? "border-l-danger"
+      : insight.level === "warning"
+      ? "border-l-warning"
+      : insight.level === "success"
+      ? "border-l-success"
+      : "border-l-primary";
+
+  const levelBadgeVariant =
+    insight.level === "danger"
+      ? "danger"
+      : insight.level === "warning"
+      ? "warning"
+      : insight.level === "success"
+      ? "success"
+      : "primary";
+
+  return (
+    <div className={cn("border-l-[3px] px-4 py-3", borderColor)}>
+      <div className="flex items-start gap-3">
+        <span className="text-xl shrink-0 mt-0.5">{insight.icon}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-sm">{insight.titre}</span>
+            <Badge variant={levelBadgeVariant}>
+              {insight.level === "danger"
+                ? "Critique"
+                : insight.level === "warning"
+                ? "Attention"
+                : insight.level === "success"
+                ? "Succès"
+                : "Info"}
+            </Badge>
+          </div>
+          <p className="text-xs text-muted mt-0.5 line-clamp-2">{insight.whatIsHappening}</p>
+
+          {expanded && (
+            <div className="mt-3 space-y-2 text-xs">
+              <div className="rounded-md border border-border bg-secondary/30 px-3 py-2">
+                <p className="font-semibold uppercase tracking-wide text-[10px] text-muted mb-1">
+                  🎯 Action recommandée
+                </p>
+                <p className="font-medium text-foreground">{insight.whatToDo}</p>
+              </div>
+              <div>
+                <p className="font-semibold uppercase tracking-wide text-[10px] text-muted mb-0.5">
+                  Impact
+                </p>
+                <p className="text-muted italic">{insight.whyItMatters}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-0.5 shrink-0">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="p-1.5 rounded hover:bg-secondary text-muted transition-colors"
+            title={expanded ? "Réduire" : "Voir les détails"}
+          >
+            {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+          <button
+            onClick={onDismiss}
+            className="p-1.5 rounded hover:bg-secondary text-muted transition-colors"
+            title="Marquer comme lu"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
-
-      {insights.length === 0 ? (
-        <Card className="border-dashed border-border/50 bg-background/40 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 bg-muted/10 rounded-full flex items-center justify-center mb-4 border border-border/40 shadow-inner">
-              <BellOff className="w-8 h-8 text-muted/60" />
-            </div>
-            <h2 className="text-xl font-bold tracking-tight mb-2">Aucune notification</h2>
-            <p className="text-muted-foreground max-w-sm">
-              Votre exploitation ne présente actuellement aucune alerte critique ni recommandation d'action.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 fill-mode-both">
-          {insights.map((i) => (
-            <div
-              key={i.id}
-              className={cn(
-                "rounded-2xl border p-5 transition-all flex flex-col sm:flex-row gap-5 items-start hover:-translate-y-0.5 hover:shadow-lg",
-                i.level === "danger"
-                  ? "border-danger/30 bg-danger/5 shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-danger/20"
-                  : i.level === "warning"
-                    ? "border-warning/40 bg-warning/5 hover:shadow-warning/20"
-                    : i.level === "success"
-                      ? "border-primary/40 bg-primary/10 hover:shadow-primary/20"
-                      : "border-primary/20 bg-primary/5 hover:shadow-primary/10"
-              )}
-            >
-              <div className="text-4xl shrink-0 p-3 bg-background/60 rounded-xl border border-border/40 shadow-sm backdrop-blur-md">
-                {i.icon}
-              </div>
-              <div className="flex-1 w-full space-y-3">
-                <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className={cn(
-                      "text-xl font-bold tracking-tight",
-                      i.level === "danger" ? "text-danger" : i.level === "warning" ? "text-warning-foreground" : "text-primary"
-                    )}>
-                      {i.titre}
-                    </div>
-                    {i.level === "danger" && (
-                      <span className="px-2 py-0.5 rounded-full bg-danger/10 text-danger text-xs font-bold uppercase tracking-wider border border-danger/20">
-                        Critique
-                      </span>
-                    )}
-                    {i.level === "warning" && (
-                      <span className="px-2 py-0.5 rounded-full bg-warning/10 text-warning-foreground text-xs font-bold uppercase tracking-wider border border-warning/20">
-                        Attention
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => farm.actions.setSettings({ readInsights: [...(farm.settings.readInsights || []), i.id] })}
-                    className="p-1.5 -mr-1.5 rounded-full hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                    title="Marquer comme lu"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <span className="font-bold text-foreground/80 uppercase text-xs tracking-widest">Le Constat</span>
-                    <div className="text-foreground/90 mt-1 font-medium leading-relaxed">{i.whatIsHappening}</div>
-                  </div>
-                  <div className="bg-background/50 p-3 rounded-xl border border-border/40 shadow-inner">
-                    <span className="font-bold text-foreground/80 uppercase text-xs tracking-widest flex items-center gap-1.5 mb-1.5">
-                      🎯 Action Recommandée
-                    </span>
-                    <div className="text-foreground font-semibold leading-relaxed">{i.whatToDo}</div>
-                  </div>
-                  <div>
-                    <span className="font-bold text-foreground/80 uppercase text-xs tracking-widest">L'Impact</span>
-                    <div className="text-muted-foreground mt-1 italic text-xs leading-relaxed">{i.whyItMatters}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </AppShell>
+    </div>
   );
 }

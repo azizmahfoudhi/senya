@@ -4,86 +4,99 @@ import * as React from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/cn";
-import { ageYearsFromISO, batchEstimatedProductionKg, sumExpensesForBatch } from "@/lib/engine";
+import {
+  ageYearsFromISO,
+  batchEstimatedProductionKg,
+  sumExpensesForBatch,
+} from "@/lib/engine";
 import { formatAge, formatKg, formatMoneyDT, formatNumber, formatProduction } from "@/lib/format";
 import { todayISO } from "@/lib/derive";
 import { useFarmData } from "@/lib/useFarmData";
 import { computeLotHealth } from "@/lib/intelligence";
 import { useHistoricalRain } from "@/lib/useHistoricalRain";
-import { Trees, Plus, Map as MapIcon, Droplets, DropletOff, Edit2, X, Check, Trash2, Star, ShieldAlert } from "lucide-react";
-import { Input } from "@/components/ui/Input";
+import type { StressLevel } from "@/lib/domain";
+import {
+  Trees,
+  Plus,
+  Layers,
+  Droplets,
+  DropletOff,
+  Edit2,
+  X,
+  Check,
+  Trash2,
+  Star,
+  ChevronDown,
+  ChevronUp,
+  ShieldAlert,
+} from "lucide-react";
 
 export default function LotsPage() {
   const farm = useFarmData();
   const { projectedRainMm } = useHistoricalRain();
   const typeById = new Map(farm.types.map((t) => [t.id, t]));
   const tISO = todayISO();
-
   const totalTrees = farm.lots.reduce((acc, l) => acc + l.nbArbres, 0);
 
   return (
-    <AppShell 
-      title="Patrimoine Végétal" 
+    <AppShell
+      title="Patrimoine Végétal"
       actions={
         <Link href="/structure">
-          <Button size="sm" variant="primary" className="gap-2 rounded-xl shadow-lg shadow-primary/20 font-bold uppercase tracking-widest text-xs">
-            <Plus className="w-4 h-4" />
+          <Button size="sm" variant="primary" className="gap-1.5">
+            <Plus className="w-3.5 h-3.5" />
             Nouveau lot
           </Button>
         </Link>
       }
     >
-      <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
-        {/* HEADER */}
-        <div className="px-2">
-          <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
-            Vos Parcelles
-          </h1>
-          <p className="text-muted-foreground font-medium pt-1 max-w-md text-lg">Inventaire vivant et diagnostic de santé de vos oliveraies en temps réel.</p>
+      <div className="space-y-4">
+        {/* Summary pills */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm">
+            <Trees className="w-4 h-4 text-primary" />
+            <span className="font-semibold">{formatNumber(totalTrees)}</span>
+            <span className="text-muted">arbres</span>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm">
+            <Layers className="w-4 h-4 text-primary" />
+            <span className="font-semibold">{farm.lots.length}</span>
+            <span className="text-muted">lots</span>
+          </div>
         </div>
 
-        {/* Summary Header */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5">
-            <CardHeader className="p-5 pb-2">
-              <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><Trees className="w-3.5 h-3.5 text-primary" /> Patrimoine</CardTitle>
-            </CardHeader>
-            <CardContent className="p-5 pt-0 flex items-baseline gap-2">
-              <div className="text-3xl font-bold tracking-tighter">{formatNumber(totalTrees)}</div>
-              <span className="text-xs font-bold text-muted uppercase">arbres</span>
-            </CardContent>
-          </Card>
-          
-          <Card className="glass-card rounded-[2rem] border-border/40 shadow-xl shadow-black/5">
-            <CardHeader className="p-5 pb-2">
-              <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2"><MapIcon className="w-3.5 h-3.5 text-success" /> Sectorisation</CardTitle>
-            </CardHeader>
-            <CardContent className="p-5 pt-0 flex items-baseline gap-2">
-              <div className="text-3xl font-bold tracking-tighter">{farm.lots.length}</div>
-              <span className="text-xs font-bold text-muted uppercase">lots</span>
-            </CardContent>
-          </Card>
-        </div>
-
+        {/* Empty state */}
         {farm.lots.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed border-border rounded-2xl bg-muted/5 mt-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-              <MapIcon className="w-8 h-8 text-primary" />
+          <div className="flex flex-col items-center justify-center gap-4 py-16 text-center rounded-lg border border-dashed border-border">
+            <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
+              <Layers className="w-6 h-6 text-muted" />
             </div>
-            <h3 className="text-lg font-bold mb-2">Aucun lot configuré</h3>
-            <p className="text-muted text-sm max-w-[300px] mb-6">
-              Séparez votre ferme en lots pour suivre précisément le rendement et les coûts selon l'âge et la variété.
-            </p>
+            <div>
+              <p className="font-semibold text-sm">Aucun lot configuré</p>
+              <p className="text-xs text-muted mt-1 max-w-xs">
+                Ajoutez vos premières parcelles pour commencer à suivre votre production.
+              </p>
+            </div>
             <Link href="/structure">
-              <Button>Créer mon premier lot</Button>
+              <Button size="sm">Créer mon premier lot</Button>
             </Link>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 gap-4">
-            {farm.lots.map((lot) => (
-              <LotCard key={lot.id} lot={lot} farm={farm} typeById={typeById} tISO={tISO} rainMm={projectedRainMm} />
+          /* Lot list */
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
+            {farm.lots.map((lot, idx) => (
+              <LotRow
+                key={lot.id}
+                lot={lot}
+                farm={farm}
+                typeById={typeById}
+                tISO={tISO}
+                rainMm={projectedRainMm}
+                isLast={idx === farm.lots.length - 1}
+              />
             ))}
           </div>
         )}
@@ -92,32 +105,38 @@ export default function LotsPage() {
   );
 }
 
-function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: ReturnType<typeof useFarmData>; typeById: Map<string, any>; tISO: string; rainMm: number }) {
+function LotRow({
+  lot,
+  farm,
+  typeById,
+  tISO,
+  rainMm,
+  isLast,
+}: {
+  lot: ReturnType<typeof useFarmData>["lots"][number];
+  farm: ReturnType<typeof useFarmData>;
+  typeById: Map<string, ReturnType<typeof useFarmData>["types"][number]>;
+  tISO: string;
+  rainMm: number;
+  isLast: boolean;
+}) {
+  const [isExpanded, setIsExpanded] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
+
+  // Edit state
   const [nom, setNom] = React.useState(lot.nom);
   const [typeId, setTypeId] = React.useState(lot.typeId);
   const [datePlantation, setDatePlantation] = React.useState(lot.datePlantationISO);
   const [nb, setNb] = React.useState(String(lot.nbArbres));
   const [irrig, setIrrig] = React.useState(lot.irrigation);
   const [croissance, setCroissance] = React.useState<number>(lot.etatCroissance ?? 3);
-  const [stress, setStress] = React.useState<import("@/lib/domain").StressLevel>(lot.stressLevel ?? "bas");
+  const [stress, setStress] = React.useState<StressLevel>(lot.stressLevel ?? "bas");
 
   const type = typeById.get(lot.typeId);
   const age = ageYearsFromISO(lot.datePlantationISO, tISO);
-  const prod = type ? batchEstimatedProductionKg({ batch: lot, type, atISO: tISO, rainMm: rainMm }) : 0;
-  const cost = sumExpensesForBatch(
-    {
-      settings: farm.settings,
-      types: farm.types,
-      lots: farm.lots,
-      depenses: farm.depenses,
-      yields: farm.yields,
-      treatments: farm.treatments,
-      scenarios: farm.scenarios,
-    },
-    lot.id,
-  );
-
+  const prod = type
+    ? batchEstimatedProductionKg({ batch: lot, type, atISO: tISO, rainMm })
+    : 0;
   const farmState = {
     settings: farm.settings,
     types: farm.types,
@@ -128,6 +147,21 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
     scenarios: farm.scenarios,
   };
   const health = computeLotHealth(farmState, lot.id, rainMm);
+  const cost = sumExpensesForBatch(farmState, lot.id);
+
+  const maturity =
+    age < 3 ? "Pépinière" : age < 7 ? "Jeune" : age < 25 ? "Adulte" : "Ancien";
+  const maturityVariant =
+    age < 3 ? "muted" : age < 7 ? "warning" : age < 25 ? "success" : "default";
+
+  const healthVariant =
+    health.total >= 80
+      ? "success"
+      : health.total >= 60
+      ? "primary"
+      : health.total >= 40
+      ? "warning"
+      : "danger";
 
   async function handleSave() {
     if (!nom.trim() || !typeId) return;
@@ -143,236 +177,231 @@ function LotCard({ lot, farm, typeById, tISO, rainMm }: { lot: any; farm: Return
     setIsEditing(false);
   }
 
-  if (isEditing) {
-    return (
-      <Card className="border-primary/50 bg-primary/5 shadow-sm">
-        <CardContent className="p-4 grid gap-3">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <div className="font-semibold text-sm">Modifier le lot</div>
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-success" onClick={handleSave}>
-                <Check className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted" onClick={() => setIsEditing(false)}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-          
-          <Input value={nom} onChange={e => setNom(e.target.value)} placeholder="Nom du lot" className="bg-background h-9" />
-          
-          <div className="grid grid-cols-2 gap-2">
-            <select
-              className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              value={typeId}
-              onChange={(e) => setTypeId(e.target.value)}
-            >
-              <option value="">Variété...</option>
-              {farm.types.map((t) => (
-                <option key={t.id} value={t.id}>{t.nom}</option>
-              ))}
-            </select>
-            <select
-              className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              value={irrig}
-              onChange={(e) => setIrrig(e.target.value as any)}
-            >
-              <option value="non_irrigue">Bour (Non irrigué)</option>
-              <option value="faible">Irrigué (Faible)</option>
-              <option value="normal">Irrigué (Normal)</option>
-              <option value="optimal">Irrigué (Optimal)</option>
-            </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <Input type="date" value={datePlantation} onChange={e => setDatePlantation(e.target.value)} className="bg-background h-9" />
-            <Input inputMode="numeric" min="1" value={nb} onChange={e => setNb(e.target.value)} className="bg-background h-9" placeholder="Nb arbres" />
-          </div>
-
-          <label className="grid gap-1.5">
-            <div className="text-xs font-medium text-foreground/80 flex items-center justify-between">
-              <span>État de production</span>
-              <span className="text-xs text-muted">
-                {croissance === 1 && "Critique (0.4x)"}
-                {croissance === 2 && "Faible (0.7x)"}
-                {croissance === 3 && "Normal (1.0x)"}
-                {croissance === 4 && "Bon (1.2x)"}
-                {croissance === 5 && "Excellent (1.5x)"}
-              </span>
-            </div>
-            <div className="flex items-center gap-1 bg-background/50 p-1.5 rounded-md border border-input">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setCroissance(star)}
-                  className={`p-1 rounded-md transition-colors ${
-                    star <= croissance ? "text-warning hover:text-warning/80" : "text-muted hover:text-muted/80"
-                  }`}
-                >
-                  <Star className={`w-4 h-4 ${star <= croissance ? "fill-current" : ""}`} />
-                </button>
-              ))}
-            </div>
-          </label>
-          <div className="grid gap-1.5">
-            <div className="text-xs font-bold text-foreground/70 uppercase tracking-wider px-0.5">État de Santé (Vigueur, Sécheresse)</div>
-            <div className="flex gap-1.5">
-              {[
-                { id: "bas", label: "Excellente", desc: "Sain" },
-                { id: "moyen", label: "Moyenne", desc: "Passable" },
-                { id: "eleve", label: "Faible", desc: "Critique" },
-              ].map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setStress(s.id as any)}
-                  className={cn(
-                    "flex-1 flex flex-col items-center py-2 px-1 rounded-xl border transition-all",
-                    stress === s.id 
-                      ? "bg-primary border-primary text-primary-foreground shadow-sm" 
-                      : "bg-background border-border hover:border-primary/50 text-muted-foreground"
-                  )}
-                >
-                  <span className="text-xs font-bold">{s.label}</span>
-                  <span className="text-[10px] opacity-80 uppercase font-medium">{s.desc}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
+  async function handleDelete() {
+    if (confirm(`Supprimer le lot "${lot.nom}" ? Cette action est irréversible.`)) {
+      await farm.actions.removeBatch(lot.id);
+    }
   }
 
-  const maturity = age < 3 ? "Pépinière" : age < 7 ? "Jeune" : age < 25 ? "Adulte" : "Ancien";
-  const maturityColor = age < 3 ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : age < 7 ? "bg-primary/10 text-primary border-primary/20" : age < 25 ? "bg-success/10 text-success border-success/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20";
-
   return (
-    <Card className="glass-card rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-700 group flex flex-col relative overflow-hidden border-border/40 hover:-translate-y-1">
-      <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-125 group-hover:rotate-12 transition-all duration-1000 pointer-events-none">
-        <Trees className="w-32 h-32" />
-      </div>
-      <CardHeader className="pb-4 relative z-10 p-6">
-        <div className="flex items-start justify-between min-w-0 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className={cn("px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border", maturityColor)}>
-                {maturity}
-              </span>
-              {lot.irrigation === "non_irrigue" ? (
-                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-muted/10 text-muted border border-border/20 flex items-center gap-1">
-                  <DropletOff className="w-2.5 h-2.5" /> Bour
+    <div className={cn(!isLast && "border-b border-border")}>
+      {/* Main row */}
+      <button
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition-colors text-left"
+        onClick={() => { setIsExpanded(!isExpanded); setIsEditing(false); }}
+      >
+        {/* Left: name + badges */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-sm truncate">{lot.nom}</span>
+            <Badge variant={maturityVariant}>{maturity}</Badge>
+            {lot.irrigation === "non_irrigue" ? (
+              <Badge variant="muted">
+                <DropletOff className="w-2.5 h-2.5" /> Bour
+              </Badge>
+            ) : (
+              <Badge variant="primary">
+                <Droplets className="w-2.5 h-2.5" /> Irrigué
+              </Badge>
+            )}
+          </div>
+          <div className="text-xs text-muted mt-0.5">
+            {type ? type.nom : <span className="text-warning flex items-center gap-1"><ShieldAlert className="w-3 h-3" /> Variété inconnue</span>}
+            {" · "}
+            {formatAge(age)}
+          </div>
+        </div>
+
+        {/* Center: trees + prod */}
+        <div className="hidden sm:flex items-center gap-4 shrink-0 text-sm">
+          <div className="text-right">
+            <div className="font-semibold">{formatNumber(lot.nbArbres)}</div>
+            <div className="text-[10px] text-muted uppercase tracking-wide">Arbres</div>
+          </div>
+          <div className="text-right">
+            <div className="font-semibold text-primary">{formatProduction(prod, age)}</div>
+            <div className="text-[10px] text-muted uppercase tracking-wide">Potentiel</div>
+          </div>
+        </div>
+
+        {/* Right: health score + chevron */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Badge variant={healthVariant}>{health.total}/100</Badge>
+          {isExpanded ? (
+            <ChevronUp className="w-4 h-4 text-muted" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-muted" />
+          )}
+        </div>
+      </button>
+
+      {/* Expanded panel */}
+      {isExpanded && (
+        <div className="border-t border-border bg-secondary/20 px-4 py-4 space-y-4">
+          {isEditing ? (
+            /* Edit form */
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  Modifier le lot
                 </span>
-              ) : (
-                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 flex items-center gap-1">
-                  <Droplets className="w-2.5 h-2.5" /> Irrigué
-                </span>
-              )}
-            </div>
-            <CardTitle className="truncate text-3xl mb-1 bg-gradient-to-br from-foreground via-foreground to-foreground/50 bg-clip-text text-transparent font-bold tracking-tighter leading-none">
-              {lot.nom}
-            </CardTitle>
-            <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1 font-bold text-xs">
-              {lot.typeId && type ? (
-                <span className="text-foreground/80">{type.nom}</span>
-              ) : (
-                <span className="text-primary flex items-center gap-1">
-                  <ShieldAlert className="w-3.5 h-3.5" /> {type?.nom || "Chemlali"} (Défaut)
-                </span>
-              )}
-              <span className="w-1 h-1 rounded-full bg-border" />
-              <span className="text-muted-foreground">{formatAge(age)}</span>
-              {lot.etatCroissance !== 3 && (
-                <>
-                  <span className="w-1 h-1 rounded-full bg-border" />
-                  <span className="flex items-center gap-0.5" title="État de production">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`w-3 h-3 ${star <= (lot.etatCroissance ?? 3) ? "text-warning fill-current" : "text-muted/40"}`}
-                      />
-                    ))}
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" className="text-success" onClick={handleSave}>
+                    <Check className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-muted" onClick={() => setIsEditing(false)}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <Input value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Nom du lot" />
+
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  className="h-9 w-full rounded-md border border-border bg-card px-3 py-1 text-sm"
+                  value={typeId}
+                  onChange={(e) => setTypeId(e.target.value)}
+                >
+                  <option value="">Variété...</option>
+                  {farm.types.map((t) => (
+                    <option key={t.id} value={t.id}>{t.nom}</option>
+                  ))}
+                </select>
+                <select
+                  className="h-9 w-full rounded-md border border-border bg-card px-3 py-1 text-sm"
+                  value={irrig}
+                  onChange={(e) => setIrrig(e.target.value as typeof irrig)}
+                >
+                  <option value="non_irrigue">Bour (Non irrigué)</option>
+                  <option value="faible">Irrigué (Faible)</option>
+                  <option value="normal">Irrigué (Normal)</option>
+                  <option value="optimal">Irrigué (Optimal)</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Input type="date" value={datePlantation} onChange={(e) => setDatePlantation(e.target.value)} />
+                <Input inputMode="numeric" min="1" value={nb} onChange={(e) => setNb(e.target.value)} placeholder="Nb arbres" />
+              </div>
+
+              {/* Growth stars */}
+              <div className="space-y-1">
+                <div className="text-xs font-medium text-muted flex items-center justify-between">
+                  <span>État de production</span>
+                  <span>
+                    {croissance === 1 && "Critique (0.4x)"}
+                    {croissance === 2 && "Faible (0.7x)"}
+                    {croissance === 3 && "Normal (1.0x)"}
+                    {croissance === 4 && "Bon (1.2x)"}
+                    {croissance === 5 && "Excellent (1.5x)"}
                   </span>
-                </>
-              )}
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="px-6 pb-6 pt-0 grid gap-5 flex-1 flex flex-col relative z-10">
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
-            <div className="text-[10px] uppercase tracking-widest text-muted font-bold mb-1 opacity-60">Arbres</div>
-            <div className="text-lg font-bold tracking-tighter">{formatNumber(lot.nbArbres)}</div>
-          </div>
-          <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
-            <div className="text-[10px] uppercase tracking-widest text-muted font-bold mb-1 opacity-60">Potentiel</div>
-            <div className="text-lg font-bold tracking-tighter text-primary truncate">{formatProduction(prod, age)}</div>
-          </div>
-          <div className="rounded-[1.5rem] border border-border/40 bg-background/40 backdrop-blur-md p-4 group-hover:bg-background/60 transition-colors">
-            <div className="text-[10px] uppercase tracking-widest text-muted font-bold mb-1 opacity-60">Santé IA</div>
-            <div className={`text-lg font-bold tracking-tighter ${health.colorClass}`}>
-              {health.total}<span className="text-xs opacity-40">/100</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-2 bg-background/30 p-3 rounded-2xl border border-border/20">
-          {[
-            { label: "Rendement", val: health.breakdown.yield, color: health.breakdown.yield < 50 ? 'from-danger/80 to-danger' : health.breakdown.yield < 80 ? 'from-warning/80 to-warning' : 'from-success/80 to-success' },
-            { label: "Eau", val: health.breakdown.water, color: health.breakdown.water < 50 ? 'from-danger/80 to-danger' : health.breakdown.water < 80 ? 'from-warning/80 to-warning' : 'from-success/80 to-success' },
-            { label: "Finances", val: health.breakdown.financial, color: health.breakdown.financial < 50 ? 'from-danger/80 to-danger' : health.breakdown.financial < 80 ? 'from-warning/80 to-warning' : 'from-success/80 to-success' },
-            { label: "Santé", val: health.breakdown.stress, color: health.breakdown.stress < 50 ? 'from-danger/80 to-danger' : health.breakdown.stress < 80 ? 'from-warning/80 to-warning' : 'from-success/80 to-success' },
-          ].map((p, idx) => (
-            <div key={idx} className="space-y-1.5">
-              <div className="flex justify-between items-center px-0.5">
-                <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">{p.label}</span>
-                <span className="text-xs font-bold tabular-nums">{p.val}%</span>
+                </div>
+                <div className="flex gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setCroissance(star)}
+                      className={cn("p-1 rounded transition-colors", star <= croissance ? "text-warning" : "text-muted")}
+                    >
+                      <Star className={cn("w-4 h-4", star <= croissance && "fill-current")} />
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="h-1.5 w-full bg-background/50 rounded-full overflow-hidden border border-border/10 shadow-inner">
-                <div 
-                  className={`h-full transition-all duration-1000 ease-out bg-gradient-to-r ${p.color}`} 
-                  style={{ width: `${p.val}%` }} 
-                />
+
+              {/* Stress level */}
+              <div className="space-y-1">
+                <div className="text-xs font-medium text-muted">État de Santé</div>
+                <div className="flex gap-1.5">
+                  {[
+                    { id: "bas" as StressLevel, label: "Excellente" },
+                    { id: "moyen" as StressLevel, label: "Moyenne" },
+                    { id: "eleve" as StressLevel, label: "Faible" },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setStress(s.id)}
+                      className={cn(
+                        "flex-1 py-1.5 px-2 rounded-md border text-xs font-semibold transition-colors",
+                        stress === s.id
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-card border-border text-muted hover:border-primary/40"
+                      )}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          ))}
-        </div>
+          ) : (
+            /* View mode: health pillars + actions */
+            <div className="space-y-3">
+              {/* Mobile stats */}
+              <div className="grid grid-cols-3 gap-2 sm:hidden text-center">
+                <div className="rounded-md border border-border bg-card py-2">
+                  <div className="font-bold text-sm">{formatNumber(lot.nbArbres)}</div>
+                  <div className="text-[10px] text-muted uppercase">Arbres</div>
+                </div>
+                <div className="rounded-md border border-border bg-card py-2">
+                  <div className="font-bold text-sm text-primary">{formatProduction(prod, age)}</div>
+                  <div className="text-[10px] text-muted uppercase">Potentiel</div>
+                </div>
+                <div className="rounded-md border border-border bg-card py-2">
+                  <div className="font-bold text-sm">{formatMoneyDT(cost)}</div>
+                  <div className="text-[10px] text-muted uppercase">Investi</div>
+                </div>
+              </div>
 
-        <div className="mt-auto flex items-center justify-between pt-2">
-          <div className="text-xs text-muted">
-            Invest: <span className="font-semibold text-foreground">{formatMoneyDT(cost)}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-muted opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
-              onClick={() => setIsEditing(true)}
-              title="Modifier le lot"
-            >
-              <Edit2 className="w-4 h-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-danger opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 p-0" 
-              onClick={() => {
-                if (confirm(`Voulez-vous vraiment supprimer le lot "${lot.nom}" ? Cette action est irréversible.`)) {
-                  farm.actions.removeBatch(lot.id);
-                }
-              }}
-              title="Supprimer le lot"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-            <Link href={`/lots/${lot.id}`}>
-              <Button size="sm" variant="secondary" className="h-8 ml-1" title="Voir les détails et l'historique">Détails</Button>
-            </Link>
-          </div>
+              {/* Pillar bars */}
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                {[
+                  { label: "Rendement", val: health.breakdown.yield },
+                  { label: "Eau", val: health.breakdown.water },
+                  { label: "Finances", val: health.breakdown.financial },
+                  { label: "Santé", val: health.breakdown.stress },
+                ].map((p) => (
+                  <div key={p.label}>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted font-medium">{p.label}</span>
+                      <span className="font-semibold tabular-nums">{p.val}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-border overflow-hidden">
+                      <div
+                        className={cn(
+                          "h-full rounded-full",
+                          p.val >= 80 ? "bg-success" : p.val >= 50 ? "bg-warning" : "bg-danger"
+                        )}
+                        style={{ width: `${p.val}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-xs text-muted">
+                  Investi: <span className="font-semibold text-foreground">{formatMoneyDT(cost)}</span>
+                </span>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)} title="Modifier">
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-danger" onClick={handleDelete} title="Supprimer">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                  <Link href={`/lots/${lot.id}`}>
+                    <Button size="sm" variant="outline">Détails</Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
-

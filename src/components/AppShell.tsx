@@ -1,101 +1,131 @@
 "use client";
 
-import { useEffect } from "react";
-
+import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import {
   BarChart3,
-  Sprout,
-  Wallet,
   Layers,
-  BrainCircuit,
+  Wallet,
   TrendingUp,
   CloudRain,
-  Moon,
-  Sun,
+  BrainCircuit,
+  Bell,
+  Settings,
+  Leaf,
 } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
-import dynamic from "next/dynamic";
-const CommandPalette = dynamic(() => import("./CommandPalette").then(mod => mod.CommandPalette), { ssr: false });
-import { Search, Command as CommandIcon, Bell } from "lucide-react";
-import { WeatherEffects } from "./WeatherEffects";
 
 const nav = [
-  { href: "/", label: "Résumé", icon: BarChart3 },
-  { href: "/pluviometrie", label: "Météo", icon: CloudRain },
-  { href: "/lots", label: "Lots", icon: Layers },
-  { href: "/depenses", label: "Dépenses", icon: Wallet },
-  { href: "/projections", label: "Prévisions", icon: TrendingUp },
+  { href: "/",             label: "Résumé",    icon: BarChart3 },
+  { href: "/lots",         label: "Lots",       icon: Layers    },
+  { href: "/depenses",     label: "Dépenses",   icon: Wallet    },
+  { href: "/projections",  label: "Prévisions", icon: TrendingUp },
+  { href: "/pluviometrie", label: "Météo",      icon: CloudRain },
 ];
 
-import Image from "next/image";
+const secondaryNav = [
+  { href: "/memory",        label: "Mémoire",       icon: BrainCircuit },
+  { href: "/notifications", label: "Alertes",        icon: Bell         },
+  { href: "/structure",     label: "Configuration",  icon: Settings     },
+];
 
 export function AppShell({
   title,
-  children,
   actions,
+  children,
 }: {
   title?: string;
   actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const { theme } = useTheme();
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then((registration) => console.log("SW registered:", registration))
-        .catch((error) => console.log("SW registration failed:", error));
-    }
-  }, []);
+  const { theme, setTheme } = useTheme();
 
   return (
-    <div className="min-h-dvh flex flex-col bg-background text-foreground transition-colors duration-300">
-      <WeatherEffects />
-      <header className="sticky top-0 z-10 border-b border-border/40 bg-background/70 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70 shadow-sm print:hidden">
-        <div className="mx-auto w-full max-w-4xl px-4 py-3 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
-          <div className="flex items-center gap-3 min-w-0">
-            <Image src="/logo.png" alt="Senya Logo" width={36} height={36} className="bg-white rounded-xl shadow-sm border border-border/50" />
-            <div className="flex flex-col">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent leading-none pb-0.5">
-                Senya
-              </h1>
+    <div className="min-h-dvh flex bg-background text-foreground">
+      {/* ── Desktop sidebar ──────────────────────────────────── */}
+      <aside className="hidden lg:flex flex-col fixed inset-y-0 left-0 z-20 border-r border-border bg-card"
+             style={{ width: "var(--sidebar-width, 220px)" }}>
+        {/* Logo */}
+        <div className="flex items-center gap-2.5 px-4 py-4 border-b border-border shrink-0">
+          <div className="w-7 h-7 rounded bg-primary/10 flex items-center justify-center shrink-0">
+            <Leaf className="w-4 h-4 text-primary" />
+          </div>
+          <span className="font-bold text-sm tracking-tight text-foreground">Senya</span>
+        </div>
+
+        {/* Primary nav */}
+        <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+          {nav.map((item) => (
+            <SidebarItem key={item.href} {...item} />
+          ))}
+
+          <div className="pt-4 pb-1 px-2">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted">
+              Outils
+            </span>
+          </div>
+
+          {secondaryNav.map((item) => (
+            <SidebarItem key={item.href} {...item} />
+          ))}
+        </nav>
+
+        {/* Theme toggle */}
+        <div className="border-t border-border px-3 py-3 shrink-0">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "day" : "dark")}
+            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-muted hover:text-foreground hover:bg-secondary transition-colors"
+          >
+            <span className="text-base">{theme === "dark" ? "☀️" : "🌙"}</span>
+            <span className="font-medium">{theme === "dark" ? "Mode clair" : "Mode sombre"}</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Main content area ────────────────────────────────── */}
+      <div className="flex flex-col flex-1 min-w-0 lg:pl-[var(--sidebar-width,220px)]">
+        {/* Mobile / page header */}
+        <header className="sticky top-0 z-10 lg:hidden border-b border-border bg-card/95 backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-2 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center">
+                <Leaf className="w-3.5 h-3.5 text-primary" />
+              </div>
+              <span className="font-bold text-sm text-foreground">Senya</span>
               {title && (
-                <div className="text-xs font-medium text-muted uppercase tracking-wider">
-                  {title}
-                </div>
+                <span className="text-muted text-sm">/ {title}</span>
               )}
             </div>
+            <div className="flex items-center gap-1">
+              {actions}
+            </div>
+          </div>
+        </header>
+
+        {/* Desktop page header */}
+        <header className="hidden lg:flex items-center justify-between gap-4 px-6 py-4 border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-10">
+          <div className="flex items-center gap-2">
+            {title && (
+              <h1 className="text-sm font-semibold text-foreground">{title}</h1>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: true }))}
-              className="hidden sm:flex items-center gap-2 h-10 px-3 rounded-xl bg-muted/5 text-muted hover:bg-muted/10 transition-all border border-border/20 group"
-              title="Rechercher (Ctrl+K)"
-            >
-              <Search className="w-4 h-4 group-hover:text-primary transition-colors" />
-              <span className="text-xs font-bold uppercase tracking-wider">Rechercher</span>
-              <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-background border border-border/40 text-[10px]">
-                <CommandIcon className="w-2.5 h-2.5" /> K
-              </div>
-            </button>
-            <div className="shrink-0">{actions}</div>
+            {actions}
           </div>
-        </div>
-      </header>
+        </header>
 
-      <CommandPalette />
+        <main className="flex-1 px-4 lg:px-6 py-5 pb-28 lg:pb-8">
+          {children}
+        </main>
+      </div>
 
-      <main className="flex-1 mx-auto w-full max-w-4xl px-4 py-6 pb-28 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both delay-100 print:pb-0 print:py-0">
-        {children}
-      </main>
-
-      <nav className="fixed bottom-0 left-0 right-0 border-t border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 pb-safe print:hidden">
-        <div className="mx-auto w-full max-w-4xl px-2 py-2 flex items-center justify-between overflow-x-auto no-scrollbar gap-1">
-          {nav.map((i) => (
-            <NavItem key={i.href} {...i} />
+      {/* ── Mobile bottom nav ────────────────────────────────── */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-20 border-t border-border bg-card/95 backdrop-blur-sm pb-safe">
+        <div className="flex items-center justify-around px-2 py-1.5">
+          {nav.map((item) => (
+            <MobileNavItem key={item.href} {...item} />
           ))}
         </div>
       </nav>
@@ -103,7 +133,7 @@ export function AppShell({
   );
 }
 
-function NavItem({
+function SidebarItem({
   href,
   label,
   icon: Icon,
@@ -114,19 +144,48 @@ function NavItem({
 }) {
   const pathname = usePathname();
   const active = pathname === href || (href !== "/" && pathname?.startsWith(href));
+
   return (
     <Link
       href={href}
       className={cn(
-        "group flex min-w-[64px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-all duration-300",
+        "flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-colors duration-150",
         active
-          ? "bg-primary/10 text-primary shadow-sm"
-          : "text-muted hover:bg-muted/10 hover:text-foreground",
+          ? "bg-primary/10 text-primary"
+          : "text-muted hover:text-foreground hover:bg-secondary"
       )}
     >
-      <Icon className={cn("h-5 w-5 shrink-0 transition-transform duration-300", active ? "scale-110" : "group-hover:scale-110")} />
-      <span className="leading-none whitespace-nowrap">{label}</span>
+      <Icon className={cn("w-4 h-4 shrink-0", active ? "text-primary" : "text-muted")} />
+      <span>{label}</span>
+      {active && (
+        <span className="ml-auto w-1 h-4 rounded-full bg-primary shrink-0" />
+      )}
     </Link>
   );
 }
 
+function MobileNavItem({
+  href,
+  label,
+  icon: Icon,
+}: {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  const pathname = usePathname();
+  const active = pathname === href || (href !== "/" && pathname?.startsWith(href));
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-md transition-colors",
+        active ? "text-primary" : "text-muted hover:text-foreground"
+      )}
+    >
+      <Icon className={cn("w-5 h-5 shrink-0", active && "text-primary")} />
+      <span className="text-[10px] font-medium leading-none">{label}</span>
+    </Link>
+  );
+}

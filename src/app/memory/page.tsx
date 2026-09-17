@@ -2,26 +2,36 @@
 
 import * as React from "react";
 import { AppShell } from "@/components/AppShell";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useFarmData } from "@/lib/useFarmData";
-import { formatDateLong, formatMoneyDT, formatKg } from "@/lib/format";
-import { BrainCircuit, Search, Wallet, ShieldAlert, CheckCircle2, Sprout, Plus, Printer, Trash2, Edit2 } from "lucide-react";
+import { formatMoneyDT, formatKg } from "@/lib/format";
+import {
+  Printer,
+  Plus,
+  Trash2,
+  Edit2,
+  X,
+  Check,
+  Search,
+  Sprout,
+  ShieldAlert,
+  Wallet,
+} from "lucide-react";
 import { Select } from "@/components/ui/Select";
+import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/cn";
 
 type MemoryEvent = {
   id: string;
   dateISO: string;
-  type: "expense" | "task" | "treatment" | "yield";
+  type: "expense" | "treatment" | "yield";
   title: string;
   subtitle?: string;
   lotId?: string;
   lotName?: string;
   amount?: number;
-  icon: React.ReactNode;
-  colorClass: string;
 };
 
 export default function MemoryPage() {
@@ -30,7 +40,7 @@ export default function MemoryPage() {
   const [filterType, setFilterType] = React.useState<string>("all");
   const [isAddYieldOpen, setIsAddYieldOpen] = React.useState(false);
 
-  // Add Yield Form State
+  // Add Yield form state
   const [selectedLotIds, setSelectedLotIds] = React.useState<Set<string>>(new Set());
   const [yDate, setYDate] = React.useState(new Date().toISOString().slice(0, 10));
   const [yQuantite, setYQuantite] = React.useState("");
@@ -39,123 +49,105 @@ export default function MemoryPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [editingEvent, setEditingEvent] = React.useState<MemoryEvent | null>(null);
 
-  if (farm.loading) return <AppShell title="Mémoire Agricole"><div className="p-8 text-center animate-pulse">Chargement de l'historique...</div></AppShell>;
+  if (farm.loading) {
+    return (
+      <AppShell title="Mémoire Agricole">
+        <p className="text-sm text-muted animate-pulse">Chargement de l'historique...</p>
+      </AppShell>
+    );
+  }
 
-  // Build Unified Timeline
-  const events: MemoryEvent[] = [];
-
-  // 1. Expenses
-  farm.depenses.forEach(e => {
-    events.push({
+  // Build unified timeline
+  const events: MemoryEvent[] = [
+    ...farm.depenses.map((e) => ({
       id: `exp-${e.id}`,
       dateISO: e.dateISO,
-      type: "expense",
+      type: "expense" as const,
       title: `Dépense : ${e.categorie}`,
-      subtitle: e.note || "Aucune note",
+      subtitle: e.note || undefined,
       lotId: e.lotId,
-      lotName: farm.lots.find(l => l.id === e.lotId)?.nom,
+      lotName: farm.lots.find((l) => l.id === e.lotId)?.nom,
       amount: e.montant,
-      icon: <Wallet className="w-4 h-4" />,
-      colorClass: "bg-danger/10 text-danger border-danger/20",
-    });
-  });
-
-  // 2. Treatments
-  farm.treatments.forEach(t => {
-    events.push({
+    })),
+    ...farm.treatments.map((t) => ({
       id: `trt-${t.id}`,
       dateISO: t.dateISO,
-      type: "treatment",
+      type: "treatment" as const,
       title: `Traitement : ${t.maladie}`,
       subtitle: t.produit + (t.notes ? ` (${t.notes})` : ""),
       lotId: t.lotId,
-      lotName: farm.lots.find(l => l.id === t.lotId)?.nom,
-      icon: <ShieldAlert className="w-4 h-4" />,
-      colorClass: "bg-warning/10 text-warning-foreground border-warning/20",
-    });
-  });
-
-
-
-  // 4. Yields
-  farm.yields.forEach(y => {
-    events.push({
+      lotName: farm.lots.find((l) => l.id === t.lotId)?.nom,
+    })),
+    ...farm.yields.map((y) => ({
       id: `yld-${y.id}`,
       dateISO: y.dateISO,
-      type: "yield",
-      title: `Récolte enregistrée`,
-      subtitle: y.note || "Aucune note",
+      type: "yield" as const,
+      title: "Récolte enregistrée",
+      subtitle: y.note || undefined,
       lotId: y.lotId,
-      lotName: farm.lots.find(l => l.id === y.lotId)?.nom,
-      amount: y.quantiteKg, // We will format this as Kg not money
-      icon: <Sprout className="w-4 h-4" />,
-      colorClass: "bg-success/10 text-success border-success/20",
-    });
-  });
+      lotName: farm.lots.find((l) => l.id === y.lotId)?.nom,
+      amount: y.quantiteKg,
+    })),
+  ].sort((a, b) => b.dateISO.localeCompare(a.dateISO));
 
-  // Sort descending by date
-  events.sort((a, b) => b.dateISO.localeCompare(a.dateISO));
-
-  // Filter
-  const filteredEvents = events.filter(e => {
+  const filteredEvents = events.filter((e) => {
     if (filterType !== "all" && e.type !== filterType) return false;
     if (search.trim()) {
       const q = search.toLowerCase();
-      const matchTitle = e.title.toLowerCase().includes(q);
-      const matchSub = e.subtitle?.toLowerCase().includes(q);
-      const matchLot = e.lotName?.toLowerCase().includes(q);
-      const matchYear = e.dateISO.includes(q);
-      if (!matchTitle && !matchSub && !matchLot && !matchYear) return false;
+      if (
+        !e.title.toLowerCase().includes(q) &&
+        !e.subtitle?.toLowerCase().includes(q) &&
+        !e.lotName?.toLowerCase().includes(q) &&
+        !e.dateISO.includes(q)
+      )
+        return false;
     }
     return true;
   });
 
-  async function handleAddYield(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleAddYield(ev: React.FormEvent) {
+    ev.preventDefault();
     if (selectedLotIds.size === 0 || !yQuantite || !yDate) return;
-
     setIsSubmitting(true);
     try {
       const totalQuantite = Number(yQuantite);
       const totalVendue = yQuantiteVendue ? Number(yQuantiteVendue) : undefined;
       const unitPrice = yPrixVente ? Number(yPrixVente) : undefined;
-      
+
       if (editingEvent) {
-        const id = editingEvent.id.substring(editingEvent.id.indexOf('-') + 1);
+        const id = editingEvent.id.slice(editingEvent.id.indexOf("-") + 1);
         await farm.actions.updateYield(id, {
           quantiteKg: totalQuantite,
           quantiteVendueKg: totalVendue,
           prixVenteUnitaire: unitPrice,
-          dateISO: yDate
+          dateISO: yDate,
         });
       } else {
-        const selectedLots = farm.lots.filter(l => selectedLotIds.has(l.id));
+        const selectedLots = farm.lots.filter((l) => selectedLotIds.has(l.id));
         const totalTrees = selectedLots.reduce((sum, l) => sum + l.nbArbres, 0);
-        
         for (const lot of selectedLots) {
-          const proportion = totalTrees > 0 ? (lot.nbArbres / totalTrees) : (1 / selectedLots.length);
-          const lotQuantite = Number((totalQuantite * proportion).toFixed(2));
-          const lotVendue = totalVendue !== undefined ? Number((totalVendue * proportion).toFixed(2)) : undefined;
-          
+          const prop = totalTrees > 0 ? lot.nbArbres / totalTrees : 1 / selectedLots.length;
           await farm.actions.addYield({
             lotId: lot.id,
             dateISO: yDate,
-            quantiteKg: lotQuantite,
-            quantiteVendueKg: lotVendue,
+            quantiteKg: Number((totalQuantite * prop).toFixed(2)),
+            quantiteVendueKg: totalVendue
+              ? Number((totalVendue * prop).toFixed(2))
+              : undefined,
             prixVenteUnitaire: unitPrice,
           });
         }
       }
-
       setIsAddYieldOpen(false);
       setEditingEvent(null);
       setSelectedLotIds(new Set());
       setYQuantite("");
       setYQuantiteVendue("");
       setYPrixVente("");
-    } catch (err: any) {
-      console.error("Erreur lors de l'enregistrement:", err);
-      alert("Erreur Supabase : " + (err.message || "Impossible d'enregistrer."));
+    } catch (err: unknown) {
+      alert(
+        "Erreur : " + (err instanceof Error ? err.message : "Impossible d'enregistrer.")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -164,9 +156,8 @@ export default function MemoryPage() {
   function openEditModal(e: MemoryEvent) {
     setEditingEvent(e);
     setYQuantite(String(e.amount || ""));
-    // We need to find the yield record to get vendue and prix
-    const id = e.id.substring(e.id.indexOf('-') + 1);
-    const yr = farm.yields.find(y => y.id === id);
+    const id = e.id.slice(e.id.indexOf("-") + 1);
+    const yr = farm.yields.find((y) => y.id === id);
     if (yr) {
       setYQuantiteVendue(String(yr.quantiteVendueKg || ""));
       setYPrixVente(String(yr.prixVenteUnitaire || ""));
@@ -176,204 +167,299 @@ export default function MemoryPage() {
     setIsAddYieldOpen(true);
   }
 
-  async function handleDeleteEvent(e: MemoryEvent) {
-    if (!confirm("Voulez-vous vraiment supprimer cet événement ?")) return;
-    
-    try {
-      const id = e.id.substring(e.id.indexOf('-') + 1);
-      if (e.type === "yield") {
-        await farm.actions.removeYield(id);
-      } else if (e.type === "expense") {
-        await farm.actions.removeExpense(id);
-      } else if (e.type === "treatment") {
-        await farm.actions.removeTreatment(id);
-      }
-    } catch (err: any) {
-      alert("Erreur lors de la suppression : " + err.message);
-    }
+  async function handleDelete(e: MemoryEvent) {
+    if (!confirm("Supprimer cet événement ?")) return;
+    const id = e.id.slice(e.id.indexOf("-") + 1);
+    if (e.type === "yield") await farm.actions.removeYield(id);
+    else if (e.type === "expense") await farm.actions.removeExpense(id);
+    else if (e.type === "treatment") await farm.actions.removeTreatment(id);
   }
 
+  const typeConfig = {
+    expense: {
+      icon: <Wallet className="w-3.5 h-3.5" />,
+      badge: "danger" as const,
+      label: "Dépense",
+    },
+    treatment: {
+      icon: <ShieldAlert className="w-3.5 h-3.5" />,
+      badge: "warning" as const,
+      label: "Traitement",
+    },
+    yield: {
+      icon: <Sprout className="w-3.5 h-3.5" />,
+      badge: "success" as const,
+      label: "Récolte",
+    },
+  };
+
   return (
-    <AppShell 
+    <AppShell
       title="Mémoire Agricole"
       actions={
-        <Button size="sm" variant="secondary" className="gap-2 print:hidden rounded-xl shadow-lg font-bold uppercase tracking-widest text-xs" onClick={() => window.print()}>
-          <Printer className="w-4 h-4" />
-          Exporter
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5 print:hidden"
+            onClick={() => window.print()}
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Exporter</span>
+          </Button>
+          <Button
+            size="sm"
+            className="gap-1.5 print:hidden"
+            onClick={() => { setEditingEvent(null); setIsAddYieldOpen(true); }}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Récolte
+          </Button>
+        </div>
       }
     >
-      <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
-        
-        {/* HEADER */}
-        <div className="px-2 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
-              Mémoire de la Ferme
-            </h1>
-            <p className="text-muted-foreground font-medium pt-1 max-w-md text-lg">Le grand livre d'histoire de votre exploitation. Archivez chaque action pour nourrir l'intelligence de demain.</p>
-          </div>
-          
-          <Button size="lg" className="gap-2 bg-primary shadow-xl shadow-primary/20 rounded-2xl font-bold uppercase tracking-widest text-xs h-14 px-8 print:hidden" onClick={() => setIsAddYieldOpen(true)}>
-            <Plus className="w-5 h-5" />
-            Saisir Récolte
-          </Button>
-
-          {/* Native Modal for Add Yield */}
-          {isAddYieldOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xl animate-in fade-in duration-300">
-              <div className="bg-card w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl border border-border/40 relative animate-in zoom-in-95 duration-500 overflow-hidden">
-                <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary via-emerald-400 to-primary" />
-                <h2 className="text-2xl font-bold tracking-tighter mb-6">{editingEvent ? "Modifier la récolte" : "Enregistrer une récolte"}</h2>
-                <form onSubmit={handleAddYield} className="space-y-6">
-                  {!editingEvent && (
-                    <div className="space-y-3">
-                      <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Affectation (Répartition auto)</div>
-                      <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1">
-                        {farm.lots.map(l => {
-                          const isSelected = selectedLotIds.has(l.id);
-                          return (
-                            <button
-                              key={l.id}
-                              type="button"
-                              onClick={() => {
-                                const next = new Set(selectedLotIds);
-                                if (next.has(l.id)) next.delete(l.id);
-                                else next.add(l.id);
-                                setSelectedLotIds(next);
-                              }}
-                              className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-xl border transition-all ${isSelected ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20' : 'bg-background hover:bg-muted border-border/40 text-muted-foreground'}`}
-                            >
-                              {l.nom}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {selectedLotIds.size === 0 && <div className="text-xs font-bold text-danger animate-pulse">SÉLECTIONNEZ UN LOT</div>}
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Date de récolte</div>
-                    <Input type="date" value={yDate} onChange={e => setYDate(e.target.value)} required className="h-12 rounded-xl bg-muted/5 font-bold" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Quantité Totale (kg)</div>
-                    <Input type="number" min="0" value={yQuantite} onChange={e => setYQuantite(e.target.value)} required placeholder="Ex: 1200" className="h-12 rounded-xl bg-muted/5 font-bold" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Qté Vendue (kg)</div>
-                      <Input type="number" min="0" value={yQuantiteVendue} onChange={e => setYQuantiteVendue(e.target.value)} placeholder="Optionnel" className="h-12 rounded-xl bg-muted/5 font-bold" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Prix (DT/kg)</div>
-                      <Input type="number" step="0.001" min="0" value={yPrixVente} onChange={e => setYPrixVente(e.target.value)} placeholder="Optionnel" className="h-12 rounded-xl bg-muted/5 font-bold" />
-                    </div>
-                  </div>
-                  <div className="flex gap-3 pt-4">
-                    <Button type="button" variant="ghost" className="flex-1 h-14 rounded-2xl font-bold uppercase tracking-widest text-xs" onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }} disabled={isSubmitting}>Annuler</Button>
-                    <Button type="submit" className="flex-1 h-14 rounded-2xl font-bold uppercase tracking-widest text-xs shadow-xl shadow-primary/20" disabled={isSubmitting || (!editingEvent && selectedLotIds.size === 0)}>
-                      {isSubmitting ? "Enregistrement..." : "Enregistrer"}
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* SEARCH & FILTERS */}
-        <div className="flex flex-col sm:flex-row gap-4 px-2 print:hidden">
-          <div className="relative flex-1 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted group-focus-within:text-primary transition-colors" />
-            <Input 
-              placeholder="Rechercher par lot, année, ou type d'événement..." 
+      <div className="space-y-4">
+        {/* Search + filter */}
+        <div className="flex gap-2 print:hidden">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+            <Input
+              placeholder="Rechercher par lot, date, événement..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-12 h-14 rounded-2xl bg-muted/5 border-border/40 focus:bg-background transition-all font-medium text-lg"
+              className="pl-9"
             />
           </div>
-          <select 
-            value={filterType} 
-            onChange={e => setFilterType(e.target.value)} 
-            className="h-14 w-full sm:w-[220px] rounded-2xl border border-border/40 bg-muted/5 px-4 py-2 text-xs font-bold uppercase tracking-widest focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
+          <Select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="w-40"
           >
-            <option value="all">Tout l'Historique</option>
+            <option value="all">Tout l'historique</option>
             <option value="yield">Récoltes</option>
             <option value="expense">Dépenses</option>
             <option value="treatment">Traitements</option>
-          </select>
+          </Select>
         </div>
 
-        {/* TIMELINE */}
-        <div className="relative ml-8 border-l-2 border-dashed border-border/60 space-y-10 pb-20">
-          {filteredEvents.length === 0 ? (
-            <div className="text-center py-20 bg-muted/5 rounded-[3rem] border-2 border-dashed border-border/40">
-              <div className="text-4xl mb-4 opacity-20">📂</div>
-              <div className="text-sm font-bold uppercase tracking-widest text-muted">Aucune archive trouvée</div>
-            </div>
-          ) : (
-            filteredEvents.map((event, index) => (
-              <div key={event.id} className="relative pl-10 animate-in fade-in slide-in-from-left-6 fill-mode-both group" style={{ animationDelay: `${index * 50}ms` }}>
-                {/* Timeline Dot */}
-                <div className={cn(
-                  "absolute -left-[17px] top-4 w-8 h-8 rounded-full border-4 border-background flex items-center justify-center shadow-xl transition-all duration-500 group-hover:scale-125 z-10",
-                  event.colorClass
-                )}>
-                  {event.icon}
-                </div>
-                
-                <Card className="glass-card rounded-[2.5rem] border-border/40 shadow-xl shadow-black/5 group-hover:shadow-primary/5 group-hover:border-primary/20 transition-all duration-500 overflow-hidden group-hover:-translate-y-1">
-                  <div className="p-8 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground bg-muted/10 px-3 py-1 rounded-full border border-border/20">
-                          {formatDateLong(event.dateISO)}
-                        </span>
-                        {event.lotName && (
-                          <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-                            {event.lotName}
-                          </span>
+        {/* Timeline */}
+        {filteredEvents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-lg border border-dashed border-border text-center">
+            <span className="text-3xl opacity-30">📂</span>
+            <p className="text-sm text-muted">Aucune archive trouvée</p>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-border bg-card overflow-hidden divide-y divide-border">
+            {filteredEvents.map((event) => {
+              const cfg = typeConfig[event.type];
+              return (
+                <div
+                  key={event.id}
+                  className="flex items-start gap-3 px-4 py-3 hover:bg-secondary/30 group transition-colors"
+                >
+                  {/* Type dot */}
+                  <div className="mt-0.5 shrink-0">
+                    <Badge variant={cfg.badge} className="gap-1">
+                      {cfg.icon}
+                      <span className="hidden sm:inline">{cfg.label}</span>
+                    </Badge>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="font-semibold text-sm">{event.title}</div>
+                        {event.subtitle && (
+                          <div className="text-xs text-muted mt-0.5 line-clamp-1">
+                            {event.subtitle}
+                          </div>
                         )}
                       </div>
-                      <h3 className="text-2xl font-bold tracking-tighter leading-tight">{event.title}</h3>
-                      {event.subtitle && <p className="text-sm font-medium text-muted-foreground italic">{event.subtitle}</p>}
-                    </div>
-                    
-                    <div className="flex items-center gap-6 shrink-0 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
                       {event.amount !== undefined && (
-                        <div className={`text-3xl font-bold tracking-tighter tabular-nums ${event.type === 'expense' ? 'text-danger' : 'text-success'}`}>
-                          {event.type === 'expense' ? `-${formatMoneyDT(event.amount)}` : `+${formatKg(event.amount)}`}
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
-                        {event.type === "yield" && (
-                          <button 
-                            onClick={() => openEditModal(event)}
-                            className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/10"
-                            title="Modifier"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                        )}
-                        <button 
-                          onClick={() => handleDeleteEvent(event)}
-                          className="w-10 h-10 rounded-xl bg-danger/10 text-danger flex items-center justify-center hover:bg-danger hover:text-white transition-all shadow-lg shadow-danger/10"
-                          title="Supprimer"
+                        <span
+                          className={cn(
+                            "font-bold text-sm shrink-0",
+                            event.type === "expense" ? "text-danger" : "text-success"
+                          )}
                         >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                          {event.type === "expense"
+                            ? `-${formatMoneyDT(event.amount)}`
+                            : `+${formatKg(event.amount)}`}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] text-muted">
+                        {new Date(event.dateISO).toLocaleDateString("fr-FR", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                      {event.lotName && (
+                        <Badge variant="primary" className="text-[9px]">
+                          {event.lotName}
+                        </Badge>
+                      )}
                     </div>
                   </div>
-                </Card>
-              </div>
-            ))
-          )}
-        </div>
 
+                  {/* Actions */}
+                  <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    {event.type === "yield" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted"
+                        onClick={() => openEditModal(event)}
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-danger"
+                      onClick={() => handleDelete(event)}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
+
+      {/* Add/Edit Yield modal */}
+      {isAddYieldOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsAddYieldOpen(false);
+              setEditingEvent(null);
+            }
+          }}
+        >
+          <div className="bg-card rounded-xl border border-border shadow-2xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold">
+                {editingEvent ? "Modifier la récolte" : "Enregistrer une récolte"}
+              </h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <form onSubmit={handleAddYield} className="space-y-3">
+              {!editingEvent && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted">Parcelles (répartition auto)</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {farm.lots.map((l) => {
+                      const isSel = selectedLotIds.has(l.id);
+                      return (
+                        <button
+                          key={l.id}
+                          type="button"
+                          onClick={() => {
+                            const next = new Set(selectedLotIds);
+                            if (next.has(l.id)) next.delete(l.id);
+                            else next.add(l.id);
+                            setSelectedLotIds(next);
+                          }}
+                          className={cn(
+                            "px-2.5 py-1 text-xs rounded-md border font-medium transition-colors",
+                            isSel
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-card border-border text-muted hover:border-primary/40"
+                          )}
+                        >
+                          {l.nom}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selectedLotIds.size === 0 && (
+                    <p className="text-[10px] text-danger font-medium">Sélectionnez au moins un lot</p>
+                  )}
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted">Date</label>
+                  <Input type="date" value={yDate} onChange={(e) => setYDate(e.target.value)} required />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted">Quantité totale (kg)</label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={yQuantite}
+                    onChange={(e) => setYQuantite(e.target.value)}
+                    required
+                    placeholder="1200"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted">Qté vendue (kg)</label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={yQuantiteVendue}
+                    onChange={(e) => setYQuantiteVendue(e.target.value)}
+                    placeholder="Optionnel"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted">Prix (DT/kg)</label>
+                  <Input
+                    type="number"
+                    step="0.001"
+                    min="0"
+                    value={yPrixVente}
+                    onChange={(e) => setYPrixVente(e.target.value)}
+                    placeholder="Optionnel"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => { setIsAddYieldOpen(false); setEditingEvent(null); }}
+                  disabled={isSubmitting}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={
+                    isSubmitting || (!editingEvent && selectedLotIds.size === 0)
+                  }
+                >
+                  {isSubmitting ? "Enregistrement..." : "Enregistrer"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
